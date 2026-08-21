@@ -123,12 +123,13 @@ GUI frontend features, or local development-environment failures in this file.
   class or `CNCA` artifact is present in the tested repository tree.
 - Workaround: `ZGG_GUI_CALENDAR` creates the native class by runtime name,
   catches unavailable-control failures, and calls release-dependent methods
-  dynamically. It runtime-compiles a native subroutine-pool adapter for
+  dynamically. Static include `ZGG_NATIVE_CALENDAR` declares handlers for
   `DATE_SELECTED` and `INFO_REQUEST`, registers the native event IDs, returns
   event ranges through ABAP memory, and deregisters before recreation or exit.
-  Adapter generation failure leaves the calendar's non-event behavior active.
-  Local structurally compatible date-info types keep the report importable
-  without declaring replacement SAP globals.
+  Local structurally compatible date-info types keep the owner report
+  importable without declaring replacement SAP globals. Because open-abap lacks
+  the calendar type surface, lint issue reporting is disabled only for this
+  native include; activation and event behavior remain native-SAP checks.
 - Upstream reference: Not reported
 
 ### The Dynamic Documents API is partial and its runtime behavior is stubbed
@@ -156,12 +157,12 @@ GUI frontend features, or local development-environment failures in this file.
   class name, calls the native API dynamically, and uses local structurally
   compatible option types. If the class is unavailable or returns no child
   areas, it displays a clear HTML fallback through `CL_GUI_HTML_VIEWER`. Static
-  event-handler declarations remain impossible until the missing element
-  classes and events are supplied. On native SAP, the report runtime-compiles
-  a typed subroutine-pool adapter for link/button `CLICKED`, input
-  `ENTERED`/`HELP_F1`, and select `SELECTED`. The adapter returns the sender name
-  and current value through ABAP memory and deregisters before reset or exit;
-  generation failure leaves the non-event document behavior active.
+  include `ZGG_NATIVE_DOCUMENT` declares typed handlers for link/button
+  `CLICKED`, input `ENTERED`/`HELP_F1`, and select `SELECTED`. It returns the
+  sender name and current value through ABAP memory and deregisters before reset
+  or exit. Because open-abap lacks the element classes and events, lint issue
+  reporting is disabled only for this native include; activation and event
+  behavior remain native-SAP checks.
 - Upstream reference: Not reported
 
 ### Tree control coverage is partial and runtime methods are stubbed
@@ -193,10 +194,11 @@ GUI frontend features, or local development-environment failures in this file.
   fallback. It uses the statically available tree surface where possible and
   invokes missing but native node-movement APIs dynamically. The class-audit
   action reports which GUI and model variants exist on the current system.
-  `ZGG_GUI_ALV_TREE` runtime-compiles a typed handler for the missing native
-  `NODE_CONTEXT_MENU_REQUEST`, preserves the tree's existing frontend event
-  registrations, adds two menu commands, and deregisters the handler on exit.
-  Adapter failure leaves the statically available tree events active.
+  Static include `ZGG_NATIVE_ALV_TREE` declares a typed handler for the missing
+  native `NODE_CONTEXT_MENU_REQUEST`, preserves the tree's existing frontend
+  event registrations, adds two menu commands, and deregisters the handler on
+  exit. Lint issue reporting is disabled only for this native include;
+  activation and event behavior remain native-SAP checks.
 - Upstream reference: Not reported
 
 ### SALV table API is declared but core runtime behavior is stubbed
@@ -354,12 +356,12 @@ GUI frontend features, or local development-environment failures in this file.
   CL_GUI_ALV_GRID` and run `npm test`; abaplint reports that the event does not
   exist. Inspect the grid and drag/drop implementations at the tested commit
   for the placeholder bodies.
-- Workaround: The sample runtime-compiles a typed handler for the missing
-  callback, registers `MC_EVT_DELAYED_CHANGE_SELECT`, preserves the requested
-  adapter across application/system event-mode recreation, and deregisters it
-  before freeing the grid. Adapter generation failure leaves all statically
-  declared handlers available for native SAP, with guarded grid construction
-  and a text fallback under open-abap.
+- Workaround: Static include `ZGG_NATIVE_ALV_EVENTS` declares a typed handler
+  for the missing callback, registers `MC_EVT_DELAYED_CHANGE_SELECT`, preserves
+  the handler across application/system event-mode recreation, and deregisters
+  it before freeing the grid. Lint issue reporting is disabled only for this
+  native include; activation and event behavior remain native-SAP checks. Grid
+  construction stays guarded with a text fallback under open-abap.
 - Upstream reference: Not reported
 
 ### SALV tree class family is missing
@@ -380,10 +382,11 @@ GUI frontend features, or local development-environment failures in this file.
   and run `npm test`; abaplint reports the unknown type. Repository searches for
   the SALV tree class family at the tested commit return no files.
 - Workaround: `ZGG_GUI_SALV_TREE` invokes the native factory and helper methods
-  dynamically and displays a text fallback when unavailable. It
-  runtime-compiles a typed adapter for native `LINK_CLICK` and `DOUBLE_CLICK`,
-  returns node and column payloads through ABAP memory, and deregisters on
-  exit. Adapter failure leaves the non-event tree behavior active.
+  dynamically and displays a text fallback when unavailable. Static include
+  `ZGG_NATIVE_SALV_TREE` declares typed native `LINK_CLICK` and `DOUBLE_CLICK`
+  handlers, returns node and column payloads through ABAP memory, and
+  deregisters on exit. Lint issue reporting is disabled only for this native
+  include; activation and event behavior remain native-SAP checks.
 - Upstream reference: Not reported
 
 ### Hierarchical-sequential SALV class family is missing
@@ -406,10 +409,11 @@ GUI frontend features, or local development-environment failures in this file.
   SALV classes.
 - Workaround: `ZGG_GUI_SALV_HIERSEQ` uses a local structurally compatible
   master/slave binding table and invokes the native factory and level methods
-  dynamically with the native `T_BINDING_LEVEL1_LEVEL2` contract. It
-  runtime-compiles a typed adapter for `LINK_CLICK` and `DOUBLE_CLICK`, records
-  level, row, and column payloads, and deregisters on exit. Adapter failure
-  leaves the non-event list behavior active.
+  dynamically with the native `T_BINDING_LEVEL1_LEVEL2` contract. Static include
+  `ZGG_NATIVE_SALV_HSEQ` declares typed `LINK_CLICK` and `DOUBLE_CLICK` handlers,
+  records level, row, and column payloads, and deregisters on exit. Lint issue
+  reporting is disabled only for this native include; activation and event
+  behavior remain native-SAP checks.
 - Upstream reference: Not reported
 
 ### Frontend Services is partial, stubbed, and has signature differences
@@ -552,10 +556,9 @@ GUI frontend features, or local development-environment failures in this file.
   CL_GUI_PICTURE`, or pass `CNDP_LIFETIME_TRANSACTION` to `DP_CREATE_URL`, and
   run `npm test`.
 - Workaround: The format fixtures use the documented transaction lifetime
-  value `'T'`. The report runtime-compiles a small native subroutine-pool
-  adapter that declares the real click/double-click handlers only when the
-  target system can compile them, registers both event IDs, returns coordinates
-  through ABAP memory, and deregisters during cleanup. Generation or
-  registration failure leaves loading and display behavior active with a
-  diagnostic status instead of terminating the report.
+  value `'T'`. Static include `ZGG_NATIVE_PICTURE` declares the real
+  click/double-click handlers, registers both event IDs, returns coordinates
+  through ABAP memory, and deregisters during cleanup. Lint issue reporting is
+  disabled only for this native include because open-abap lacks the event;
+  activation and event behavior remain native-SAP checks.
 - Upstream reference: Not reported

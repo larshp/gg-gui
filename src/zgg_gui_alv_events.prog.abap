@@ -62,9 +62,10 @@ DATA gv_status TYPE c LENGTH 108.
 DATA gv_detail TYPE c LENGTH 108.
 DATA gv_event_count TYPE i.
 DATA gv_application_events TYPE abap_bool VALUE abap_true.
-DATA gv_native_event_program TYPE c LENGTH 8.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_delayed_requested TYPE abap_bool.
+
+INCLUDE zgg_native_alv_events.
 
 CLASS lcl_drag_payload IMPLEMENTATION.
   METHOD constructor.
@@ -379,79 +380,6 @@ FORM register_delayed.
   ENDIF.
 ENDFORM.
 
-FORM register_native_delayed_event.
-  DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
-  DATA lv_message TYPE string.
-
-  IF gv_native_events_registered = abap_true.
-    RETURN.
-  ENDIF.
-  IF gv_native_event_program IS INITIAL.
-    lt_source = VALUE #(
-      ( `PROGRAM SUBPOOL.` )
-      ( `CLASS lcl_events DEFINITION DEFERRED.` )
-      ( `DATA go_events TYPE REF TO lcl_events.` )
-      ( `DATA go_grid TYPE REF TO cl_gui_alv_grid.` )
-      ( `CLASS lcl_events DEFINITION.` )
-      ( `  PUBLIC SECTION.` )
-      ( `    METHODS on_delayed FOR EVENT delayed_changed_sel_callback` )
-      ( `      OF cl_gui_alv_grid.` )
-      ( `ENDCLASS.` )
-      ( `CLASS lcl_events IMPLEMENTATION.` )
-      ( `  METHOD on_delayed.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'DELAYED_SELECTION'.` )
-      ( `    EXPORT event = lv_event TO MEMORY ID 'ZGG_GUI_ALV_DELAYED'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'ALV_DELAYED' ).` )
-      ( `  ENDMETHOD.` )
-      ( `ENDCLASS.` )
-      ( `FORM register USING io_grid TYPE REF TO object` )
-      ( `    CHANGING cv_registered TYPE abap_bool.` )
-      ( `  CLEAR cv_registered.` )
-      ( `  go_grid ?= io_grid.` )
-      ( `  CREATE OBJECT go_events.` )
-      ( `  SET HANDLER go_events->on_delayed FOR go_grid.` )
-      ( `  CALL METHOD go_grid->register_delayed_event` )
-      ( `    EXPORTING i_event_id = cl_gui_alv_grid=>mc_evt_delayed_change_select.` )
-      ( `  cv_registered = abap_true.` )
-      ( `ENDFORM.` )
-      ( `FORM unregister.` )
-      ( `  IF go_events IS BOUND AND go_grid IS BOUND.` )
-      ( `    SET HANDLER go_events->on_delayed FOR go_grid ACTIVATION space.` )
-      ( `  ENDIF.` )
-      ( `  FREE: go_events, go_grid.` )
-      ( `ENDFORM.` ) ).
-
-    GENERATE SUBROUTINE POOL lt_source
-      NAME gv_native_event_program MESSAGE lv_message.
-    IF sy-subrc <> 0 OR gv_native_event_program IS INITIAL.
-      CLEAR: gv_native_event_program, gv_native_events_registered.
-      gv_status = |Native delayed-event adapter did not compile: { lv_message }|.
-      gv_detail = 'Other statically declared ALV event handlers remain active'.
-      RETURN.
-    ENDIF.
-  ENDIF.
-
-  TRY.
-      PERFORM register IN PROGRAM (gv_native_event_program)
-        USING go_grid CHANGING gv_native_events_registered.
-    CATCH cx_root INTO DATA(lx_event_error).
-      CLEAR gv_native_events_registered.
-      gv_status = |Native delayed-event registration failed: { lx_event_error->get_text( ) }|.
-  ENDTRY.
-ENDFORM.
-
-FORM unregister_delayed_event.
-  IF gv_native_event_program IS NOT INITIAL AND
-      gv_native_events_registered = abap_true.
-    TRY.
-        PERFORM unregister IN PROGRAM (gv_native_event_program) IF FOUND.
-      CATCH cx_root.
-    ENDTRY.
-  ENDIF.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_ALV_DELAYED'.
-ENDFORM.
-
 FORM request_print_events.
   IF go_grid IS NOT BOUND.
     RETURN.
@@ -507,7 +435,6 @@ ENDFORM.
 
 FORM free_controls.
   PERFORM unregister_delayed_event.
-  CLEAR gv_native_event_program.
   FREE: go_events, go_dragdrop.
   IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.

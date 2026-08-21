@@ -30,11 +30,12 @@ DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_status TYPE c LENGTH 108.
 DATA gv_detail TYPE c LENGTH 108.
 DATA gv_sequence TYPE i VALUE 500.
-DATA gv_native_event_program TYPE c LENGTH 8.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_salv_event TYPE c LENGTH 24.
 DATA gv_event_node TYPE string.
 DATA gv_event_column TYPE c LENGTH 40.
+
+INCLUDE zgg_native_salv_tree.
 
 START-OF-SELECTION.
   CALL SCREEN 100.
@@ -118,7 +119,7 @@ FORM create_controls.
       IF gv_native_events_registered = abap_true.
         gv_status = 'Native SALV tree created with link-click and double-click events'.
       ELSE.
-        gv_status = 'Native SALV tree created; native event adapter unavailable'.
+        gv_status = 'Native SALV tree created; native event handler unavailable'.
       ENDIF.
       gv_detail = 'The report uses dynamic calls because the complete SALV tree class family is missing from open-abap'.
     CATCH cx_root INTO DATA(lx_error).
@@ -128,85 +129,6 @@ FORM create_controls.
   ENDTRY.
 ENDFORM.
 
-FORM register_salv_tree_events.
-  DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
-  DATA lv_message TYPE string.
-
-  IF gv_native_event_program IS INITIAL.
-    lt_source = VALUE #(
-      ( `PROGRAM SUBPOOL.` )
-      ( `CLASS lcl_events DEFINITION DEFERRED.` )
-      ( `DATA go_events TYPE REF TO lcl_events.` )
-      ( `DATA go_tree TYPE REF TO cl_salv_tree.` )
-      ( `DATA go_salv_events TYPE REF TO cl_salv_events_tree.` )
-      ( `CLASS lcl_events DEFINITION.` )
-      ( `  PUBLIC SECTION.` )
-      ( `    METHODS on_link FOR EVENT link_click OF cl_salv_events_tree` )
-      ( `      IMPORTING columnname node_key.` )
-      ( `    METHODS on_double FOR EVENT double_click OF cl_salv_events_tree` )
-      ( `      IMPORTING columnname node_key.` )
-      ( `ENDCLASS.` )
-      ( `CLASS lcl_events IMPLEMENTATION.` )
-      ( `  METHOD on_link.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'LINK_CLICK'.` )
-      ( `    EXPORT event = lv_event node_key = node_key columnname = columnname` )
-      ( `      TO MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'SALV_EVT' ).` )
-      ( `  ENDMETHOD.` )
-      ( `  METHOD on_double.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'DOUBLE_CLICK'.` )
-      ( `    EXPORT event = lv_event node_key = node_key columnname = columnname` )
-      ( `      TO MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'SALV_EVT' ).` )
-      ( `  ENDMETHOD.` )
-      ( `ENDCLASS.` )
-      ( `FORM register USING io_tree TYPE REF TO object` )
-      ( `    CHANGING cv_registered TYPE abap_bool.` )
-      ( `  CLEAR cv_registered.` )
-      ( `  go_tree ?= io_tree.` )
-      ( `  go_salv_events = go_tree->get_event( ).` )
-      ( `  CREATE OBJECT go_events.` )
-      ( `  SET HANDLER go_events->on_link FOR go_salv_events.` )
-      ( `  SET HANDLER go_events->on_double FOR go_salv_events.` )
-      ( `  cv_registered = abap_true.` )
-      ( `ENDFORM.` )
-      ( `FORM unregister.` )
-      ( `  IF go_events IS BOUND AND go_salv_events IS BOUND.` )
-      ( `    SET HANDLER go_events->on_link FOR go_salv_events ACTIVATION space.` )
-      ( `    SET HANDLER go_events->on_double FOR go_salv_events ACTIVATION space.` )
-      ( `  ENDIF.` )
-      ( `  FREE: go_events, go_salv_events, go_tree.` )
-      ( `ENDFORM.` ) ).
-
-    GENERATE SUBROUTINE POOL lt_source
-      NAME gv_native_event_program MESSAGE lv_message.
-    IF sy-subrc <> 0 OR gv_native_event_program IS INITIAL.
-      CLEAR: gv_native_event_program, gv_native_events_registered.
-      gv_detail = |Native SALV tree event adapter did not compile: { lv_message }|.
-      RETURN.
-    ENDIF.
-  ENDIF.
-
-  TRY.
-      PERFORM register IN PROGRAM (gv_native_event_program)
-        USING go_tree CHANGING gv_native_events_registered.
-    CATCH cx_root INTO DATA(lx_event_error).
-      CLEAR gv_native_events_registered.
-      gv_detail = |Native SALV tree event registration failed: { lx_event_error->get_text( ) }|.
-  ENDTRY.
-ENDFORM.
-
-FORM unregister_salv_tree_events.
-  IF gv_native_event_program IS NOT INITIAL AND
-      gv_native_events_registered = abap_true.
-    TRY.
-        PERFORM unregister IN PROGRAM (gv_native_event_program) IF FOUND.
-      CATCH cx_root.
-    ENDTRY.
-  ENDIF.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.
-ENDFORM.
 
 FORM populate_nodes.
   DATA ls_empty TYPE ty_row.
@@ -385,7 +307,6 @@ ENDFORM.
 
 FORM free_controls.
   PERFORM unregister_salv_tree_events.
-  CLEAR gv_native_event_program.
   FREE: go_nodes, go_columns, go_functions, go_selections, go_tree.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
   IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.

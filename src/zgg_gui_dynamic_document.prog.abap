@@ -25,11 +25,12 @@ DATA gv_status TYPE c LENGTH 108.
 DATA gv_detail TYPE c LENGTH 108.
 DATA gv_value TYPE c LENGTH 250 VALUE 'Initial form value'.
 DATA gv_refresh_count TYPE i.
-DATA gv_native_event_program TYPE c LENGTH 8.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_document_event TYPE c LENGTH 24.
 DATA gv_event_element TYPE c LENGTH 40.
 DATA gv_event_value TYPE c LENGTH 250.
+
+INCLUDE zgg_native_document.
 
 START-OF-SELECTION.
   CALL SCREEN 100.
@@ -106,7 +107,7 @@ FORM create_document.
       IF gv_native_events_registered = abap_true.
         gv_status = 'Native Dynamic Document created; five element events registered'.
       ELSE.
-        gv_status = 'Native Dynamic Document created; native element event adapter unavailable'.
+        gv_status = 'Native Dynamic Document created; native element event handler unavailable'.
       ENDIF.
       gv_detail = 'Use Refresh value to update one retained form element without reconstructing the table'.
     CATCH cx_root INTO DATA(lx_error).
@@ -200,126 +201,6 @@ FORM populate_document USING iv_reuse TYPE abap_bool.
       reuse_registration = iv_reuse.
 ENDFORM.
 
-FORM register_document_events.
-  DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
-  DATA lv_message TYPE string.
-
-  IF gv_native_event_program IS INITIAL.
-    lt_source = VALUE #(
-      ( `PROGRAM SUBPOOL.` )
-      ( `CLASS lcl_events DEFINITION DEFERRED.` )
-      ( `DATA go_events TYPE REF TO lcl_events.` )
-      ( `DATA go_link TYPE REF TO cl_dd_link_element.` )
-      ( `DATA go_button TYPE REF TO cl_dd_button_element.` )
-      ( `DATA go_input TYPE REF TO cl_dd_input_element.` )
-      ( `DATA go_select TYPE REF TO cl_dd_select_element.` )
-      ( `CLASS lcl_events DEFINITION.` )
-      ( `  PUBLIC SECTION.` )
-      ( `    METHODS on_link FOR EVENT clicked OF cl_dd_link_element IMPORTING sender.` )
-      ( `    METHODS on_button FOR EVENT clicked OF cl_dd_button_element IMPORTING sender.` )
-      ( `    METHODS on_entered FOR EVENT entered OF cl_dd_input_element IMPORTING sender.` )
-      ( `    METHODS on_help FOR EVENT help_f1 OF cl_dd_input_element IMPORTING sender.` )
-      ( `    METHODS on_selected FOR EVENT selected OF cl_dd_select_element IMPORTING sender.` )
-      ( `ENDCLASS.` )
-      ( `CLASS lcl_events IMPLEMENTATION.` )
-      ( `  METHOD on_link.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'LINK_CLICKED'.` )
-      ( `    DATA lv_value TYPE c LENGTH 250.` )
-      ( `    EXPORT event = lv_event element = sender->name value = lv_value` )
-      ( `      TO MEMORY ID 'ZGG_GUI_DD_EVENT'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'DD_EVENT' ).` )
-      ( `  ENDMETHOD.` )
-      ( `  METHOD on_button.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'BUTTON_CLICKED'.` )
-      ( `    DATA lv_value TYPE c LENGTH 250.` )
-      ( `    EXPORT event = lv_event element = sender->name value = lv_value` )
-      ( `      TO MEMORY ID 'ZGG_GUI_DD_EVENT'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'DD_EVENT' ).` )
-      ( `  ENDMETHOD.` )
-      ( `  METHOD on_entered.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'INPUT_ENTERED'.` )
-      ( `    EXPORT event = lv_event element = sender->name value = sender->value` )
-      ( `      TO MEMORY ID 'ZGG_GUI_DD_EVENT'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'DD_EVENT' ).` )
-      ( `  ENDMETHOD.` )
-      ( `  METHOD on_help.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'INPUT_HELP_F1'.` )
-      ( `    EXPORT event = lv_event element = sender->name value = sender->value` )
-      ( `      TO MEMORY ID 'ZGG_GUI_DD_EVENT'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'DD_EVENT' ).` )
-      ( `  ENDMETHOD.` )
-      ( `  METHOD on_selected.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'SELECT_SELECTED'.` )
-      ( `    EXPORT event = lv_event element = sender->name value = sender->value` )
-      ( `      TO MEMORY ID 'ZGG_GUI_DD_EVENT'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'DD_EVENT' ).` )
-      ( `  ENDMETHOD.` )
-      ( `ENDCLASS.` )
-      ( `FORM register USING io_link TYPE REF TO object io_button TYPE REF TO object` )
-      ( `    io_input TYPE REF TO object io_select TYPE REF TO object` )
-      ( `    CHANGING cv_registered TYPE abap_bool.` )
-      ( `  CLEAR cv_registered.` )
-      ( `  go_link ?= io_link.` )
-      ( `  go_button ?= io_button.` )
-      ( `  go_input ?= io_input.` )
-      ( `  go_select ?= io_select.` )
-      ( `  CREATE OBJECT go_events.` )
-      ( `  SET HANDLER go_events->on_link FOR go_link.` )
-      ( `  SET HANDLER go_events->on_button FOR go_button.` )
-      ( `  SET HANDLER go_events->on_entered FOR go_input.` )
-      ( `  SET HANDLER go_events->on_help FOR go_input.` )
-      ( `  SET HANDLER go_events->on_selected FOR go_select.` )
-      ( `  cv_registered = abap_true.` )
-      ( `ENDFORM.` )
-      ( `FORM unregister.` )
-      ( `  IF go_events IS BOUND.` )
-      ( `    IF go_link IS BOUND.` )
-      ( `      SET HANDLER go_events->on_link FOR go_link ACTIVATION space.` )
-      ( `    ENDIF.` )
-      ( `    IF go_button IS BOUND.` )
-      ( `      SET HANDLER go_events->on_button FOR go_button ACTIVATION space.` )
-      ( `    ENDIF.` )
-      ( `    IF go_input IS BOUND.` )
-      ( `      SET HANDLER go_events->on_entered FOR go_input ACTIVATION space.` )
-      ( `      SET HANDLER go_events->on_help FOR go_input ACTIVATION space.` )
-      ( `    ENDIF.` )
-      ( `    IF go_select IS BOUND.` )
-      ( `      SET HANDLER go_events->on_selected FOR go_select ACTIVATION space.` )
-      ( `    ENDIF.` )
-      ( `  ENDIF.` )
-      ( `  FREE: go_events, go_link, go_button, go_input, go_select.` )
-      ( `ENDFORM.` ) ).
-
-    GENERATE SUBROUTINE POOL lt_source
-      NAME gv_native_event_program MESSAGE lv_message.
-    IF sy-subrc <> 0 OR gv_native_event_program IS INITIAL.
-      CLEAR: gv_native_event_program, gv_native_events_registered.
-      gv_status = |Native document event adapter did not compile: { lv_message }|.
-      RETURN.
-    ENDIF.
-  ENDIF.
-
-  TRY.
-      PERFORM register IN PROGRAM (gv_native_event_program)
-        USING go_link go_button go_input go_select
-        CHANGING gv_native_events_registered.
-    CATCH cx_root INTO DATA(lx_event_error).
-      CLEAR gv_native_events_registered.
-      gv_status = |Native document event registration failed: { lx_event_error->get_text( ) }|.
-  ENDTRY.
-ENDFORM.
-
-FORM unregister_document_events.
-  IF gv_native_event_program IS NOT INITIAL AND
-      gv_native_events_registered = abap_true.
-    TRY.
-        PERFORM unregister IN PROGRAM (gv_native_event_program) IF FOUND.
-      CATCH cx_root.
-    ENDTRY.
-  ENDIF.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_DD_EVENT'.
-ENDFORM.
 
 FORM refresh_input.
   IF go_input IS NOT BOUND.
@@ -388,7 +269,7 @@ FORM reset_document.
       IF gv_native_events_registered = abap_true.
         gv_status = 'Document reset with five native element events registered'.
       ELSE.
-        gv_status = 'Document reset; native element event adapter unavailable'.
+        gv_status = 'Document reset; native element event handler unavailable'.
       ENDIF.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Document reset failed: { lx_error->get_text( ) }|.
@@ -417,7 +298,6 @@ ENDFORM.
 
 FORM free_controls.
   PERFORM unregister_document_events.
-  CLEAR gv_native_event_program.
   IF go_fallback IS BOUND.
     go_fallback->close_document( ).
     go_fallback->free( ).

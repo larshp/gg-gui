@@ -185,7 +185,9 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table.
   DATA lo_column TYPE REF TO cl_salv_column.
   DATA lo_functions TYPE REF TO cl_salv_functions_list.
   DATA lo_settings TYPE REF TO cl_salv_display_settings.
+  DATA lo_selections TYPE REF TO cl_salv_selections.
   DATA lo_layout TYPE REF TO cl_salv_layout.
+  DATA lt_selected_rows TYPE salv_t_row.
   DATA ls_color TYPE lvc_s_colo.
   DATA ls_key TYPE ty_layout_key.
 
@@ -268,8 +270,10 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table.
   lo_settings->set_list_header( 'Read-only SALV product gallery' ).
   lo_settings->set_striped_pattern( abap_true ).
   lo_settings->set_fit_column_to_table_size( abap_true ).
-  io_salv->set_selection_mode( if_salv_c_selection_mode=>multiple ).
-  io_salv->set_selected_rows( VALUE cl_salv_table=>ty_rows( ( 1 ) ( 3 ) ) ).
+  lo_selections = io_salv->get_selections( ).
+  lo_selections->set_selection_mode( if_salv_c_selection_mode=>multiple ).
+  lt_selected_rows = VALUE #( ( 1 ) ( 3 ) ).
+  lo_selections->set_selected_rows( lt_selected_rows ).
 
   ls_key-report = sy-repid.
   ls_key-handle = 'MAIN'.

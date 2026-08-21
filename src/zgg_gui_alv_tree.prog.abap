@@ -76,9 +76,10 @@ DATA gv_status TYPE c LENGTH 108.
 DATA gv_detail TYPE c LENGTH 108.
 DATA gv_lazy_loaded TYPE abap_bool.
 DATA gv_changed TYPE abap_bool.
-DATA gv_native_event_program TYPE c LENGTH 8.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_context_node TYPE lvc_nkey.
+
+INCLUDE zgg_native_alv_tree.
 
 CLASS lcl_events IMPLEMENTATION.
   METHOD on_link.
@@ -212,7 +213,7 @@ FORM create_controls.
       IF gv_native_events_registered = abap_true.
         gv_status = 'ALV tree created with node, item, and context-menu request events'.
       ELSE.
-        gv_status = 'ALV tree created; native context-menu request adapter unavailable'.
+        gv_status = 'ALV tree created; native context-menu request handler unavailable'.
       ENDIF.
       gv_detail = 'Lazy children are loaded only by the Load lazy action; duplicate loads are prevented'.
     CATCH cx_root INTO DATA(lx_error).
@@ -221,86 +222,6 @@ FORM create_controls.
   ENDTRY.
 ENDFORM.
 
-FORM register_native_context_event.
-  DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
-  DATA lv_message TYPE string.
-
-  IF gv_native_event_program IS INITIAL.
-    lt_source = VALUE #(
-      ( `PROGRAM SUBPOOL.` )
-      ( `CLASS lcl_events DEFINITION DEFERRED.` )
-      ( `DATA go_events TYPE REF TO lcl_events.` )
-      ( `DATA go_tree TYPE REF TO cl_gui_alv_tree.` )
-      ( `CLASS lcl_events DEFINITION.` )
-      ( `  PUBLIC SECTION.` )
-      ( `    METHODS on_request FOR EVENT node_context_menu_request` )
-      ( `      OF cl_gui_alv_tree IMPORTING node_key menu.` )
-      ( `ENDCLASS.` )
-      ( `CLASS lcl_events IMPLEMENTATION.` )
-      ( `  METHOD on_request.` )
-      ( `    menu->add_separator( ).` )
-      ( `    menu->add_function( fcode = 'ZDETAIL' text = 'Show node details' ).` )
-      ( `    menu->add_function( fcode = 'ZRESET' text = 'Reset sample' ).` )
-      ( `    EXPORT node_key = node_key TO MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'TREE_CTX' ).` )
-      ( `  ENDMETHOD.` )
-      ( `ENDCLASS.` )
-      ( `FORM register USING io_tree TYPE REF TO object` )
-      ( `    CHANGING cv_registered TYPE abap_bool.` )
-      ( `  DATA lt_events TYPE cntl_simple_events.` )
-      ( `  CLEAR cv_registered.` )
-      ( `  go_tree ?= io_tree.` )
-      ( `  CREATE OBJECT go_events.` )
-      ( `  CALL METHOD go_tree->get_registered_events` )
-      ( `    IMPORTING events = lt_events EXCEPTIONS cntl_error = 1 OTHERS = 2.` )
-      ( `  IF sy-subrc <> 0. RETURN. ENDIF.` )
-      ( `  DELETE lt_events WHERE eventid = cl_gui_column_tree=>eventid_node_context_menu_req.` )
-      ( `  APPEND VALUE #( eventid = cl_gui_column_tree=>eventid_node_context_menu_req` )
-      ( `    appl_event = abap_true ) TO lt_events.` )
-      ( `  CALL METHOD go_tree->set_registered_events` )
-      ( `    EXPORTING events = lt_events` )
-      ( `    EXCEPTIONS cntl_error = 1 cntl_system_error = 2` )
-      ( `      illegal_event_combination = 3 OTHERS = 4.` )
-      ( `  IF sy-subrc <> 0. RETURN. ENDIF.` )
-      ( `  SET HANDLER go_events->on_request FOR go_tree.` )
-      ( `  cv_registered = abap_true.` )
-      ( `ENDFORM.` )
-      ( `FORM unregister.` )
-      ( `  IF go_events IS BOUND AND go_tree IS BOUND.` )
-      ( `    SET HANDLER go_events->on_request FOR go_tree ACTIVATION space.` )
-      ( `  ENDIF.` )
-      ( `  FREE: go_events, go_tree.` )
-      ( `ENDFORM.` ) ).
-
-    GENERATE SUBROUTINE POOL lt_source
-      NAME gv_native_event_program MESSAGE lv_message.
-    IF sy-subrc <> 0 OR gv_native_event_program IS INITIAL.
-      CLEAR: gv_native_event_program, gv_native_events_registered.
-      gv_detail = |Native tree context-event adapter did not compile: { lv_message }|.
-      RETURN.
-    ENDIF.
-  ENDIF.
-
-  TRY.
-      PERFORM register IN PROGRAM (gv_native_event_program)
-        USING go_tree CHANGING gv_native_events_registered.
-    CATCH cx_root INTO DATA(lx_event_error).
-      CLEAR gv_native_events_registered.
-      gv_detail = |Native tree context-event registration failed: { lx_event_error->get_text( ) }|.
-  ENDTRY.
-ENDFORM.
-
-FORM unregister_context_event.
-  IF gv_native_event_program IS NOT INITIAL AND
-      gv_native_events_registered = abap_true.
-    TRY.
-        PERFORM unregister IN PROGRAM (gv_native_event_program) IF FOUND.
-      CATCH cx_root.
-    ENDTRY.
-  ENDIF.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.
-ENDFORM.
 
 FORM build_field_catalog.
   gt_fieldcat = VALUE #(
@@ -539,7 +460,6 @@ ENDFORM.
 
 FORM free_controls.
   PERFORM unregister_context_event.
-  CLEAR gv_native_event_program.
   FREE: go_events, go_dragdrop.
   IF go_tree IS BOUND. go_tree->free( ). FREE go_tree. ENDIF.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.

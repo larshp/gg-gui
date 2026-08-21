@@ -16,11 +16,12 @@ DATA gv_mode TYPE i VALUE cl_gui_picture=>display_mode_fit_center.
 DATA gv_mode_text TYPE c LENGTH 26.
 DATA gv_border TYPE abap_bool VALUE abap_true.
 DATA gv_status TYPE c LENGTH 100.
-DATA gv_native_event_program TYPE c LENGTH 8.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_picture_event TYPE c LENGTH 24.
 DATA gv_mouse_x TYPE i.
 DATA gv_mouse_y TYPE i.
+
+INCLUDE zgg_native_picture.
 
 START-OF-SELECTION.
   gv_url = p_url.
@@ -123,82 +124,6 @@ FORM create_controls.
   ENDIF.
 ENDFORM.
 
-FORM register_native_picture_events.
-  DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
-  DATA lv_message TYPE string.
-
-  IF gv_native_event_program IS NOT INITIAL.
-    RETURN.
-  ENDIF.
-
-  lt_source = VALUE #(
-    ( `PROGRAM SUBPOOL.` )
-    ( `CLASS lcl_events DEFINITION DEFERRED.` )
-    ( `DATA go_events TYPE REF TO lcl_events.` )
-    ( `DATA go_picture TYPE REF TO cl_gui_picture.` )
-    ( `CLASS lcl_events DEFINITION.` )
-    ( `  PUBLIC SECTION.` )
-    ( `    METHODS on_click FOR EVENT picture_click OF cl_gui_picture` )
-    ( `      IMPORTING mouse_pos_x mouse_pos_y.` )
-    ( `    METHODS on_double_click FOR EVENT picture_dblclick OF cl_gui_picture` )
-    ( `      IMPORTING mouse_pos_x mouse_pos_y.` )
-    ( `ENDCLASS.` )
-    ( `CLASS lcl_events IMPLEMENTATION.` )
-    ( `  METHOD on_click.` )
-    ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'PICTURE_CLICK'.` )
-    ( `    EXPORT event = lv_event mouse_pos_x = mouse_pos_x` )
-    ( `      mouse_pos_y = mouse_pos_y TO MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.` )
-    ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'PIC_EVENT' ).` )
-    ( `  ENDMETHOD.` )
-    ( `  METHOD on_double_click.` )
-    ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'PICTURE_DBLCLICK'.` )
-    ( `    EXPORT event = lv_event mouse_pos_x = mouse_pos_x` )
-    ( `      mouse_pos_y = mouse_pos_y TO MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.` )
-    ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'PIC_EVENT' ).` )
-    ( `  ENDMETHOD.` )
-    ( `ENDCLASS.` )
-    ( `FORM register USING io_picture TYPE REF TO object` )
-    ( `    CHANGING cv_registered TYPE abap_bool.` )
-    ( `  DATA lt_events TYPE cntl_simple_events.` )
-    ( `  CLEAR cv_registered.` )
-    ( `  go_picture ?= io_picture.` )
-    ( `  CREATE OBJECT go_events.` )
-    ( `  lt_events = VALUE #(` )
-    ( `    ( eventid = cl_gui_picture=>eventid_picture_click appl_event = abap_true )` )
-    ( `    ( eventid = cl_gui_picture=>eventid_picture_dblclick appl_event = abap_true ) ).` )
-    ( `  CALL METHOD go_picture->set_registered_events` )
-    ( `    EXPORTING events = lt_events` )
-    ( `    EXCEPTIONS cntl_error = 1 cntl_system_error = 2` )
-    ( `      illegal_event_combination = 3 OTHERS = 4.` )
-    ( `  IF sy-subrc <> 0. RETURN. ENDIF.` )
-    ( `  SET HANDLER go_events->on_click FOR go_picture.` )
-    ( `  SET HANDLER go_events->on_double_click FOR go_picture.` )
-    ( `  cv_registered = abap_true.` )
-    ( `ENDFORM.` )
-    ( `FORM unregister.` )
-    ( `  IF go_events IS BOUND AND go_picture IS BOUND.` )
-    ( `    SET HANDLER go_events->on_click FOR go_picture ACTIVATION space.` )
-    ( `    SET HANDLER go_events->on_double_click FOR go_picture ACTIVATION space.` )
-    ( `  ENDIF.` )
-    ( `  FREE: go_events, go_picture.` )
-    ( `ENDFORM.` ) ).
-
-  GENERATE SUBROUTINE POOL lt_source
-    NAME gv_native_event_program MESSAGE lv_message.
-  IF sy-subrc <> 0 OR gv_native_event_program IS INITIAL.
-    CLEAR: gv_native_event_program, gv_native_events_registered.
-    gv_status = |Native picture event adapter did not compile: { lv_message }|.
-    RETURN.
-  ENDIF.
-
-  TRY.
-      PERFORM register IN PROGRAM (gv_native_event_program)
-        USING go_picture CHANGING gv_native_events_registered.
-    CATCH cx_root INTO DATA(lx_event_error).
-      CLEAR gv_native_events_registered.
-      gv_status = |Native picture event registration failed: { lx_event_error->get_text( ) }|.
-  ENDTRY.
-ENDFORM.
 
 FORM publish_format_fixture USING iv_format TYPE sy-ucomm.
   DATA lv_base64 TYPE string.
@@ -328,14 +253,7 @@ FORM describe_mode.
 ENDFORM.
 
 FORM free_controls.
-  IF gv_native_event_program IS NOT INITIAL.
-    TRY.
-        PERFORM unregister IN PROGRAM (gv_native_event_program) IF FOUND.
-      CATCH cx_root.
-    ENDTRY.
-  ENDIF.
-  CLEAR: gv_native_event_program, gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.
+  PERFORM unregister_picture_events.
   IF go_picture IS BOUND.
     go_picture->free( ).
     FREE go_picture.

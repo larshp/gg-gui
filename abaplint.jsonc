@@ -1,6 +1,7 @@
 {
   "global": {
     "files": "/src/**/*.*",
+    "noIssues": ["/src/zgg_native_.*\\.prog\\.abap$"],
     "skipGeneratedGatewayClasses": true,
     "skipGeneratedPersistentClasses": true,
     "skipGeneratedFunctionGroups": true,
@@ -39,6 +40,15 @@
     "cds_association_name": true,
     "cds_check_syntax": true,
     "cds_comment_style": true,
+    "cloud_types": true,
+    "colon_missing_space": true,
+    "commented_code": true,
+    "constant_classes": true,
+    "constructor_visibility_public": true,
+    "contains_tab": true,
+    "cyclic_oo": true,
+    "cyclomatic_complexity": true,
+    "dangerous_statement": true,
     "change_if_to_case": false,
     "check_abstract": true,
     "check_subrc": false,
