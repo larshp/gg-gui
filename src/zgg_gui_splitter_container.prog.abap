@@ -151,7 +151,7 @@ FORM load_html.
     ( '</body></html>' ) ).
   go_html->load_data(
     IMPORTING assigned_url = lv_url
-    CHANGING data_table = lt_html ).
+    CHANGING data_table    = lt_html ).
   go_html->show_url( url = lv_url in_place = abap_true ).
 ENDFORM.
 
@@ -205,10 +205,10 @@ FORM apply_sizes.
 
   IF gv_relative = abap_true.
     go_splitter->set_row_mode(
-      EXPORTING mode = cl_gui_splitter_container=>mode_relative
+      EXPORTING mode   = cl_gui_splitter_container=>mode_relative
       IMPORTING result = lv_row_rc ).
     go_splitter->set_column_mode(
-      EXPORTING mode = cl_gui_splitter_container=>mode_relative
+      EXPORTING mode   = cl_gui_splitter_container=>mode_relative
       IMPORTING result = lv_col_rc ).
     go_splitter->set_row_height(
       EXPORTING id = 1 height = 55
@@ -219,10 +219,10 @@ FORM apply_sizes.
     gv_status = 'Relative mode: first row 55 percent, first column 50 percent'.
   ELSE.
     go_splitter->set_row_mode(
-      EXPORTING mode = cl_gui_splitter_container=>mode_absolute
+      EXPORTING mode   = cl_gui_splitter_container=>mode_absolute
       IMPORTING result = lv_row_rc ).
     go_splitter->set_column_mode(
-      EXPORTING mode = cl_gui_splitter_container=>mode_absolute
+      EXPORTING mode   = cl_gui_splitter_container=>mode_absolute
       IMPORTING result = lv_col_rc ).
     go_splitter->set_row_height(
       EXPORTING id = 1 height = 220
@@ -269,10 +269,10 @@ FORM read_sizes.
   DATA lv_col_2 TYPE i.
 
   go_splitter->get_row_height(
-    EXPORTING id = 1
+    EXPORTING id     = 1
     IMPORTING result = lv_row_1 ).
   go_splitter->get_row_height(
-    EXPORTING id = 2
+    EXPORTING id     = 2
     IMPORTING result = lv_row_2 ).
   TRY.
       CALL METHOD go_splitter->('GET_COLUMN_WIDTH')

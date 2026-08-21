@@ -97,11 +97,11 @@ FORM create_controls.
   TRY.
       CREATE OBJECT go_docking TYPE (lv_class_name)
         EXPORTING
-          repid = sy-repid
-          dynnr = sy-dynnr
-          side = gv_side
-          extension = gv_extension
-          lifetime = c_lifetime_dynpro
+          repid                   = sy-repid
+          dynnr                   = sy-dynnr
+          side                    = gv_side
+          extension               = gv_extension
+          lifetime                = c_lifetime_dynpro
           no_autodef_progid_dynnr = abap_true.
       go_container ?= go_docking.
       CREATE OBJECT go_editor EXPORTING parent = go_container.

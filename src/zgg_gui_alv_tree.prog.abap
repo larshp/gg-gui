@@ -385,10 +385,10 @@ FORM extend_toolbar.
   IF lo_toolbar IS BOUND.
     lo_toolbar->add_button(
       fcode = 'ZLOAD' icon = '@17@' butn_type = 0
-      text = 'Load lazy' quickinfo = 'Load the children of the lazy folder' ).
+      text = 'Load lazy' quickinfo = 'Load lazy-folder children' ).
     lo_toolbar->add_button(
       fcode = 'ZCALC' icon = '@15@' butn_type = 0
-      text = 'Calculate' quickinfo = 'Update calculated ALV tree columns' ).
+      text = 'Calculate' quickinfo = 'Update calculated columns' ).
   ENDIF.
 ENDFORM.
 

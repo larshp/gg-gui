@@ -105,15 +105,15 @@ AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_city.
 
   CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'
     EXPORTING
-      retfield    = 'CITY'
-      value_org   = 'S'
+      retfield        = 'CITY'
+      value_org       = 'S'
     TABLES
-      value_tab   = lt_cities
-      return_tab  = lt_return
+      value_tab       = lt_cities
+      return_tab      = lt_return
     EXCEPTIONS
-      parameter_error        = 1
-      no_values_found        = 2
-      OTHERS                 = 3.
+      parameter_error = 1
+      no_values_found = 2
+      OTHERS          = 3.
 
   IF sy-subrc = 0.
     READ TABLE lt_return INTO ls_return INDEX 1.

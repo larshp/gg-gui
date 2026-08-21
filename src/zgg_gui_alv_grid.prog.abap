@@ -189,7 +189,7 @@ FORM selection_roundtrip.
       go_grid->set_selected_columns( it_col_table = lt_columns ).
       go_grid->set_selected_cells( it_cells = lt_cells ).
       go_grid->set_current_cell_via_id(
-        is_row_id = VALUE #( index = 1 )
+        is_row_id    = VALUE #( index = 1 )
         is_column_id = VALUE #( fieldname = 'NAME' ) ).
       gv_status = |Read rows { lines( lt_row_numbers ) }, columns { lines( lt_columns ) }, cells { lines( lt_cells ) }; then selected examples|.
       gv_detail = |Previous current cell: row { lv_row }, column { ls_column-fieldname }, value { lv_value }|.
@@ -294,7 +294,7 @@ FORM criteria_roundtrip.
       go_grid->set_sort_criteria( it_sort = gt_sort ).
       go_grid->set_filter_criteria( it_filter = lt_current_filter ).
       go_grid->refresh_table_display(
-        is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true )
+        is_stable      = VALUE lvc_s_stbl( row = abap_true col = abap_true )
         i_soft_refresh = abap_false ).
       gv_status = |Sort, subtotal, and aggregate criteria restored; filter count is now { lines( lt_current_filter ) }|.
       gv_detail = 'Quantity and price total fields remain active while category supplies subtotal groups'.
@@ -337,7 +337,7 @@ FORM refresh_grid.
   ENDIF.
   TRY.
       go_grid->refresh_table_display(
-        is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true )
+        is_stable      = VALUE lvc_s_stbl( row = abap_true col = abap_true )
         i_soft_refresh = abap_true ).
       gv_status = |Stable soft refresh complete; P100 quantity is { <row>-quantity }|.
     CATCH cx_root INTO DATA(lx_error).

@@ -292,7 +292,7 @@ FORM create_controls.
         hierarchy_header = ls_header.
       go_tree->add_column( name = 'NAME' width = 20 header_text = 'Scope' ).
       CREATE OBJECT go_toolbar EXPORTING parent = go_toolbar_host
-        display_mode = cl_gui_toolbar=>m_mode_horizontal.
+        display_mode                            = cl_gui_toolbar=>m_mode_horizontal.
       CREATE OBJECT go_grid EXPORTING i_parent = go_grid_host.
       CREATE OBJECT go_details EXPORTING parent = go_detail_host.
       CREATE OBJECT go_events.
@@ -373,18 +373,18 @@ ENDFORM.
 
 FORM populate_toolbar.
   go_toolbar->add_button( fcode = 'TREE' icon = '@3P@' butn_type = c_button
-    text = 'Tree' quickinfo = 'Make the navigation tree active' ).
+    text = 'Tree' quickinfo = 'Activate navigation tree' ).
   go_toolbar->add_button( fcode = 'GRID' icon = '@3Y@' butn_type = c_button
     text = 'Grid' quickinfo = 'Make the ALV grid active' ).
   go_toolbar->add_button( fcode = 'DETAIL' icon = '@0S@' butn_type = c_button
     text = 'Details' quickinfo = 'Make the detail editor active' ).
   go_toolbar->add_button( fcode = '' icon = '' butn_type = c_separator ).
   go_toolbar->add_button( fcode = 'REFRESH' icon = '@42@' butn_type = c_button
-    text = 'Refresh' quickinfo = 'Refresh the active child control' ).
+    text = 'Refresh' quickinfo = 'Refresh active child control' ).
   go_toolbar->add_button( fcode = 'TOGGLE' icon = '@3Z@' butn_type = c_button
-    text = 'Details pane' quickinfo = 'Show or hide the lower detail pane' ).
+    text = 'Details pane' quickinfo = 'Show or hide detail pane' ).
   go_toolbar->add_button( fcode = 'RESET' icon = '@18@' butn_type = c_button
-    text = 'Reset' quickinfo = 'Reset data, filters, details, and pane sizes' ).
+    text = 'Reset' quickinfo = 'Reset data, filters, and panes' ).
 ENDFORM.
 
 FORM select_navigation USING iv_node TYPE tv_nodekey.
@@ -448,7 +448,7 @@ FORM toolbar_action USING iv_fcode TYPE sy-ucomm.
     WHEN 'TOGGLE'.
       gv_details_visible = xsdbool( gv_details_visible = abap_false ).
       go_right_splitter->set_row_height( id = 3
-        height = COND #( WHEN gv_details_visible = abap_true THEN 34 ELSE 0 ) ).
+        height                              = COND #( WHEN gv_details_visible = abap_true THEN 34 ELSE 0 ) ).
       gv_status = |Toolbar detail-pane visibility { gv_details_visible }|.
     WHEN 'RESET'.
       PERFORM reset_workbench.

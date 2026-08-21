@@ -71,7 +71,7 @@ MODULE user_command_0100 INPUT.
       IF gv_dynamic_added = abap_false.
         go_toolbar->add_button(
           fcode = 'DYNAMIC' icon = '@17@' butn_type = c_button
-          text = 'Dynamic' quickinfo = 'Button added after initial creation' ).
+          text = 'Dynamic' quickinfo = 'Added after initial creation' ).
         gv_dynamic_added = abap_true.
         gv_status = 'Dynamic button appended'.
       ENDIF.
@@ -148,7 +148,7 @@ FORM create_toolbar.
 
   CREATE OBJECT go_toolbar
     EXPORTING
-      parent = go_host
+      parent       = go_host
       display_mode = COND #( WHEN gv_vertical = abap_true
         THEN cl_gui_toolbar=>m_mode_vertical
         ELSE cl_gui_toolbar=>m_mode_horizontal ).
@@ -172,7 +172,7 @@ FORM create_toolbar.
     text = 'Dropdown' quickinfo = 'Raises DROPDOWN_CLICKED' ).
   go_toolbar->add_button(
     fcode = 'MENU' icon = '@3S@' butn_type = c_menu
-    text = 'Menu' quickinfo = 'Button with a static context menu' ).
+    text = 'Menu' quickinfo = 'Open static context menu' ).
   go_toolbar->add_button(
     fcode = 'DISABLED' icon = '@0W@' butn_type = c_button
     text = 'Disabled' quickinfo = 'Initially disabled button'

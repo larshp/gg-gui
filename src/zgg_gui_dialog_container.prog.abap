@@ -99,13 +99,13 @@ FORM create_dialog.
   TRY.
       CREATE OBJECT go_dialog TYPE (lv_class_name)
         EXPORTING
-          repid = sy-repid
-          dynnr = sy-dynnr
-          left = gv_left
-          top = gv_top
-          width = gv_width
-          height = gv_height
-          caption = gv_caption
+          repid    = sy-repid
+          dynnr    = sy-dynnr
+          left     = gv_left
+          top      = gv_top
+          width    = gv_width
+          height   = gv_height
+          caption  = gv_caption
           lifetime = c_lifetime_dynpro.
       go_container ?= go_dialog.
       CREATE OBJECT go_editor EXPORTING parent = go_container.

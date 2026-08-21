@@ -248,19 +248,19 @@ FORM publish_format_fixture USING iv_format TYPE sy-ucomm.
   ENDIF.
 
   CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
-    EXPORTING buffer = lv_blob
+    EXPORTING buffer        = lv_blob
     IMPORTING output_length = lv_size
-    TABLES binary_tab = lt_data.
+    TABLES binary_tab       = lt_data.
 
   CLEAR gv_url.
   CALL FUNCTION 'DP_CREATE_URL'
     EXPORTING
-      type = 'image'
-      subtype = lv_subtype
-      size = lv_size
-      lifetime = 'T'
-    TABLES data = lt_data
-    CHANGING url = gv_url
+      type            = 'image'
+      subtype         = lv_subtype
+      size            = lv_size
+      lifetime        = 'T'
+    TABLES data       = lt_data
+    CHANGING url      = gv_url
     EXCEPTIONS OTHERS = 1.
   IF sy-subrc <> 0 OR gv_url IS INITIAL.
     gv_status = |Data Provider could not publish the { iv_format } fixture|.
@@ -275,14 +275,14 @@ FORM publish_demo_mime.
   CLEAR gv_url.
   CALL FUNCTION 'DP_PUBLISH_WWW_URL'
     EXPORTING
-      objid = 'HTMLCNTL_TESTHTM2_SAPLOGO'
+      objid                 = 'HTMLCNTL_TESTHTM2_SAPLOGO'
     IMPORTING
-      url = gv_url
+      url                   = gv_url
     EXCEPTIONS
       dp_invalid_parameters = 1
-      no_object = 2
-      dp_error_publish = 3
-      OTHERS = 4.
+      no_object             = 2
+      dp_error_publish      = 3
+      OTHERS                = 4.
   IF sy-subrc <> 0.
     gv_status = |Standard MIME object could not be published; rc { sy-subrc }|.
   ENDIF.
@@ -301,7 +301,7 @@ FORM load_picture.
     gv_last_url = gv_url.
   ELSE.
     go_picture->load_picture_from_url(
-      EXPORTING url = gv_url
+      EXPORTING url    = gv_url
       IMPORTING result = lv_result ).
     IF lv_result = 0.
       gv_status = |Synchronous load failed or source was rejected: { gv_url }|.

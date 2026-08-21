@@ -42,25 +42,25 @@ MODULE user_command_0100 INPUT.
     WHEN 'LINK_NAME'.
       go_container->link(
         EXPORTING
-          repid = sy-repid
-          dynnr = sy-dynnr
-          container = 'CC_MAIN'
+          repid                       = sy-repid
+          dynnr                       = sy-dynnr
+          container                   = 'CC_MAIN'
         EXCEPTIONS
-          cntl_error = 1
-          cntl_system_error = 2
+          cntl_error                  = 1
+          cntl_system_error           = 2
           lifetime_dynpro_dynpro_link = 3
-          OTHERS = 4 ).
+          OTHERS                      = 4 ).
       gv_link_state = |Linked by program, screen, and custom-control name; rc { sy-subrc }|.
     WHEN 'LINK_PARENT'.
       IF cl_gui_container=>default_screen IS BOUND.
         go_container->link(
           EXPORTING
-            parent = cl_gui_container=>default_screen
+            parent                      = cl_gui_container=>default_screen
           EXCEPTIONS
-            cntl_error = 1
-            cntl_system_error = 2
+            cntl_error                  = 1
+            cntl_system_error           = 2
             lifetime_dynpro_dynpro_link = 3
-            OTHERS = 4 ).
+            OTHERS                      = 4 ).
         gv_link_state = |Linked to DEFAULT_SCREEN parent; rc { sy-subrc }|.
       ELSE.
         gv_link_state = 'DEFAULT_SCREEN is not bound in this frontend session'.
@@ -109,11 +109,11 @@ FORM create_container.
 
   CREATE OBJECT go_container
     EXPORTING
-      container_name = 'CC_MAIN'
-      repid = sy-repid
-      dynnr = sy-dynnr
+      container_name          = 'CC_MAIN'
+      repid                   = sy-repid
+      dynnr                   = sy-dynnr
       no_autodef_progid_dynnr = abap_true
-      lifetime = gv_lifetime.
+      lifetime                = gv_lifetime.
   PERFORM create_child.
   gv_link_state = 'Custom container created from explicit dynpro coordinates'.
 ENDFORM.

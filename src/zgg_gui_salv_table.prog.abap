@@ -406,7 +406,7 @@ FORM show_popup.
       cl_salv_table=>factory(
         EXPORTING list_display = abap_true
         IMPORTING r_salv_table = lo_popup
-        CHANGING t_table = lt_popup ).
+        CHANGING t_table       = lt_popup ).
       lo_popup->set_screen_popup(
         start_column = 10 end_column = 100 start_line = 3 end_line = 25 ).
       lo_popup->get_functions( )->set_all( abap_true ).
@@ -426,7 +426,7 @@ FORM show_fullscreen.
       cl_salv_table=>factory(
         EXPORTING list_display = abap_false
         IMPORTING r_salv_table = lo_full
-        CHANGING t_table = lt_full ).
+        CHANGING t_table       = lt_full ).
       lo_full->set_screen_status(
         report = sy-repid pfstatus = 'STANDARD'
         set_functions = cl_salv_table=>c_functions_all ).

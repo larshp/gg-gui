@@ -124,16 +124,16 @@ FORM create_calendar.
   TRY.
       CREATE OBJECT go_calendar TYPE (lv_class_name)
         EXPORTING
-          parent = go_host
-          view_style = c_style_vertical
+          parent          = go_host
+          view_style      = c_style_vertical
           selection_style = gv_selection_style
-          focus_date = gv_focus
-          display_months = 3
-          stand_alone = abap_false
-          week_begin_day = '1'
-          week_end = '67'
-          year_begin = gv_focus(4) - 2
-          year_end = gv_focus(4) + 2.
+          focus_date      = gv_focus
+          display_months  = 3
+          stand_alone     = abap_false
+          week_begin_day  = '1'
+          week_end        = '67'
+          year_begin      = gv_focus(4) - 2
+          year_end        = gv_focus(4) + 2.
       go_control ?= go_calendar.
       PERFORM register_calendar_events.
       IF gv_native_events_registered = abap_true.

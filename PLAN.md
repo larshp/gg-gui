@@ -704,7 +704,8 @@ Every sample must:
   functionality in `ANORMALIES.md`, including a minimal reproduction and the
   native SAP behavior expected.
 - [x] Avoid color as the only indication of status or validation.
-- [x] Use icons with text or quick info where their meaning is not universal.
+- [x] Use icons with text or quick info where their meaning is not universal,
+  keeping quick-info values within native fixed-length parameter limits.
 - [x] Exclude Screen Painter icon aliases known to fail native object import;
   repository verification rejects these values before delivery.
 - [x] Separate top-level Screen Painter elements that share rows by at least one
@@ -720,6 +721,9 @@ cleanup, Screen Painter icon aliases, top-level element spacing, quantity and
 currency references, PLAN coverage, anomaly record structure, and the
 direct-database-DML rule. Behavioral and visual requirements still require the
 native checks in Phase 6 and are not inferred from this gate.
+
+`npm run lint` enforces ABAP syntax and API parameter compatibility, including
+fixed-length toolbar quick-info arguments.
 
 ## Delivery Plan
 

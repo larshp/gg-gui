@@ -36,10 +36,10 @@ START-OF-SELECTION.
   DATA lv_alpha_external TYPE c LENGTH 10.
 
   CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
-    EXPORTING input = p_alpha
+    EXPORTING input  = p_alpha
     IMPORTING output = lv_alpha_internal.
   CALL FUNCTION 'CONVERSION_EXIT_ALPHA_OUTPUT'
-    EXPORTING input = lv_alpha_internal
+    EXPORTING input  = lv_alpha_internal
     IMPORTING output = lv_alpha_external.
 
   WRITE: / 'Text:', p_text,

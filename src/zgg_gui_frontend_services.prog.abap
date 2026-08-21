@@ -128,12 +128,12 @@ FORM inspect_gui_available.
       CALL METHOD (lv_class)=>(lv_method) RECEIVING return = gv_gui_available.
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |GUI_IS_AVAILABLE returned { gv_gui_available }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
     CATCH cx_root INTO DATA(lx_error).
       gv_gui_available = abap_false.
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |GUI availability method missing or failed: { lx_error->get_text( ) }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
   ENDTRY.
   gv_status = COND #( WHEN gv_gui_available = abap_true
     THEN 'Interactive frontend detected; operations still require explicit buttons and may trigger security prompts'
@@ -158,7 +158,7 @@ FORM run_dialogs.
         CHANGING file_table = lt_files rc = lv_rc user_action = lv_action ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Open dialog action { lv_action }, selected entries { lv_rc }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
       IF lv_rc > 0.
         READ TABLE lt_files INDEX 1 INTO DATA(ls_file).
         gv_target = ls_file-filename.
@@ -172,16 +172,16 @@ FORM run_dialogs.
           user_action = lv_action ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Save dialog action { lv_action }, path { lv_fullpath }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
 
       cl_gui_frontend_services=>directory_browse(
-        EXPORTING window_title = 'Select a directory without changing it'
-          initial_folder = gv_temp_dir
+        EXPORTING window_title   = 'Select a directory without changing it'
+          initial_folder         = gv_temp_dir
         CHANGING selected_folder = lv_selected ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = COND string( WHEN lv_selected IS INITIAL
           THEN 'Directory selection canceled' ELSE |Directory selected: { lv_selected }| )
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
       gv_status = 'Open, save, and directory-selection dialogs completed or were canceled consistently'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Frontend dialog unavailable or rejected: { lx_error->get_text( ) }|.
@@ -207,7 +207,7 @@ FORM create_sample_files.
         EXPORTING directory = gv_sample_dir CHANGING rc = lv_rc ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Create directory rc { lv_rc }: { gv_sample_dir }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
       cl_gui_frontend_services=>gui_download(
         EXPORTING filename = gv_text_file filetype = 'ASC'
           write_lf = abap_true confirm_overwrite = abap_true
@@ -220,7 +220,7 @@ FORM create_sample_files.
       gv_detail = gv_sample_dir.
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Downloaded text { gv_text_file } and binary { gv_binary_file }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Directory creation or download unavailable/rejected: { lx_error->get_text( ) }|.
       PERFORM add_log USING gv_status.
@@ -342,13 +342,13 @@ FORM inspect_directories.
       CALL METHOD (lv_class)=>(lv_method) CHANGING sapgui_directory = lv_sapgui.
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Temp { gv_temp_dir }; Desktop { lv_desktop }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |System { lv_system }; SAP GUI { lv_sapgui }; Work { lv_work }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Upload { lv_upload }; Download { lv_download }; Current { lv_current }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
 
       lv_method = 'DIRECTORY_SET_CURRENT'.
       CALL METHOD (lv_class)=>(lv_method) EXPORTING current_directory = gv_sample_dir.
@@ -444,7 +444,7 @@ FORM reset_log.
   gv_target = 'https://help.sap.com'.
   zcl_gg_gui_demo_helper=>reset_log(
     EXPORTING initial_event = 'Event log and target reset; existing sample-owned files were not deleted'
-    CHANGING log = gt_log ).
+    CHANGING log            = gt_log ).
   gv_status = 'Log reset; use Cleanup explicitly to remove sample-owned frontend files'.
   gv_detail = gv_sample_dir.
 ENDFORM.

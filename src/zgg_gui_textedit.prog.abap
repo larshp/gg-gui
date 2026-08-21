@@ -77,8 +77,8 @@ FORM create_controls.
   CREATE OBJECT go_host EXPORTING container_name = 'CC_MAIN'.
   CREATE OBJECT go_editor
     EXPORTING
-      parent = go_host
-      wordwrap_mode = cl_gui_textedit=>wordwrap_at_windowborder
+      parent                     = go_host
+      wordwrap_mode              = cl_gui_textedit=>wordwrap_at_windowborder
       wordwrap_to_linebreak_mode = cl_gui_textedit=>false.
   PERFORM set_initial_text.
   go_editor->set_toolbar_mode( toolbar_mode = cl_gui_textedit=>true ).

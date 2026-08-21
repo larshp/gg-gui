@@ -46,7 +46,7 @@ CLASS lcl_events IMPLEMENTATION.
     lcl_log=>add( |Application event: timer tick { gv_timer_ticks }| ).
     cl_gui_cfw=>set_new_ok_code(
       EXPORTING new_code = 'TIMER'
-      IMPORTING rc = DATA(lv_rc) ).
+      IMPORTING rc       = DATA(lv_rc) ).
     IF lv_rc <> 0.
       lcl_log=>add( |SET_NEW_OK_CODE returned { lv_rc }| ).
     ENDIF.
@@ -169,7 +169,7 @@ FORM register_events.
   DATA lt_events TYPE cntl_simple_events.
 
   lt_events = VALUE #( ( eventid = cl_gui_textedit=>event_double_click
-    appl_event = gv_application_event ) ).
+    appl_event                   = gv_application_event ) ).
   go_editor->set_registered_events( events = lt_events ).
 ENDFORM.
 

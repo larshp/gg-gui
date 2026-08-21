@@ -161,13 +161,13 @@ FORM rebuild_menu.
   TRY.
       go_ili->clear_contextmenu( ).
       go_ili->add_contextmenuitem( str = 'Move region'
-        menumode = cl_gui_ilidragndrop_control=>co_mf_enabled ).
+        menumode                       = cl_gui_ilidragndrop_control=>co_mf_enabled ).
       go_ili->add_contextmenuitem( str = 'Resize both axes'
-        menumode = cl_gui_ilidragndrop_control=>co_mf_enabled ).
+        menumode                       = cl_gui_ilidragndrop_control=>co_mf_enabled ).
       go_ili->add_contextmenuitem( str = ''
-        menumode = cl_gui_ilidragndrop_control=>co_mf_separator ).
+        menumode                       = cl_gui_ilidragndrop_control=>co_mf_separator ).
       go_ili->add_contextmenuitem( str = 'Show or hide'
-        menumode = cl_gui_ilidragndrop_control=>co_mf_checked ).
+        menumode                       = cl_gui_ilidragndrop_control=>co_mf_checked ).
       go_ili->show_contextmenu( ).
       gv_menu_count = 4.
       gv_status = 'Internal context menu rebuilt with move, resize, separator, and visibility items'.
