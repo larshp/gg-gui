@@ -34,6 +34,12 @@ The catalog does not attempt to include:
 - Every method of every control. Each sample covers representative display,
   input, event, refresh, and cleanup behavior instead.
 
+Base classes, event payloads, exceptions, interfaces, DDIC structures, and type
+pools do not receive standalone programs. Compatibility artifacts such as
+`CL_GUI_ALV_GRID_BASE`, `CL_ALV_EVENT_DATA`, `CL_ALV_EVENT_TOOLBAR_SET`,
+`CL_DD_ELEMENT`, SALV base and exception classes, and LVC structures are
+covered through the runnable sample that consumes them.
+
 Controls that depend on the frontend, operating system, installed desktop
 software, or ABAP Platform release must be labeled as optional and must fail
 gracefully when unavailable.
@@ -68,7 +74,12 @@ gracefully when unavailable.
 - [ ] Create a control once during PBO and reuse it on later round trips.
 - [ ] Register and handle system and application events.
 - [ ] Demonstrate `CL_GUI_CFW=>DISPATCH` and `CL_GUI_CFW=>FLUSH`.
+- [ ] Demonstrate `SET_NEW_OK_CODE`, `UPDATE_VIEW`, and metric-to-pixel
+  conversion.
 - [ ] Set focus and inspect the active control.
+- [ ] Check validity and frontend technology flags through `CL_GUI_OBJECT`.
+- [ ] Set visibility, enablement, alignment, position, width, and height through
+  common `CL_GUI_CONTROL` methods.
 - [ ] Refresh frontend state without recreating the control.
 - [ ] Free controls in the correct child-to-parent order.
 - [ ] Handle Control Framework and automation errors.
@@ -188,7 +199,8 @@ gracefully when unavailable.
 - [ ] Modal dialog screen using `CALL SCREEN ... STARTING AT ... ENDING AT`.
 - [ ] Standard confirmation, information, and value-entry popups.
 - [ ] Safe message types and status-bar messages.
-- [ ] Progress indication without blocking normal cancellation.
+- [ ] Progress indication with `CL_PROGRESS_INDICATOR=>PROGRESS_INDICATE`
+  without blocking normal cancellation.
 - [ ] DDIC search help and custom process-on-value-request logic.
 - [ ] DDIC documentation and custom process-on-help-request logic.
 - [ ] Return selected values and distinguish confirm, cancel, and close.
@@ -198,6 +210,9 @@ gracefully when unavailable.
 #### `ZGG_GUI_CUSTOM_CONTAINER` - Custom container
 
 - [ ] Embed a control in a Screen Painter custom-control area.
+- [ ] Compare a custom container with `CL_GUI_CONTAINER=>SCREEN0` and
+  `DEFAULT_SCREEN`.
+- [ ] Link a container by program, screen, custom-control name, or parent.
 - [ ] Compare container lifetime modes.
 - [ ] Resize the screen and child control.
 - [ ] Replace or recreate the hosted child safely.
@@ -215,6 +230,8 @@ gracefully when unavailable.
 - [ ] Nested `CL_GUI_SPLITTER_CONTAINER` instances.
 - [ ] `CL_GUI_EASY_SPLITTER_CONTAINER` comparison.
 - [ ] Fixed, relative, minimum, and hidden pane sizes.
+- [ ] Row and column sizing modes, sash visibility, and border settings.
+- [ ] Read current row heights and column widths after interactive resizing.
 - [ ] Place a different working control in each cell.
 
 #### `ZGG_GUI_DIALOG_CONTAINER` - Modeless dialog container
@@ -238,8 +255,10 @@ gracefully when unavailable.
 #### `ZGG_GUI_PICTURE` - Picture control
 
 - [ ] Load a MIME repository or URL-based image.
+- [ ] Compare synchronous and asynchronous URL loading.
 - [ ] Display supported bitmap formats.
 - [ ] Stretch, fit, center, and keep-aspect display modes.
+- [ ] Toggle the 3D border.
 - [ ] React to picture clicks where supported.
 - [ ] Clear and reload the image.
 - [ ] Handle unavailable or invalid image sources.
@@ -252,6 +271,8 @@ gracefully when unavailable.
 - [ ] Selection, current line, and current position.
 - [ ] Modified-state and text-change handling.
 - [ ] Protected text or line areas where supported.
+- [ ] Fixed-width and proportional fonts.
+- [ ] Delete all text and restore the initial document.
 - [ ] Local file load and save through an explicit user-selected path.
 
 #### `ZGG_GUI_HTML_VIEWER` - HTML viewer
@@ -260,9 +281,20 @@ gracefully when unavailable.
 - [ ] Display a URL when frontend security permits it.
 - [ ] Handle `SAPEVENT` links and normal hyperlinks.
 - [ ] Provide images and related resources to generated HTML.
+- [ ] Compare `LOAD_DATA` plus `SHOW_URL` with direct `SHOW_DATA`.
+- [ ] Read the current URL and configure viewer UI flags.
 - [ ] Navigate backward, forward, home, and refresh.
+- [ ] Close the current document and release its resources.
 - [ ] Document rendering and security differences between frontends.
 - [ ] Avoid relying on deprecated browser-specific behavior.
+
+#### `ZGG_GUI_ABAP_BROWSER` - ABAP browser helper
+
+- [ ] Display an HTML string with `CL_ABAP_BROWSER=>SHOW_HTML`.
+- [ ] Display XML supplied as both `STRING` and `XSTRING`.
+- [ ] Compare fullscreen, supplied-container, and dialog display modes.
+- [ ] Set a title and demonstrate the printing option where supported.
+- [ ] Handle malformed or empty content without terminating the caller.
 
 #### `ZGG_GUI_TOOLBAR` - Toolbar control
 
@@ -270,7 +302,8 @@ gracefully when unavailable.
 - [ ] Separators, icons, quick info, and disabled buttons.
 - [ ] Dynamic insert, delete, enable, and check state.
 - [ ] Function-selected and dropdown-clicked events.
-- [ ] Context menus built with `CL_CTMENU`.
+- [ ] Context menus and submenus built with `CL_CTMENU`.
+- [ ] Static context-menu tables, button groups, visibility, and state changes.
 
 #### `ZGG_GUI_CALENDAR` - Calendar control
 
@@ -286,12 +319,19 @@ gracefully when unavailable.
 - [ ] Simple tree using `CL_SIMPLE_TREE_MODEL`.
 - [ ] List tree using `CL_LIST_TREE_MODEL`.
 - [ ] Column tree using `CL_COLUMN_TREE_MODEL`.
-- [ ] Compare the corresponding low-level `CL_GUI_*_TREE` controls.
+- [ ] Compare `CL_GUI_SIMPLE_TREE`, `CL_GUI_LIST_TREE`, and
+  `CL_GUI_COLUMN_TREE` with their tree-model counterparts.
+- [ ] Exercise inherited `CL_TREE_CONTROL_BASE` selection, visibility, and
+  expanded-node APIs.
+- [ ] Exercise `CL_ITEM_TREE_CONTROL` behavior through a column or list tree.
 - [ ] Add, update, move, expand, collapse, and delete nodes.
-- [ ] Icons, checkboxes, item styles, and multiple columns.
-- [ ] Node and item selection, double-click, context menu, and key events.
+- [ ] Icons, checkboxes, item buttons, editable items, item styles, and multiple
+  columns.
+- [ ] Hierarchy headers, column widths, hidden columns, and header events.
+- [ ] Node and item selection, chosen state, double-click, context menu, and key
+  events.
 - [ ] Lazy loading of child nodes.
-- [ ] Drag-and-drop within a tree and to another control.
+- [ ] Single- and multi-item drag-and-drop within a tree and to another control.
 
 #### `ZGG_GUI_DYNAMIC_DOCUMENT` - Dynamic Documents
 
@@ -299,6 +339,9 @@ gracefully when unavailable.
 - [ ] Headings, text, icons, links, and formatted areas.
 - [ ] Tables and form areas.
 - [ ] Buttons, input elements, and select elements.
+- [ ] Background pictures, document merging, and vertical splitting.
+- [ ] Table row and column styles.
+- [ ] Print a generated document.
 - [ ] Handle document events.
 - [ ] Refresh parts of a document without rebuilding unrelated state.
 
@@ -316,20 +359,52 @@ gracefully when unavailable.
 
 - [ ] Automatic column generation.
 - [ ] Column texts, visibility, width, alignment, and technical columns.
+- [ ] Currency, quantity, sign, zero, edit-mask, key, color, cell-type,
+  exception, and hyperlink column settings.
 - [ ] Standard functions, sorting, filtering, and aggregation.
+- [ ] Add and remove custom functions and handle `ADDED_FUNCTION`.
 - [ ] Layout variants and initial layout keys.
+- [ ] Find default and available layouts with `CL_SALV_LAYOUT_SERVICE`,
+  including layout F4 help.
 - [ ] Striped pattern, optimized width, selection modes, and row marks.
-- [ ] Link-click and double-click events.
-- [ ] Fullscreen and container-based display.
+- [ ] Configure hyperlinks through `CL_SALV_HYPERLINKS` and handle link-click
+  and double-click events.
+- [ ] Top-of-list, end-of-list, and print-specific form elements.
+- [ ] Fullscreen, popup, container-based, and offline display.
+- [ ] Export the current SALV representation with `TO_XML`.
 
 #### `ZGG_GUI_ALV_GRID` - Basic ALV Grid Control
 
 - [ ] Build a field catalog manually and from DDIC metadata.
 - [ ] Pass a stable output table to `SET_TABLE_FOR_FIRST_DISPLAY`.
 - [ ] Apply layout and toolbar exclusions.
+- [ ] Read and replace frontend field catalogs and layouts.
+- [ ] Read and set selected rows, columns, cells, and the current cell.
 - [ ] Refresh with stable row and column position.
+- [ ] Read and restore scroll information.
 - [ ] Sort, filter, subtotal, aggregate, print, and export.
+- [ ] Read filtered entries, subtotals, print settings, and sort/filter criteria.
+- [ ] Change the grid title, ready-for-input state, and border.
 - [ ] Save and load layout variants.
+
+#### `ZGG_GUI_ALV_DYNAMIC` - Dynamic ALV output tables
+
+- [ ] Define an LVC field catalog without a static output structure.
+- [ ] Create the output table with
+  `CL_ALV_TABLE_CREATE=>CREATE_DYNAMIC_TABLE`.
+- [ ] Populate the generated table safely through data references and field
+  symbols.
+- [ ] Add the optional style table and use the returned style-field name.
+- [ ] Display and edit the generated table in `CL_GUI_ALV_GRID`.
+
+#### `ZGG_GUI_ALV_VARIANTS` - Direct ALV variant handling
+
+- [ ] Construct `CL_ALV_VARIANT` with output table, field catalog, layout, and
+  variant key.
+- [ ] Read variant information and the stored field catalog.
+- [ ] Apply, save, and switch between sample-owned variants.
+- [ ] Delete only variants created by this sample after explicit confirmation.
+- [ ] Clean up sample variants and leave unrelated user variants untouched.
 
 #### `ZGG_GUI_ALV_EDIT` - Editable ALV grid
 
@@ -338,7 +413,9 @@ gracefully when unavailable.
 - [ ] Custom F4 help.
 - [ ] Register edit events and call `CHECK_CHANGED_DATA`.
 - [ ] Handle `DATA_CHANGED` and `DATA_CHANGED_FINISHED`.
-- [ ] Validate input and show protocol errors.
+- [ ] Validate input with `CL_ALV_CHANGED_DATA_PROTOCOL`.
+- [ ] Add and display protocol entries, modify cells and styles, retrieve cell
+  values, and refresh the protocol.
 - [ ] Insert, copy, and delete rows.
 - [ ] Detect, save, and discard changes without database updates.
 
@@ -354,6 +431,8 @@ gracefully when unavailable.
 #### `ZGG_GUI_ALV_EVENTS` - ALV interaction and extension
 
 - [ ] Double-click, hotspot, user-command, and selection events.
+- [ ] Handle before- and after-user-command, F1, F4, button, menu, and subtotal
+  text events.
 - [ ] Add custom toolbar functions.
 - [ ] Modify the context menu.
 - [ ] Delayed selection-change events.
@@ -368,7 +447,11 @@ gracefully when unavailable.
 - [ ] Node and item events.
 - [ ] Dynamic node loading.
 - [ ] Toolbar and context-menu extensions.
-- [ ] Expand, collapse, select, and refresh while retaining state.
+- [ ] Hierarchy headers, help fields, optimized columns, and calculated values.
+- [ ] Read and change nodes, items, checked items, parents, children, and
+  subtrees.
+- [ ] Expand, collapse, select, retain the top node, and refresh while retaining
+  state.
 
 #### `ZGG_GUI_SALV_TREE` - SALV tree
 
@@ -391,19 +474,36 @@ gracefully when unavailable.
 
 - [ ] File-open, file-save, and directory-selection dialogs.
 - [ ] Upload and download text and binary data.
+- [ ] Check file and directory existence and read file sizes.
+- [ ] Copy and delete files inside a sample-owned temporary directory.
+- [ ] List, create, select, change, and delete sample-owned directories.
 - [ ] Read and write clipboard text.
-- [ ] Query frontend type, platform, GUI version, and capabilities.
+- [ ] Query frontend type, platform, GUI version, computer name, drive type,
+  path separator, and capabilities.
+- [ ] Read the temporary, desktop, system, SAP GUI work, and default
+  upload/download directories.
+- [ ] Demonstrate a read-only registry lookup on SAP GUI for Windows.
 - [ ] Open a user-confirmed local file or URL.
 - [ ] Handle unavailable GUI, background execution, and security rejection.
 
 #### `ZGG_GUI_DRAG_DROP` - Cross-control drag-and-drop
 
-- [ ] Define drag-and-drop behavior objects and flavors.
+- [ ] Define `CL_DRAGDROP` behavior objects, flavors, effects, and handles.
 - [ ] Reorder rows in an ALV grid.
 - [ ] Reparent tree nodes.
 - [ ] Transfer an item between a tree and an ALV grid.
-- [ ] Accept, reject, and undo drops.
+- [ ] Transfer application data through `CL_DRAGDROPOBJECT`.
+- [ ] Accept, abort, reject, and undo drops.
 - [ ] Display source, target, flavor, and event sequence.
+
+#### `ZGG_GUI_ILI_DRAGDROP` - Interactive drag and resize control
+
+- [ ] Create `CL_GUI_ILIDRAGNDROP_CONTROL` in a container.
+- [ ] Start dragging in move, horizontal resize, vertical resize, and combined
+  resize modes.
+- [ ] Show, hide, position, and resize the interactive region.
+- [ ] Handle dropped and resized events.
+- [ ] Add, display, clear, and handle the control's internal context menu.
 
 #### `ZGG_GUI_CLASSIC_LIST` - Classic and interactive lists
 
@@ -459,6 +559,8 @@ Every sample must:
 - [ ] Choose the frontends included in the compatibility promise.
 - [ ] Audit standard examples in transactions `DWDM`, `BIBS`, and `SE83`.
 - [ ] Review available `BCALV*` demonstration programs.
+- [ ] Cross-check the class and type surface in
+  [`open-abap-gui`](https://github.com/open-abap/open-abap-gui/tree/main/src).
 - [ ] Inventory relevant public subclasses of `CL_GUI_CONTROL` in the target
   systems.
 - [ ] Create the naming rules, common demo data, and catalog launcher.
@@ -475,19 +577,21 @@ Every sample must:
 
 - [ ] Implement all four container families.
 - [ ] Implement picture, text edit, HTML viewer, toolbar, and calendar samples.
+- [ ] Implement the ABAP browser helper sample.
 - [ ] Implement tree models and low-level tree comparisons.
 - [ ] Implement Dynamic Documents and timer samples.
 
 ### Phase 4 - ALV and composed applications
 
 - [ ] Implement SALV table and the basic ALV grid.
-- [ ] Add editing, formatting, validation, variants, and events.
+- [ ] Add dynamic tables, editing, formatting, validation, variants, and events.
 - [ ] Implement ALV tree, SALV tree, and hierarchical-sequential SALV.
 - [ ] Build the workbench-style composite sample and cross-control drag-and-drop.
 
 ### Phase 5 - Compatibility and optional integrations
 
 - [ ] Add frontend services with security-aware error handling.
+- [ ] Add generic and ILI-specific drag-and-drop samples.
 - [ ] Add classic list processing and mark it as legacy.
 - [ ] Add Office Integration only on a suitable Windows test environment.
 - [ ] Add installed graphics controls behind runtime capability checks.
@@ -519,3 +623,4 @@ and the launcher lists and runs every sample.
 - [Selection-screen elements](https://help.sap.com/docs/SUPPORT_CONTENT/abap/3353524274.html)
 - [Working with the ALV Grid Control](https://help.sap.com/docs/ABAP_PLATFORM_NEW/70396d7dec4c4f19b9ca3b2e47559d12/4ebd16291041389ee10000000a421937.html)
 - [Classic list processing](https://help.sap.com/docs/SUPPORT_CONTENT/abap/3353525729.html)
+- [`open-abap-gui` source inventory](https://github.com/open-abap/open-abap-gui/tree/main/src)
