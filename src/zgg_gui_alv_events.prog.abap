@@ -440,7 +440,7 @@ FORM register_native_delayed_event.
   ENDTRY.
 ENDFORM.
 
-FORM unregister_native_delayed_event.
+FORM unregister_delayed_event.
   IF gv_native_event_program IS NOT INITIAL AND
       gv_native_events_registered = abap_true.
     TRY.
@@ -467,7 +467,7 @@ ENDFORM.
 
 FORM toggle_event_mode.
   gv_application_events = xsdbool( gv_application_events = abap_false ).
-  PERFORM unregister_native_delayed_event.
+  PERFORM unregister_delayed_event.
   IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
   FREE go_events.
   PERFORM create_grid.
@@ -506,7 +506,7 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
 ENDFORM.
 
 FORM free_controls.
-  PERFORM unregister_native_delayed_event.
+  PERFORM unregister_delayed_event.
   CLEAR gv_native_event_program.
   FREE: go_events, go_dragdrop.
   IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.

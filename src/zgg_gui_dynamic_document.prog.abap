@@ -192,7 +192,7 @@ FORM populate_document USING iv_reuse TYPE abap_bool.
       tooltip = 'Native CL_DD_BUTTON_ELEMENT clicked event' name = 'SAMPLE_BUTTON'
     IMPORTING button = go_button.
 
-  PERFORM register_native_document_events.
+  PERFORM register_document_events.
 
   CALL METHOD go_document->('MERGE_DOCUMENT').
   CALL METHOD go_document->('DISPLAY_DOCUMENT')
@@ -200,7 +200,7 @@ FORM populate_document USING iv_reuse TYPE abap_bool.
       reuse_registration = iv_reuse.
 ENDFORM.
 
-FORM register_native_document_events.
+FORM register_document_events.
   DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
   DATA lv_message TYPE string.
 
@@ -309,7 +309,7 @@ FORM register_native_document_events.
   ENDTRY.
 ENDFORM.
 
-FORM unregister_native_document_events.
+FORM unregister_document_events.
   IF gv_native_event_program IS NOT INITIAL AND
       gv_native_events_registered = abap_true.
     TRY.
@@ -380,7 +380,7 @@ FORM reset_document.
     RETURN.
   ENDIF.
   TRY.
-      PERFORM unregister_native_document_events.
+      PERFORM unregister_document_events.
       CALL METHOD go_document->('INITIALIZE_DOCUMENT').
       FREE: go_right_area, go_table, go_table_area, go_form, go_link,
         go_input, go_select, go_button.
@@ -416,7 +416,7 @@ FORM show_fallback USING iv_error TYPE string.
 ENDFORM.
 
 FORM free_controls.
-  PERFORM unregister_native_document_events.
+  PERFORM unregister_document_events.
   CLEAR gv_native_event_program.
   IF go_fallback IS BOUND.
     go_fallback->close_document( ).

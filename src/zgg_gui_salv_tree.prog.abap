@@ -113,7 +113,7 @@ FORM create_controls.
       PERFORM configure_columns.
       CALL METHOD go_functions->('SET_ALL') EXPORTING value = abap_true.
       CALL METHOD go_selections->('SET_SELECTION_MODE') EXPORTING value = 2.
-      PERFORM register_native_salv_tree_events.
+      PERFORM register_salv_tree_events.
       CALL METHOD go_tree->('DISPLAY').
       IF gv_native_events_registered = abap_true.
         gv_status = 'Native SALV tree created with link-click and double-click events'.
@@ -128,7 +128,7 @@ FORM create_controls.
   ENDTRY.
 ENDFORM.
 
-FORM register_native_salv_tree_events.
+FORM register_salv_tree_events.
   DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
   DATA lv_message TYPE string.
 
@@ -196,7 +196,7 @@ FORM register_native_salv_tree_events.
   ENDTRY.
 ENDFORM.
 
-FORM unregister_native_salv_tree_events.
+FORM unregister_salv_tree_events.
   IF gv_native_event_program IS NOT INITIAL AND
       gv_native_events_registered = abap_true.
     TRY.
@@ -384,7 +384,7 @@ FORM show_fallback USING iv_error TYPE string.
 ENDFORM.
 
 FORM free_controls.
-  PERFORM unregister_native_salv_tree_events.
+  PERFORM unregister_salv_tree_events.
   CLEAR gv_native_event_program.
   FREE: go_nodes, go_columns, go_functions, go_selections, go_tree.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.

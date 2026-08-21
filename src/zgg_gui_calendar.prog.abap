@@ -135,7 +135,7 @@ FORM create_calendar.
           year_begin = gv_focus(4) - 2
           year_end = gv_focus(4) + 2.
       go_control ?= go_calendar.
-      PERFORM register_native_calendar_events.
+      PERFORM register_calendar_events.
       IF gv_native_events_registered = abap_true.
         gv_status = 'Calendar DATE_SELECTED and INFO_REQUEST events registered'.
       ELSE.
@@ -147,7 +147,7 @@ FORM create_calendar.
   ENDTRY.
 ENDFORM.
 
-FORM register_native_calendar_events.
+FORM register_calendar_events.
   DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
   DATA lv_message TYPE string.
 
@@ -222,7 +222,7 @@ FORM register_native_calendar_events.
   ENDTRY.
 ENDFORM.
 
-FORM unregister_native_calendar_events.
+FORM unregister_calendar_events.
   IF gv_native_event_program IS NOT INITIAL AND
       gv_native_events_registered = abap_true.
     TRY.
@@ -308,7 +308,7 @@ FORM describe_state.
 ENDFORM.
 
 FORM free_calendar.
-  PERFORM unregister_native_calendar_events.
+  PERFORM unregister_calendar_events.
   IF go_control IS BOUND. go_control->free( ). FREE go_control. ENDIF.
   FREE go_calendar.
 ENDFORM.

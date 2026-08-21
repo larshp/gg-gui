@@ -290,7 +290,7 @@ FORM register_native_context_event.
   ENDTRY.
 ENDFORM.
 
-FORM unregister_native_context_event.
+FORM unregister_context_event.
   IF gv_native_event_program IS NOT INITIAL AND
       gv_native_events_registered = abap_true.
     TRY.
@@ -538,7 +538,7 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
 ENDFORM.
 
 FORM free_controls.
-  PERFORM unregister_native_context_event.
+  PERFORM unregister_context_event.
   CLEAR gv_native_event_program.
   FREE: go_events, go_dragdrop.
   IF go_tree IS BOUND. go_tree->free( ). FREE go_tree. ENDIF.

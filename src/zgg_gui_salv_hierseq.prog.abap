@@ -258,7 +258,7 @@ FORM consume_native_hierseq_event.
   ENDIF.
 ENDFORM.
 
-FORM unregister_native_hierseq_events.
+FORM unregister_hierseq_events.
   IF gv_native_event_program IS NOT INITIAL AND
       gv_native_events_registered = abap_true.
     TRY.
@@ -359,7 +359,7 @@ FORM show_fallback USING iv_error TYPE string.
 ENDFORM.
 
 FORM free_controls.
-  PERFORM unregister_native_hierseq_events.
+  PERFORM unregister_hierseq_events.
   CLEAR gv_native_event_program.
   FREE: go_header_columns, go_item_columns, go_item_sorts,
     go_item_filters, go_item_aggregations, go_hierseq.
