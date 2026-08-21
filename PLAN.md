@@ -163,7 +163,8 @@ gracefully when unavailable.
 
 - [x] Static text fields and input/output fields.
 - [x] Output-only, required, invisible, and intensified fields.
-- [x] Date, time, numeric, quantity, currency, and masked templates.
+- [x] Date, time, numeric, quantity, currency, and masked templates, including
+  explicit `QUAN`/`UNIT` and `CURR`/`CUKY` reference-field pairs.
 - [x] Dropdown list boxes.
 - [x] Checkboxes and radio-button groups with and without function codes.
 - [x] Text and icon pushbuttons.
@@ -708,15 +709,17 @@ Every sample must:
   repository verification rejects these values before delivery.
 - [x] Separate top-level Screen Painter elements that share rows by at least one
   column; repository verification rejects touching or overlapping elements.
+- [x] Give top-level `QUAN` and `CURR` fields explicit unit and currency
+  references; repository verification checks matching visible reference types.
 - [ ] Work at common window sizes and DPI scaling levels.
 - [x] Document any frontend, operating-system, release, or software dependency.
 
 `npm run verify:repo` enforces the independently executable report shape,
 catalog parity and schema, screen/XML pairing, dynpro exit paths, event-receiver
-cleanup, Screen Painter icon aliases and top-level element spacing, PLAN
-coverage, anomaly record structure, and the direct-database-DML rule.
-Behavioral and visual requirements still require the native checks in Phase 6
-and are not inferred from this gate.
+cleanup, Screen Painter icon aliases, top-level element spacing, quantity and
+currency references, PLAN coverage, anomaly record structure, and the
+direct-database-DML rule. Behavioral and visual requirements still require the
+native checks in Phase 6 and are not inferred from this gate.
 
 ## Delivery Plan
 

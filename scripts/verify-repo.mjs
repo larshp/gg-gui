@@ -34,6 +34,8 @@ const topLevelScreenFields = (dynpro) =>
       const height = Number.parseInt(elementValue(field, "HEIGHT") || "1", 10);
       return {
         name: elementValue(field, "NAME"),
+        format: elementValue(field, "FORMAT").toUpperCase(),
+        reference: elementValue(field, "REF_FIELD").toUpperCase(),
         top: line,
         bottom: line + height - 1,
         left: column,
@@ -77,6 +79,23 @@ for (const file of reportFiles) {
     const dynpro = match[1];
     const screen = elementValue(dynpro.match(/<HEADER>([\s\S]*?)<\/HEADER>/i)?.[1] ?? "", "SCREEN");
     const screenFields = topLevelScreenFields(dynpro);
+    const fieldsByName = new Map(
+      screenFields.map((field) => [field.name.toUpperCase(), field]),
+    );
+    for (const field of screenFields) {
+      const referenceFormat = { CURR: "CUKY", QUAN: "UNIT" }[field.format];
+      if (!referenceFormat) continue;
+      if (!field.reference) {
+        fail(`${xmlName}: screen ${screen}, ${field.format} field ${field.name} has no reference field`);
+      }
+      const reference = fieldsByName.get(field.reference);
+      if (reference && reference.format !== referenceFormat) {
+        fail(
+          `${xmlName}: screen ${screen}, ${field.name} references ${reference.name} ` +
+          `with format ${reference.format} instead of ${referenceFormat}`,
+        );
+      }
+    }
     for (let first = 0; first < screenFields.length; first += 1) {
       for (let second = first + 1; second < screenFields.length; second += 1) {
         const a = screenFields[first];

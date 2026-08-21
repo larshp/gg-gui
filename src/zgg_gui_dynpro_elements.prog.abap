@@ -12,7 +12,8 @@ DATA gv_time TYPE t VALUE sy-uzeit.
 DATA gv_count TYPE i VALUE 5.
 DATA gv_amount TYPE p LENGTH 8 DECIMALS 2 VALUE '12.50'.
 DATA gv_quantity TYPE p LENGTH 8 DECIMALS 3 VALUE '3.250'.
-DATA gv_currency TYPE c LENGTH 3 VALUE 'EUR'.
+DATA gv_unit TYPE c LENGTH 3 VALUE 'KG'.
+DATA gv_currency TYPE c LENGTH 5 VALUE 'EUR'.
 DATA gv_user TYPE syuname.
 DATA gv_icon TYPE c LENGTH 40.
 DATA gv_list TYPE c LENGTH 10 VALUE 'ONE'.
@@ -64,6 +65,7 @@ MODULE user_command_0100 INPUT.
       gv_count = 5.
       gv_amount = '12.50'.
       gv_quantity = '3.250'.
+      gv_unit = 'KG'.
       gv_currency = 'EUR'.
       gv_user = sy-uname.
       gv_list = 'ONE'.
