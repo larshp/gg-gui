@@ -17,6 +17,32 @@ const unsupportedScreenIcons = new Set([
   "ICON_PLUS",
   "ICON_SYSTEM_OKAY",
 ]);
+const elementValue = (block, tag) =>
+  block.match(new RegExp(`<${tag}>([^<]*)</${tag}>`, "i"))?.[1].trim() ?? "";
+const topLevelScreenFields = (dynpro) =>
+  [...dynpro.matchAll(/<RPY_DYFATC>([\s\S]*?)<\/RPY_DYFATC>/gi)]
+    .map((match) => match[1])
+    .filter((field) => elementValue(field, "CONT_TYPE").toUpperCase() === "SCREEN")
+    .filter((field) => !["FRAME", "OKCODE"].includes(elementValue(field, "TYPE").toUpperCase()))
+    .map((field) => {
+      const line = Number.parseInt(elementValue(field, "LINE"), 10);
+      const column = Number.parseInt(elementValue(field, "COLUMN"), 10);
+      const width = Number.parseInt(
+        elementValue(field, "VISLENGTH") || elementValue(field, "LENGTH"),
+        10,
+      );
+      const height = Number.parseInt(elementValue(field, "HEIGHT") || "1", 10);
+      return {
+        name: elementValue(field, "NAME"),
+        top: line,
+        bottom: line + height - 1,
+        left: column,
+        right: column + width - 1,
+      };
+    })
+    .filter((field) =>
+      field.name && [field.top, field.bottom, field.left, field.right].every(Number.isFinite),
+    );
 
 const reportFiles = files.filter((name) => /^zgg_gui_.+\.prog\.abap$/i.test(name));
 const sampleFiles = reportFiles.filter((name) => name !== "zgg_gui_catalog.prog.abap");
@@ -44,6 +70,23 @@ for (const file of reportFiles) {
     const icon = match[1].trim().toUpperCase();
     if (unsupportedScreenIcons.has(icon)) {
       fail(`${xmlName}: unsupported Screen Painter icon ${icon}`);
+    }
+  }
+  const dynpros = xml.match(/<DYNPROS>([\s\S]*?)<\/DYNPROS>/i)?.[1] ?? "";
+  for (const match of dynpros.matchAll(/<item>([\s\S]*?)<\/item>/gi)) {
+    const dynpro = match[1];
+    const screen = elementValue(dynpro.match(/<HEADER>([\s\S]*?)<\/HEADER>/i)?.[1] ?? "", "SCREEN");
+    const screenFields = topLevelScreenFields(dynpro);
+    for (let first = 0; first < screenFields.length; first += 1) {
+      for (let second = first + 1; second < screenFields.length; second += 1) {
+        const a = screenFields[first];
+        const b = screenFields[second];
+        const rowsOverlap = a.top <= b.bottom && b.top <= a.bottom;
+        const columnsTouch = a.left <= b.right + 1 && b.left <= a.right + 1;
+        if (rowsOverlap && columnsTouch) {
+          fail(`${xmlName}: screen ${screen}, element ${a.name} touches or overlaps ${b.name}`);
+        }
+      }
     }
   }
   if (!/<TPOOL>[\s\S]*?<ID>R<\/ID>/i.test(xml)) {

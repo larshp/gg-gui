@@ -28,6 +28,7 @@
     "check_ddic": true,
     "check_include": true,
     "check_syntax": true,
+    "dynpro_checks": true,
     "global_class": true,
     "implement_methods": true,
     "method_implemented_twice": true,

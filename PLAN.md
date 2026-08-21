@@ -706,14 +706,17 @@ Every sample must:
 - [x] Use icons with text or quick info where their meaning is not universal.
 - [x] Exclude Screen Painter icon aliases known to fail native object import;
   repository verification rejects these values before delivery.
+- [x] Separate top-level Screen Painter elements that share rows by at least one
+  column; repository verification rejects touching or overlapping elements.
 - [ ] Work at common window sizes and DPI scaling levels.
 - [x] Document any frontend, operating-system, release, or software dependency.
 
 `npm run verify:repo` enforces the independently executable report shape,
 catalog parity and schema, screen/XML pairing, dynpro exit paths, event-receiver
-cleanup, Screen Painter icon aliases, PLAN coverage, anomaly record structure,
-and the direct-database-DML rule. Behavioral and visual requirements still
-require the native checks in Phase 6 and are not inferred from this gate.
+cleanup, Screen Painter icon aliases and top-level element spacing, PLAN
+coverage, anomaly record structure, and the direct-database-DML rule.
+Behavioral and visual requirements still require the native checks in Phase 6
+and are not inferred from this gate.
 
 ## Delivery Plan
 
