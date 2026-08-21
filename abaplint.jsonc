@@ -1,0 +1,40 @@
+{
+  "global": {
+    "files": "/src/**/*.*",
+    "skipGeneratedGatewayClasses": true,
+    "skipGeneratedPersistentClasses": true,
+    "skipGeneratedFunctionGroups": true,
+    "errorOnDuplicateFilenames": true
+  },
+  "dependencies": [
+    {
+      "url": "https://github.com/open-abap/open-abap-core",
+      "folder": "/deps/open-abap-core",
+      "files": "/src/**/*.*"
+    },
+    {
+      "url": "https://github.com/open-abap/open-abap-gui",
+      "folder": "/deps/open-abap-gui",
+      "files": "/src/**/*.*"
+    }
+  ],
+  "syntax": {
+    "version": "v750",
+    "errorNamespace": "^(ZGG_GUI_|ZCL_GG_GUI_|LCL_|LIF_|TY_)"
+  },
+  "rules": {
+    "7bit_ascii": true,
+    "begin_end_names": true,
+    "check_ddic": true,
+    "check_include": true,
+    "check_syntax": true,
+    "global_class": true,
+    "implement_methods": true,
+    "method_implemented_twice": true,
+    "parser_error": true,
+    "selection_screen_texts_missing": true,
+    "unknown_types": true,
+    "whitespace_end": true,
+    "xml_consistency": true
+  }
+}

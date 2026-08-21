@@ -1,0 +1,13 @@
+{
+  "name": "gg-gui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Curated ABAP samples for SAP GUI controls and screen elements",
+  "scripts": {
+    "lint": "abaplint --format codeframe",
+    "test": "npm run lint"
+  },
+  "devDependencies": {
+    "@abaplint/cli": "2.120.27"
+  }
+}

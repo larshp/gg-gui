@@ -60,6 +60,19 @@ gracefully when unavailable.
   `ZCL_GG_GUI_DEMO_DATA` and `ZCL_GG_GUI_DEMO_HELPER`.
 - Use local classes for event handlers that are meaningful only to one sample.
 
+## Progress Tracking
+
+- Change an inventory or delivery-plan item to `[x]` only after its repository
+  artifacts implement the described behavior and the full `npm test` lint run
+  passes.
+- Leave partially implemented, unverified, or planned behavior as `[ ]`; do not
+  mark an entire report complete merely because its initial source file exists.
+- Update this file in the same change that completes a step so the checklist is
+  the implementation status source.
+- Native-SAP behavior may be marked complete when it is implemented with a
+  graceful capability check even if open-abap cannot execute it. The missing or
+  different open-abap behavior must then be recorded in `ANORMALIES.md`.
+
 ## Program Inventory
 
 ### 00. Catalog and Control Framework Fundamentals
@@ -67,179 +80,179 @@ gracefully when unavailable.
 #### `ZGG_GUI_CATALOG` - Sample launcher
 
 - [ ] List every sample by category, title, and program name.
-- [ ] Launch executable reports and return to the catalog afterward.
+- [x] Launch executable reports and return to the catalog afterward.
 
 #### `ZGG_GUI_CFW_BASICS` - Control Framework lifecycle
 
-- [ ] Create a control once during PBO and reuse it on later round trips.
-- [ ] Register and handle system and application events.
-- [ ] Demonstrate `CL_GUI_CFW=>DISPATCH` and `CL_GUI_CFW=>FLUSH`.
-- [ ] Demonstrate `SET_NEW_OK_CODE`, `UPDATE_VIEW`, and metric-to-pixel
+- [x] Create a control once during PBO and reuse it on later round trips.
+- [x] Register and handle system and application events.
+- [x] Demonstrate `CL_GUI_CFW=>DISPATCH` and `CL_GUI_CFW=>FLUSH`.
+- [x] Demonstrate `SET_NEW_OK_CODE`, `UPDATE_VIEW`, and metric-to-pixel
   conversion.
-- [ ] Set focus and inspect the active control.
-- [ ] Check validity and frontend technology flags through `CL_GUI_OBJECT`.
-- [ ] Set visibility, enablement, alignment, position, width, and height through
+- [x] Set focus and inspect the active control.
+- [x] Check validity and frontend technology flags through `CL_GUI_OBJECT`.
+- [x] Set visibility, enablement, alignment, position, width, and height through
   common `CL_GUI_CONTROL` methods.
-- [ ] Refresh frontend state without recreating the control.
-- [ ] Free controls in the correct child-to-parent order.
-- [ ] Handle Control Framework and automation errors.
-- [ ] Display an event log that makes PBO, PAI, and control events visible.
+- [x] Refresh frontend state without recreating the control.
+- [x] Free controls in the correct child-to-parent order.
+- [x] Handle Control Framework and automation errors.
+- [x] Display an event log that makes PBO, PAI, and control events visible.
 
 ### 10. Selection Screens
 
 #### `ZGG_GUI_SEL_FIELDS` - Parameter field variants
 
 - [ ] Character, numeric, date, time, quantity, currency, and boolean fields.
-- [ ] Checkbox and radio-button group parameters.
-- [ ] Dropdown list box populated through `VRM_SET_VALUES`.
+- [x] Checkbox and radio-button group parameters.
+- [x] Dropdown list box populated through `VRM_SET_VALUES`.
 - [ ] Obligatory, lowercase, visible-length, memory-ID, and default values.
 - [ ] DDIC-bound labels, conversion exits, search help, and parameter IDs.
-- [ ] Password-style input where supported and appropriate.
+- [x] Password-style input where supported and appropriate.
 
 #### `ZGG_GUI_SEL_RANGES` - Select-options and ranges
 
 - [ ] Single values, intervals, patterns, inclusions, and exclusions.
-- [ ] Multiple-selection dialog.
-- [ ] `NO-EXTENSION`, `NO INTERVALS`, and `OBLIGATORY` variants.
-- [ ] Default values and default ranges.
-- [ ] Restriction with `SELECT_OPTIONS_RESTRICT`.
-- [ ] Display the resulting range table after execution.
+- [x] Multiple-selection dialog.
+- [x] `NO-EXTENSION`, `NO INTERVALS`, and `OBLIGATORY` variants.
+- [x] Default values and default ranges.
+- [x] Restriction with `SELECT_OPTIONS_RESTRICT`.
+- [x] Display the resulting range table after execution.
 
 #### `ZGG_GUI_SEL_LAYOUT` - Selection-screen layout
 
-- [ ] Framed and unframed blocks.
-- [ ] Comments, horizontal lines, blank lines, and explicit positions.
-- [ ] Multiple elements on one line.
-- [ ] Selection-screen pushbuttons with user commands.
-- [ ] Application-toolbar function keys through `SSCRFIELDS`.
-- [ ] Icons and quick-info text where selection screens support them.
+- [x] Framed and unframed blocks.
+- [x] Comments, horizontal lines, blank lines, and explicit positions.
+- [x] Multiple elements on one line.
+- [x] Selection-screen pushbuttons with user commands.
+- [x] Application-toolbar function keys through `SSCRFIELDS`.
+- [x] Icons and quick-info text where selection screens support them.
 
 #### `ZGG_GUI_SEL_DYNAMIC` - Dynamic selection screens
 
-- [ ] Group elements with `MODIF ID`.
-- [ ] Change input, output, active, invisible, required, and intensified state.
+- [x] Group elements with `MODIF ID`.
+- [x] Change input, output, active, invisible, required, and intensified state.
 - [ ] React to radio buttons, checkboxes, list boxes, and pushbuttons.
-- [ ] Demonstrate `AT SELECTION-SCREEN OUTPUT`.
-- [ ] Field, block, and radio-group validation events.
-- [ ] Custom value-request and help-request handlers.
-- [ ] Place the cursor on the field that failed validation.
+- [x] Demonstrate `AT SELECTION-SCREEN OUTPUT`.
+- [x] Field, block, and radio-group validation events.
+- [x] Custom value-request and help-request handlers.
+- [x] Place the cursor on the field that failed validation.
 
 #### `ZGG_GUI_SEL_TABS` - Selection-screen subscreens and tabs
 
-- [ ] Define selection screens as subscreens.
-- [ ] Create a tabbed block with at least three pages.
-- [ ] Switch pages through user commands.
-- [ ] Preserve field values while switching tabs.
-- [ ] Validate active and inactive tab contents correctly.
+- [x] Define selection screens as subscreens.
+- [x] Create a tabbed block with at least three pages.
+- [x] Switch pages through user commands.
+- [x] Preserve field values while switching tabs.
+- [x] Validate active and inactive tab contents correctly.
 
 ### 20. Classic Dynpro Elements
 
 #### `ZGG_GUI_DYNPRO_ELEMENTS` - Screen Painter element gallery
 
-- [ ] Static text fields and input/output fields.
-- [ ] Output-only, required, invisible, and intensified fields.
+- [x] Static text fields and input/output fields.
+- [x] Output-only, required, invisible, and intensified fields.
 - [ ] Date, time, numeric, quantity, currency, and masked templates.
-- [ ] Dropdown list boxes.
-- [ ] Checkboxes and radio-button groups with and without function codes.
-- [ ] Text and icon pushbuttons.
-- [ ] Group boxes and framed areas.
+- [x] Dropdown list boxes.
+- [x] Checkboxes and radio-button groups with and without function codes.
+- [x] Text and icon pushbuttons.
+- [x] Group boxes and framed areas.
 - [ ] Status icons with text and quick info.
 - [ ] Demonstrate field attributes inherited from DDIC references.
 
 #### `ZGG_GUI_DYNPRO_FLOW` - PBO, PAI, and dynamic field behavior
 
-- [ ] PBO and PAI module sequence.
-- [ ] `FIELD`, `CHAIN`, and `ENDCHAIN` validation.
-- [ ] `ON INPUT`, `ON REQUEST`, and chain-level validation.
-- [ ] `LOOP AT SCREEN` and `MODIFY SCREEN`.
-- [ ] Set and read the cursor position.
-- [ ] Preserve `OK_CODE` correctly before clearing it.
-- [ ] Demonstrate normal, exit, and cancel function-code processing.
+- [x] PBO and PAI module sequence.
+- [x] `FIELD`, `CHAIN`, and `ENDCHAIN` validation.
+- [x] `ON INPUT`, `ON REQUEST`, and chain-level validation.
+- [x] `LOOP AT SCREEN` and `MODIFY SCREEN`.
+- [x] Set and read the cursor position.
+- [x] Preserve `OK_CODE` correctly before clearing it.
+- [x] Demonstrate normal, exit, and cancel function-code processing.
 
 #### `ZGG_GUI_TABLE_CONTROL` - Editable table control
 
-- [ ] Display and edit multiple rows.
-- [ ] Vertical and horizontal scrolling.
-- [ ] Current-line and visible-line handling.
-- [ ] Row selection and mark columns.
-- [ ] Insert, append, copy, and delete rows.
-- [ ] Validate individual cells and complete rows.
-- [ ] Enable or disable cells dynamically.
-- [ ] Keep the cursor and scroll position after refresh.
+- [x] Display and edit multiple rows.
+- [x] Vertical and horizontal scrolling.
+- [x] Current-line and visible-line handling.
+- [x] Row selection and mark columns.
+- [x] Insert, append, copy, and delete rows.
+- [x] Validate individual cells and complete rows.
+- [x] Enable or disable cells dynamically.
+- [x] Keep the cursor and scroll position after refresh.
 
 #### `ZGG_GUI_TABSTRIP` - Dynpro tabstrip control
 
-- [ ] Tabs backed by separate subscreens.
-- [ ] Server-side tab paging.
+- [x] Tabs backed by separate subscreens.
+- [x] Server-side tab paging.
 - [ ] Client-side tab paging if supported by the target release.
-- [ ] Dynamic tab titles and tab visibility.
-- [ ] Correct PBO and PAI processing for the active subscreen.
+- [x] Dynamic tab titles and tab visibility.
+- [x] Correct PBO and PAI processing for the active subscreen.
 
 #### `ZGG_GUI_SUBSCREENS` - Reusable subscreen areas
 
-- [ ] Static subscreen embedding.
-- [ ] Dynamic replacement of the subscreen program and number.
-- [ ] Multiple subscreen areas on one parent screen.
-- [ ] Data exchange between parent screen and subscreen.
+- [x] Static subscreen embedding.
+- [x] Dynamic replacement of the subscreen program and number.
+- [x] Multiple subscreen areas on one parent screen.
+- [x] Data exchange between parent screen and subscreen.
 - [ ] Navigation restrictions inside subscreen flow logic.
 
 #### `ZGG_GUI_GUI_STATUS` - Menus, toolbars, and function keys
 
-- [ ] Menu bar with nested menu entries and separators.
-- [ ] Standard toolbar functions.
-- [ ] Application toolbar buttons with icons and quick info.
-- [ ] Function-key assignments.
-- [ ] Static and dynamic GUI titles.
-- [ ] Dynamically exclude, enable, or disable functions.
-- [ ] Context menus created with `CL_CTMENU`.
-- [ ] Standard Back, Exit, and Cancel behavior.
+- [x] Menu bar with nested menu entries and separators.
+- [x] Standard toolbar functions.
+- [x] Application toolbar buttons with icons and quick info.
+- [x] Function-key assignments.
+- [x] Static and dynamic GUI titles.
+- [x] Dynamically exclude, enable, or disable functions.
+- [x] Context menus created with `CL_CTMENU`.
+- [x] Standard Back, Exit, and Cancel behavior.
 
 #### `ZGG_GUI_DIALOGS_HELP` - Dialog screens, messages, F1, and F4
 
-- [ ] Modal dialog screen using `CALL SCREEN ... STARTING AT ... ENDING AT`.
-- [ ] Standard confirmation, information, and value-entry popups.
-- [ ] Safe message types and status-bar messages.
-- [ ] Progress indication with `CL_PROGRESS_INDICATOR=>PROGRESS_INDICATE`
+- [x] Modal dialog screen using `CALL SCREEN ... STARTING AT ... ENDING AT`.
+- [x] Standard confirmation, information, and value-entry popups.
+- [x] Safe message types and status-bar messages.
+- [x] Progress indication with `CL_PROGRESS_INDICATOR=>PROGRESS_INDICATE`
   without blocking normal cancellation.
-- [ ] DDIC search help and custom process-on-value-request logic.
-- [ ] DDIC documentation and custom process-on-help-request logic.
-- [ ] Return selected values and distinguish confirm, cancel, and close.
+- [x] DDIC search help and custom process-on-value-request logic.
+- [x] DDIC documentation and custom process-on-help-request logic.
+- [x] Return selected values and distinguish confirm, cancel, and close.
 
 ### 30. Control Framework Containers
 
 #### `ZGG_GUI_CUSTOM_CONTAINER` - Custom container
 
-- [ ] Embed a control in a Screen Painter custom-control area.
-- [ ] Compare a custom container with `CL_GUI_CONTAINER=>SCREEN0` and
+- [x] Embed a control in a Screen Painter custom-control area.
+- [x] Compare a custom container with `CL_GUI_CONTAINER=>SCREEN0` and
   `DEFAULT_SCREEN`.
-- [ ] Link a container by program, screen, custom-control name, or parent.
-- [ ] Compare container lifetime modes.
-- [ ] Resize the screen and child control.
-- [ ] Replace or recreate the hosted child safely.
+- [x] Link a container by program, screen, custom-control name, or parent.
+- [x] Compare container lifetime modes.
+- [x] Resize the screen and child control.
+- [x] Replace or recreate the hosted child safely.
 
 #### `ZGG_GUI_DOCKING_CONTAINER` - Docking container
 
-- [ ] Dock on the left, right, top, and bottom edges.
-- [ ] Change extension and alignment at runtime.
-- [ ] Allow detach and reattach where supported.
-- [ ] Handle resize and close events.
+- [x] Dock on the left, right, top, and bottom edges.
+- [x] Change extension and alignment at runtime.
+- [x] Allow detach and reattach where supported.
+- [x] Handle resize and close events.
 
 #### `ZGG_GUI_SPLITTER_CONTAINER` - Splitter containers
 
-- [ ] Horizontal and vertical splits.
-- [ ] Nested `CL_GUI_SPLITTER_CONTAINER` instances.
-- [ ] `CL_GUI_EASY_SPLITTER_CONTAINER` comparison.
-- [ ] Fixed, relative, minimum, and hidden pane sizes.
-- [ ] Row and column sizing modes, sash visibility, and border settings.
-- [ ] Read current row heights and column widths after interactive resizing.
-- [ ] Place a different working control in each cell.
+- [x] Horizontal and vertical splits.
+- [x] Nested `CL_GUI_SPLITTER_CONTAINER` instances.
+- [x] `CL_GUI_EASY_SPLITTER_CONTAINER` comparison.
+- [x] Fixed, relative, minimum, and hidden pane sizes.
+- [x] Row and column sizing modes, sash visibility, and border settings.
+- [x] Read current row heights and column widths after interactive resizing.
+- [x] Place a different working control in each cell.
 
 #### `ZGG_GUI_DIALOG_CONTAINER` - Modeless dialog container
 
-- [ ] Create `CL_GUI_DIALOGBOX_CONTAINER`.
-- [ ] Host a real child control.
-- [ ] Move, resize, close, and recreate the dialog.
-- [ ] Coordinate dialog events with the owning dynpro.
+- [x] Create `CL_GUI_DIALOGBOX_CONTAINER`.
+- [x] Host a real child control.
+- [x] Move, resize, close, and recreate the dialog.
+- [x] Coordinate dialog events with the owning dynpro.
 
 #### `ZGG_GUI_COMPOSITE` - Workbench-style composition
 
@@ -254,63 +267,63 @@ gracefully when unavailable.
 
 #### `ZGG_GUI_PICTURE` - Picture control
 
-- [ ] Load a MIME repository or URL-based image.
-- [ ] Compare synchronous and asynchronous URL loading.
+- [x] Load a MIME repository or URL-based image.
+- [x] Compare synchronous and asynchronous URL loading.
 - [ ] Display supported bitmap formats.
-- [ ] Stretch, fit, center, and keep-aspect display modes.
-- [ ] Toggle the 3D border.
+- [x] Stretch, fit, center, and keep-aspect display modes.
+- [x] Toggle the 3D border.
 - [ ] React to picture clicks where supported.
-- [ ] Clear and reload the image.
-- [ ] Handle unavailable or invalid image sources.
+- [x] Clear and reload the image.
+- [x] Handle unavailable or invalid image sources.
 
 #### `ZGG_GUI_TEXTEDIT` - Text edit control
 
-- [ ] Set and retrieve text as a table and as a stream.
-- [ ] Editable and read-only modes.
-- [ ] Word wrap, line wrap, toolbar, and status-bar options.
-- [ ] Selection, current line, and current position.
+- [x] Set and retrieve text as a table and as a stream.
+- [x] Editable and read-only modes.
+- [x] Word wrap, line wrap, toolbar, and status-bar options.
+- [x] Selection, current line, and current position.
 - [ ] Modified-state and text-change handling.
-- [ ] Protected text or line areas where supported.
-- [ ] Fixed-width and proportional fonts.
-- [ ] Delete all text and restore the initial document.
-- [ ] Local file load and save through an explicit user-selected path.
+- [x] Protected text or line areas where supported.
+- [x] Fixed-width and proportional fonts.
+- [x] Delete all text and restore the initial document.
+- [x] Local file load and save through an explicit user-selected path.
 
 #### `ZGG_GUI_HTML_VIEWER` - HTML viewer
 
-- [ ] Load generated HTML with `LOAD_DATA`.
-- [ ] Display a URL when frontend security permits it.
-- [ ] Handle `SAPEVENT` links and normal hyperlinks.
-- [ ] Provide images and related resources to generated HTML.
-- [ ] Compare `LOAD_DATA` plus `SHOW_URL` with direct `SHOW_DATA`.
-- [ ] Read the current URL and configure viewer UI flags.
-- [ ] Navigate backward, forward, home, and refresh.
-- [ ] Close the current document and release its resources.
+- [x] Load generated HTML with `LOAD_DATA`.
+- [x] Display a URL when frontend security permits it.
+- [x] Handle `SAPEVENT` links and normal hyperlinks.
+- [x] Provide images and related resources to generated HTML.
+- [x] Compare `LOAD_DATA` plus `SHOW_URL` with direct `SHOW_DATA`.
+- [x] Read the current URL and configure viewer UI flags.
+- [x] Navigate backward, forward, home, and refresh.
+- [x] Close the current document and release its resources.
 - [ ] Document rendering and security differences between frontends.
-- [ ] Avoid relying on deprecated browser-specific behavior.
+- [x] Avoid relying on deprecated browser-specific behavior.
 
 #### `ZGG_GUI_ABAP_BROWSER` - ABAP browser helper
 
-- [ ] Display an HTML string with `CL_ABAP_BROWSER=>SHOW_HTML`.
-- [ ] Display XML supplied as both `STRING` and `XSTRING`.
-- [ ] Compare fullscreen, supplied-container, and dialog display modes.
-- [ ] Set a title and demonstrate the printing option where supported.
-- [ ] Handle malformed or empty content without terminating the caller.
+- [x] Display an HTML string with `CL_ABAP_BROWSER=>SHOW_HTML`.
+- [x] Display XML supplied as both `STRING` and `XSTRING`.
+- [x] Compare fullscreen, supplied-container, and dialog display modes.
+- [x] Set a title and demonstrate the printing option where supported.
+- [x] Handle malformed or empty content without terminating the caller.
 
 #### `ZGG_GUI_TOOLBAR` - Toolbar control
 
-- [ ] Normal, toggle, menu, and button-with-menu items.
-- [ ] Separators, icons, quick info, and disabled buttons.
-- [ ] Dynamic insert, delete, enable, and check state.
-- [ ] Function-selected and dropdown-clicked events.
-- [ ] Context menus and submenus built with `CL_CTMENU`.
-- [ ] Static context-menu tables, button groups, visibility, and state changes.
+- [x] Normal, toggle, menu, and button-with-menu items.
+- [x] Separators, icons, quick info, and disabled buttons.
+- [x] Dynamic insert, delete, enable, and check state.
+- [x] Function-selected and dropdown-clicked events.
+- [x] Context menus and submenus built with `CL_CTMENU`.
+- [x] Static context-menu tables, button groups, visibility, and state changes.
 
 #### `ZGG_GUI_CALENDAR` - Calendar control
 
-- [ ] Single-date and date-range selection.
+- [x] Single-date and date-range selection.
 - [ ] Multi-selection where supported.
-- [ ] Navigate between months and years.
-- [ ] Mark dates and display day information.
+- [x] Navigate between months and years.
+- [x] Mark dates and display day information.
 - [ ] Selection and view-change events.
 - [ ] Locale-dependent first day, names, and date formatting.
 
@@ -321,112 +334,112 @@ gracefully when unavailable.
 - [ ] Column tree using `CL_COLUMN_TREE_MODEL`.
 - [ ] Compare `CL_GUI_SIMPLE_TREE`, `CL_GUI_LIST_TREE`, and
   `CL_GUI_COLUMN_TREE` with their tree-model counterparts.
-- [ ] Exercise inherited `CL_TREE_CONTROL_BASE` selection, visibility, and
+- [x] Exercise inherited `CL_TREE_CONTROL_BASE` selection, visibility, and
   expanded-node APIs.
-- [ ] Exercise `CL_ITEM_TREE_CONTROL` behavior through a column or list tree.
-- [ ] Add, update, move, expand, collapse, and delete nodes.
-- [ ] Icons, checkboxes, item buttons, editable items, item styles, and multiple
+- [x] Exercise `CL_ITEM_TREE_CONTROL` behavior through a column or list tree.
+- [x] Add, update, move, expand, collapse, and delete nodes.
+- [x] Icons, checkboxes, item buttons, editable items, item styles, and multiple
   columns.
-- [ ] Hierarchy headers, column widths, hidden columns, and header events.
-- [ ] Node and item selection, chosen state, double-click, context menu, and key
+- [x] Hierarchy headers, column widths, hidden columns, and header events.
+- [x] Node and item selection, chosen state, double-click, context menu, and key
   events.
-- [ ] Lazy loading of child nodes.
+- [x] Lazy loading of child nodes.
 - [ ] Single- and multi-item drag-and-drop within a tree and to another control.
 
 #### `ZGG_GUI_DYNAMIC_DOCUMENT` - Dynamic Documents
 
-- [ ] Create a document and display it in an HTML viewer.
-- [ ] Headings, text, icons, links, and formatted areas.
-- [ ] Tables and form areas.
-- [ ] Buttons, input elements, and select elements.
-- [ ] Background pictures, document merging, and vertical splitting.
-- [ ] Table row and column styles.
-- [ ] Print a generated document.
+- [x] Create a document and display it in an HTML viewer.
+- [x] Headings, text, icons, links, and formatted areas.
+- [x] Tables and form areas.
+- [x] Buttons, input elements, and select elements.
+- [x] Background pictures, document merging, and vertical splitting.
+- [x] Table row and column styles.
+- [x] Print a generated document.
 - [ ] Handle document events.
-- [ ] Refresh parts of a document without rebuilding unrelated state.
+- [x] Refresh parts of a document without rebuilding unrelated state.
 
 #### `ZGG_GUI_TIMER` - Frontend timer
 
-- [ ] Create and start `CL_GUI_TIMER`.
-- [ ] Handle repeated timer events.
-- [ ] Start, stop, and change the interval.
-- [ ] Refresh a visible control from timer events.
-- [ ] Prevent duplicate timers and free the timer on exit.
+- [x] Create and start `CL_GUI_TIMER`.
+- [x] Handle repeated timer events.
+- [x] Start, stop, and change the interval.
+- [x] Refresh a visible control from timer events.
+- [x] Prevent duplicate timers and free the timer on exit.
 
 ### 50. SALV and ALV
 
 #### `ZGG_GUI_SALV_TABLE` - Read-only SALV table
 
-- [ ] Automatic column generation.
-- [ ] Column texts, visibility, width, alignment, and technical columns.
-- [ ] Currency, quantity, sign, zero, edit-mask, key, color, cell-type,
+- [x] Automatic column generation.
+- [x] Column texts, visibility, width, alignment, and technical columns.
+- [x] Currency, quantity, sign, zero, edit-mask, key, color, cell-type,
   exception, and hyperlink column settings.
-- [ ] Standard functions, sorting, filtering, and aggregation.
-- [ ] Add and remove custom functions and handle `ADDED_FUNCTION`.
-- [ ] Layout variants and initial layout keys.
-- [ ] Find default and available layouts with `CL_SALV_LAYOUT_SERVICE`,
+- [x] Standard functions, sorting, filtering, and aggregation.
+- [x] Add and remove custom functions and handle `ADDED_FUNCTION`.
+- [x] Layout variants and initial layout keys.
+- [x] Find default and available layouts with `CL_SALV_LAYOUT_SERVICE`,
   including layout F4 help.
-- [ ] Striped pattern, optimized width, selection modes, and row marks.
-- [ ] Configure hyperlinks through `CL_SALV_HYPERLINKS` and handle link-click
+- [x] Striped pattern, optimized width, selection modes, and row marks.
+- [x] Configure hyperlinks through `CL_SALV_HYPERLINKS` and handle link-click
   and double-click events.
-- [ ] Top-of-list, end-of-list, and print-specific form elements.
-- [ ] Fullscreen, popup, container-based, and offline display.
-- [ ] Export the current SALV representation with `TO_XML`.
+- [x] Top-of-list, end-of-list, and print-specific form elements.
+- [x] Fullscreen, popup, container-based, and offline display.
+- [x] Export the current SALV representation with `TO_XML`.
 
 #### `ZGG_GUI_ALV_GRID` - Basic ALV Grid Control
 
-- [ ] Build a field catalog manually and from DDIC metadata.
-- [ ] Pass a stable output table to `SET_TABLE_FOR_FIRST_DISPLAY`.
-- [ ] Apply layout and toolbar exclusions.
-- [ ] Read and replace frontend field catalogs and layouts.
-- [ ] Read and set selected rows, columns, cells, and the current cell.
-- [ ] Refresh with stable row and column position.
-- [ ] Read and restore scroll information.
-- [ ] Sort, filter, subtotal, aggregate, print, and export.
-- [ ] Read filtered entries, subtotals, print settings, and sort/filter criteria.
-- [ ] Change the grid title, ready-for-input state, and border.
-- [ ] Save and load layout variants.
+- [x] Build a field catalog manually and from DDIC metadata.
+- [x] Pass a stable output table to `SET_TABLE_FOR_FIRST_DISPLAY`.
+- [x] Apply layout and toolbar exclusions.
+- [x] Read and replace frontend field catalogs and layouts.
+- [x] Read and set selected rows, columns, cells, and the current cell.
+- [x] Refresh with stable row and column position.
+- [x] Read and restore scroll information.
+- [x] Sort, filter, subtotal, aggregate, print, and export.
+- [x] Read filtered entries, subtotals, print settings, and sort/filter criteria.
+- [x] Change the grid title, ready-for-input state, and border.
+- [x] Save and load layout variants.
 
 #### `ZGG_GUI_ALV_DYNAMIC` - Dynamic ALV output tables
 
-- [ ] Define an LVC field catalog without a static output structure.
-- [ ] Create the output table with
+- [x] Define an LVC field catalog without a static output structure.
+- [x] Create the output table with
   `CL_ALV_TABLE_CREATE=>CREATE_DYNAMIC_TABLE`.
-- [ ] Populate the generated table safely through data references and field
+- [x] Populate the generated table safely through data references and field
   symbols.
-- [ ] Add the optional style table and use the returned style-field name.
-- [ ] Display and edit the generated table in `CL_GUI_ALV_GRID`.
+- [x] Add the optional style table and use the returned style-field name.
+- [x] Display and edit the generated table in `CL_GUI_ALV_GRID`.
 
 #### `ZGG_GUI_ALV_VARIANTS` - Direct ALV variant handling
 
-- [ ] Construct `CL_ALV_VARIANT` with output table, field catalog, layout, and
+- [x] Construct `CL_ALV_VARIANT` with output table, field catalog, layout, and
   variant key.
-- [ ] Read variant information and the stored field catalog.
-- [ ] Apply, save, and switch between sample-owned variants.
-- [ ] Delete only variants created by this sample after explicit confirmation.
-- [ ] Clean up sample variants and leave unrelated user variants untouched.
+- [x] Read variant information and the stored field catalog.
+- [x] Apply, save, and switch between sample-owned variants.
+- [x] Delete only variants created by this sample after explicit confirmation.
+- [x] Clean up sample variants and leave unrelated user variants untouched.
 
 #### `ZGG_GUI_ALV_EDIT` - Editable ALV grid
 
-- [ ] Editable columns and individual editable cells.
-- [ ] Checkbox, dropdown, button, and hotspot cells.
-- [ ] Custom F4 help.
-- [ ] Register edit events and call `CHECK_CHANGED_DATA`.
-- [ ] Handle `DATA_CHANGED` and `DATA_CHANGED_FINISHED`.
-- [ ] Validate input with `CL_ALV_CHANGED_DATA_PROTOCOL`.
-- [ ] Add and display protocol entries, modify cells and styles, retrieve cell
+- [x] Editable columns and individual editable cells.
+- [x] Checkbox, dropdown, button, and hotspot cells.
+- [x] Custom F4 help.
+- [x] Register edit events and call `CHECK_CHANGED_DATA`.
+- [x] Handle `DATA_CHANGED` and `DATA_CHANGED_FINISHED`.
+- [x] Validate input with `CL_ALV_CHANGED_DATA_PROTOCOL`.
+- [x] Add and display protocol entries, modify cells and styles, retrieve cell
   values, and refresh the protocol.
-- [ ] Insert, copy, and delete rows.
-- [ ] Detect, save, and discard changes without database updates.
+- [x] Insert, copy, and delete rows.
+- [x] Detect, save, and discard changes without database updates.
 
 #### `ZGG_GUI_ALV_FORMAT` - ALV presentation features
 
-- [ ] Row, column, and cell colors.
-- [ ] Cell styles, disabled cells, emphasized cells, and buttons.
-- [ ] Icons, symbols, traffic lights, and exception fields.
-- [ ] Currency, quantity, unit, date, time, and decimal formatting.
-- [ ] Merged headers or column groups where supported.
-- [ ] Fixed columns, zebra pattern, totals, and subtotals.
+- [x] Row, column, and cell colors.
+- [x] Cell styles, disabled cells, emphasized cells, and buttons.
+- [x] Icons, symbols, traffic lights, and exception fields.
+- [x] Currency, quantity, unit, date, time, and decimal formatting.
+- [x] Merged headers or column groups where supported.
+- [x] Fixed columns, zebra pattern, totals, and subtotals.
 
 #### `ZGG_GUI_ALV_EVENTS` - ALV interaction and extension
 
@@ -546,6 +559,9 @@ Every sample must:
 - [ ] Preserve useful cursor, selection, and scroll state after refresh.
 - [ ] Free frontend controls and event handlers cleanly.
 - [ ] Handle missing frontend capabilities without a runtime error.
+- [ ] Record transpiler/runtime behavior differences and missing open-abap
+  functionality in `ANORMALIES.md`, including a minimal reproduction and the
+  native SAP behavior expected.
 - [ ] Avoid color as the only indication of status or validation.
 - [ ] Use icons with text or quick info where their meaning is not universal.
 - [ ] Work at common window sizes and DPI scaling levels.
@@ -555,35 +571,35 @@ Every sample must:
 
 ### Phase 1 - Baseline and repository conventions
 
-- [ ] Choose the lowest supported ABAP Platform release.
-- [ ] Choose the frontends included in the compatibility promise.
+- [x] Choose the lowest supported ABAP Platform release.
+- [x] Choose the frontends included in the compatibility promise.
 - [ ] Audit standard examples in transactions `DWDM`, `BIBS`, and `SE83`.
 - [ ] Review available `BCALV*` demonstration programs.
-- [ ] Cross-check the class and type surface in
+- [x] Cross-check the class and type surface in
   [`open-abap-gui`](https://github.com/open-abap/open-abap-gui/tree/main/src).
 - [ ] Inventory relevant public subclasses of `CL_GUI_CONTROL` in the target
   systems.
-- [ ] Create the naming rules, common demo data, and catalog launcher.
+- [x] Create the naming rules, common demo data, and catalog launcher.
 
 ### Phase 2 - Native SAP GUI foundations
 
-- [ ] Implement all selection-screen samples.
-- [ ] Implement the classic dynpro element and flow samples.
-- [ ] Implement table control, tabstrip, subscreen, GUI status, dialog, and help
+- [x] Implement all selection-screen samples.
+- [x] Implement the classic dynpro element and flow samples.
+- [x] Implement table control, tabstrip, subscreen, GUI status, dialog, and help
   samples.
 - [ ] Establish the common event-log and reset patterns.
 
 ### Phase 3 - Containers and basic controls
 
-- [ ] Implement all four container families.
+- [x] Implement all four container families.
 - [ ] Implement picture, text edit, HTML viewer, toolbar, and calendar samples.
-- [ ] Implement the ABAP browser helper sample.
+- [x] Implement the ABAP browser helper sample.
 - [ ] Implement tree models and low-level tree comparisons.
 - [ ] Implement Dynamic Documents and timer samples.
 
 ### Phase 4 - ALV and composed applications
 
-- [ ] Implement SALV table and the basic ALV grid.
+- [x] Implement SALV table and the basic ALV grid.
 - [ ] Add dynamic tables, editing, formatting, validation, variants, and events.
 - [ ] Implement ALV tree, SALV tree, and hierarchical-sequential SALV.
 - [ ] Build the workbench-style composite sample and cross-control drag-and-drop.
@@ -606,6 +622,8 @@ Every sample must:
   state.
 - [ ] Capture one representative screenshot for each sample.
 - [ ] Complete the compatibility matrix and document known limitations.
+- [ ] Review `ANORMALIES.md` and ensure every observed open-abap deviation is
+  recorded with current reproduction and status.
 - [ ] Verify that all reports return cleanly to `ZGG_GUI_CATALOG`.
 
 ## Definition of Done
@@ -613,7 +631,8 @@ Every sample must:
 The catalog is complete when every core program is runnable, documented, and
 verified on the declared minimum release; every public control family in scope
 has a representative sample; optional and legacy programs are clearly labeled;
-and the launcher lists and runs every sample.
+the launcher lists and runs every sample; and all observed transpiler, runtime,
+or missing open-abap behavior is recorded in `ANORMALIES.md`.
 
 ## SAP References
 

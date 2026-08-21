@@ -1,0 +1,4 @@
+PROCESS BEFORE OUTPUT.
+
+PROCESS AFTER INPUT.
+  FIELD gv_left_value MODULE validate_left ON REQUEST.

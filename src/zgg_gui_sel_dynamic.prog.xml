@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_PROG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <PROGDIR>
+    <NAME>ZGG_GUI_SEL_DYNAMIC</NAME>
+    <SUBC>1</SUBC>
+    <RLOAD>E</RLOAD>
+    <FIXPT>X</FIXPT>
+    <UCCHECK>X</UCCHECK>
+   </PROGDIR>
+   <TPOOL>
+    <item><ID>R</ID><ENTRY>Dynamic Selection Screens</ENTRY><LENGTH>25</LENGTH></item>
+    <item><ID>S</ID><KEY>P_ENABLE</KEY><ENTRY>Enable input</ENTRY><LENGTH>12</LENGTH></item>
+    <item><ID>S</ID><KEY>P_BASIC</KEY><ENTRY>Basic mode</ENTRY><LENGTH>10</LENGTH></item>
+    <item><ID>S</ID><KEY>P_ADV</KEY><ENTRY>Advanced mode</ENTRY><LENGTH>13</LENGTH></item>
+    <item><ID>S</ID><KEY>P_REQ</KEY><ENTRY>Required value</ENTRY><LENGTH>14</LENGTH></item>
+    <item><ID>S</ID><KEY>P_CITY</KEY><ENTRY>City</ENTRY><LENGTH>4</LENGTH></item>
+    <item><ID>S</ID><KEY>P_SECRET</KEY><ENTRY>Secret</ENTRY><LENGTH>6</LENGTH></item>
+    <item><ID>S</ID><KEY>P_NOTE</KEY><ENTRY>F1 help field</ENTRY><LENGTH>13</LENGTH></item>
+   </TPOOL>
+  </asx:values>
+ </asx:abap>
+</abapGit>

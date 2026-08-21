@@ -1,0 +1,8 @@
+PROCESS BEFORE OUTPUT.
+
+PROCESS AFTER INPUT.
+  CHAIN.
+    FIELD gv_name.
+    FIELD gv_role.
+    MODULE validate_identity ON CHAIN-REQUEST.
+  ENDCHAIN.
