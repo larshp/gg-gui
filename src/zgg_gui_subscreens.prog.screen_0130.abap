@@ -1,0 +1,4 @@
+PROCESS BEFORE OUTPUT.
+
+PROCESS AFTER INPUT.
+  FIELD gv_right_b MODULE validate_right_b ON REQUEST.

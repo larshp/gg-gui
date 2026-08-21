@@ -1,0 +1,8 @@
+PROCESS BEFORE OUTPUT.
+  MODULE status_0100.
+  CALL SUBSCREEN sub_area INCLUDING sy-repid gv_subscreen.
+
+PROCESS AFTER INPUT.
+  MODULE exit_0100 AT EXIT-COMMAND.
+  CALL SUBSCREEN sub_area.
+  MODULE user_command_0100.
