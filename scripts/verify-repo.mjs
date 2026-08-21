@@ -9,6 +9,14 @@ const read = (path) => readFileSync(path, "utf8");
 const fail = (message) => {
   throw new Error(message);
 };
+const unsupportedScreenIcons = new Set([
+  "ICON_BACK",
+  "ICON_HIDE",
+  "ICON_MINUS",
+  "ICON_PICTURE",
+  "ICON_PLUS",
+  "ICON_SYSTEM_OKAY",
+]);
 
 const reportFiles = files.filter((name) => /^zgg_gui_.+\.prog\.abap$/i.test(name));
 const sampleFiles = reportFiles.filter((name) => name !== "zgg_gui_catalog.prog.abap");
@@ -32,6 +40,12 @@ for (const file of reportFiles) {
   }
 
   const xml = read(join(srcDir, xmlName));
+  for (const match of xml.matchAll(/<ICON_NAME>([^<]+)<\/ICON_NAME>/gi)) {
+    const icon = match[1].trim().toUpperCase();
+    if (unsupportedScreenIcons.has(icon)) {
+      fail(`${xmlName}: unsupported Screen Painter icon ${icon}`);
+    }
+  }
   if (!/<TPOOL>[\s\S]*?<ID>R<\/ID>/i.test(xml)) {
     fail(`${program}: missing report title in its text pool`);
   }
