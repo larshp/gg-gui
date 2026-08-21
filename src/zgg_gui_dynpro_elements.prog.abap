@@ -1,5 +1,7 @@
 REPORT zgg_gui_dynpro_elements.
 
+TYPE-POOLS icon.
+
 " Screen 0100 is a compact gallery of common Screen Painter elements.
 DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_text TYPE c LENGTH 30 VALUE 'Editable text'.
@@ -9,6 +11,10 @@ DATA gv_date TYPE d VALUE sy-datum.
 DATA gv_time TYPE t VALUE sy-uzeit.
 DATA gv_count TYPE i VALUE 5.
 DATA gv_amount TYPE p LENGTH 8 DECIMALS 2 VALUE '12.50'.
+DATA gv_quantity TYPE p LENGTH 8 DECIMALS 3 VALUE '3.250'.
+DATA gv_currency TYPE c LENGTH 3 VALUE 'EUR'.
+DATA gv_user TYPE syuname.
+DATA gv_icon TYPE c LENGTH 40.
 DATA gv_list TYPE c LENGTH 10 VALUE 'ONE'.
 DATA gv_check TYPE abap_bool VALUE abap_true.
 DATA gv_radio_a TYPE abap_bool VALUE abap_true.
@@ -22,6 +28,8 @@ MODULE status_0100 OUTPUT.
   DATA lt_values TYPE vrm_values.
 
   ADD 1 TO gv_pbo_count.
+  IF gv_user IS INITIAL. gv_user = sy-uname. ENDIF.
+  WRITE icon_green_light AS ICON QUICKINFO 'Ready: values may be edited and reset' TO gv_icon.
   lt_values = VALUE #(
     ( key = 'ONE' text = 'First entry' )
     ( key = 'TWO' text = 'Second entry' )
@@ -55,6 +63,9 @@ MODULE user_command_0100 INPUT.
       gv_time = sy-uzeit.
       gv_count = 5.
       gv_amount = '12.50'.
+      gv_quantity = '3.250'.
+      gv_currency = 'EUR'.
+      gv_user = sy-uname.
       gv_list = 'ONE'.
       gv_check = abap_true.
       gv_radio_a = abap_true.

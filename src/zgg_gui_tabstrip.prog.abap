@@ -14,6 +14,7 @@ DATA gv_note TYPE c LENGTH 50 VALUE 'Values remain while switching pages'.
 DATA gv_status TYPE c LENGTH 60.
 
 CONTROLS ts_main TYPE TABSTRIP.
+CONTROLS ts_client TYPE TABSTRIP.
 
 START-OF-SELECTION.
   ts_main-activetab = 'TAB1'.
@@ -63,6 +64,10 @@ MODULE user_command_0100 INPUT.
       ENDIF.
     WHEN 'APPLY'.
       gv_status = |Active page { ts_main-activetab } was applied|.
+    WHEN 'CLIENT'.
+      ts_client-activetab = 'CLTAB1'.
+      gv_status = 'Local paging loads every tab page before frontend paging'.
+      CALL SCREEN 200.
     WHEN 'RESET'.
       gv_name = 'Ada Lovelace'.
       gv_role = 'Developer'.
@@ -79,6 +84,34 @@ MODULE user_command_0100 INPUT.
     ts_main-activetab = 'TAB1'.
     gv_subscreen = '0110'.
   ENDIF.
+ENDMODULE.
+
+MODULE status_0200 OUTPUT.
+  gv_tab1_title = 'Identity (local)'.
+  gv_tab2_title = 'Settings (local)'.
+  gv_tab3_title = 'Advanced (local)'.
+  IF ts_client-activetab IS INITIAL.
+    ts_client-activetab = 'CLTAB1'.
+  ENDIF.
+ENDMODULE.
+
+MODULE user_command_0200 INPUT.
+  DATA lv_client_code TYPE sy-ucomm.
+
+  lv_client_code = gv_ok_code.
+  CLEAR gv_ok_code.
+  CASE lv_client_code.
+    WHEN 'APPLY'.
+      gv_status = |Local paging applied all subscreens; visible tab { ts_client-activetab }|.
+    WHEN 'RESET'.
+      gv_name = 'Ada Lovelace'.
+      gv_role = 'Developer'.
+      gv_notify = abap_true.
+      gv_start_date = sy-datum.
+      gv_note = 'Values remain while switching pages'.
+      ts_client-activetab = 'CLTAB1'.
+      gv_status = 'All locally loaded tab pages were reset'.
+  ENDCASE.
 ENDMODULE.
 
 MODULE validate_identity INPUT.

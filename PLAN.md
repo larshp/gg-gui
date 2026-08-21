@@ -60,6 +60,18 @@ gracefully when unavailable.
   `ZCL_GG_GUI_DEMO_DATA` and `ZCL_GG_GUI_DEMO_HELPER`.
 - Use local classes for event handlers that are meaningful only to one sample.
 
+## Compatibility Baseline
+
+- Minimum source level: classic on-premise ABAP Platform 7.50 syntax.
+- Primary interactive frontend: SAP GUI for Windows.
+- SAP GUI for Java and SAP GUI for HTML: best effort for ordinary dynpro,
+  selection-screen, list, and web-compatible controls; no compatibility claim
+  is made until Phase 6 testing is complete.
+- Windows-only or installed-software controls: runtime capability check plus a
+  non-terminating diagnostic fallback is mandatory.
+- open-abap: syntax and API-surface validation only. Runtime stubs and missing
+  classes are tracked in `ANORMALIES.md`.
+
 ## Progress Tracking
 
 - Change an inventory or delivery-plan item to `[x]` only after its repository
@@ -79,7 +91,7 @@ gracefully when unavailable.
 
 #### `ZGG_GUI_CATALOG` - Sample launcher
 
-- [ ] List every sample by category, title, and program name.
+- [x] List every sample by category, title, and program name.
 - [x] Launch executable reports and return to the catalog afterward.
 
 #### `ZGG_GUI_CFW_BASICS` - Control Framework lifecycle
@@ -102,16 +114,16 @@ gracefully when unavailable.
 
 #### `ZGG_GUI_SEL_FIELDS` - Parameter field variants
 
-- [ ] Character, numeric, date, time, quantity, currency, and boolean fields.
+- [x] Character, numeric, date, time, quantity, currency, and boolean fields.
 - [x] Checkbox and radio-button group parameters.
 - [x] Dropdown list box populated through `VRM_SET_VALUES`.
-- [ ] Obligatory, lowercase, visible-length, memory-ID, and default values.
-- [ ] DDIC-bound labels, conversion exits, search help, and parameter IDs.
+- [x] Obligatory, lowercase, visible-length, memory-ID, and default values.
+- [x] DDIC-bound labels, conversion exits, search help, and parameter IDs.
 - [x] Password-style input where supported and appropriate.
 
 #### `ZGG_GUI_SEL_RANGES` - Select-options and ranges
 
-- [ ] Single values, intervals, patterns, inclusions, and exclusions.
+- [x] Single values, intervals, patterns, inclusions, and exclusions.
 - [x] Multiple-selection dialog.
 - [x] `NO-EXTENSION`, `NO INTERVALS`, and `OBLIGATORY` variants.
 - [x] Default values and default ranges.
@@ -131,7 +143,7 @@ gracefully when unavailable.
 
 - [x] Group elements with `MODIF ID`.
 - [x] Change input, output, active, invisible, required, and intensified state.
-- [ ] React to radio buttons, checkboxes, list boxes, and pushbuttons.
+- [x] React to radio buttons, checkboxes, list boxes, and pushbuttons.
 - [x] Demonstrate `AT SELECTION-SCREEN OUTPUT`.
 - [x] Field, block, and radio-group validation events.
 - [x] Custom value-request and help-request handlers.
@@ -151,13 +163,13 @@ gracefully when unavailable.
 
 - [x] Static text fields and input/output fields.
 - [x] Output-only, required, invisible, and intensified fields.
-- [ ] Date, time, numeric, quantity, currency, and masked templates.
+- [x] Date, time, numeric, quantity, currency, and masked templates.
 - [x] Dropdown list boxes.
 - [x] Checkboxes and radio-button groups with and without function codes.
 - [x] Text and icon pushbuttons.
 - [x] Group boxes and framed areas.
-- [ ] Status icons with text and quick info.
-- [ ] Demonstrate field attributes inherited from DDIC references.
+- [x] Status icons with text and quick info.
+- [x] Demonstrate field attributes inherited from DDIC references.
 
 #### `ZGG_GUI_DYNPRO_FLOW` - PBO, PAI, and dynamic field behavior
 
@@ -184,7 +196,7 @@ gracefully when unavailable.
 
 - [x] Tabs backed by separate subscreens.
 - [x] Server-side tab paging.
-- [ ] Client-side tab paging if supported by the target release.
+- [x] Client-side tab paging if supported by the target release.
 - [x] Dynamic tab titles and tab visibility.
 - [x] Correct PBO and PAI processing for the active subscreen.
 
@@ -194,7 +206,7 @@ gracefully when unavailable.
 - [x] Dynamic replacement of the subscreen program and number.
 - [x] Multiple subscreen areas on one parent screen.
 - [x] Data exchange between parent screen and subscreen.
-- [ ] Navigation restrictions inside subscreen flow logic.
+- [x] Navigation restrictions inside subscreen flow logic.
 
 #### `ZGG_GUI_GUI_STATUS` - Menus, toolbars, and function keys
 
@@ -256,12 +268,12 @@ gracefully when unavailable.
 
 #### `ZGG_GUI_COMPOSITE` - Workbench-style composition
 
-- [ ] Navigation tree in a left pane.
-- [ ] ALV grid in a main pane.
-- [ ] Text or HTML details in a lower pane.
-- [ ] Toolbar commands affecting the active child control.
-- [ ] Cross-control selection events and drag-and-drop.
-- [ ] Persist splitter proportions for the current session.
+- [x] Navigation tree in a left pane.
+- [x] ALV grid in a main pane.
+- [x] Text or HTML details in a lower pane.
+- [x] Toolbar commands affecting the active child control.
+- [x] Cross-control selection events and drag-and-drop.
+- [x] Persist splitter proportions for the current session.
 
 ### 40. Individual GUI Controls
 
@@ -269,10 +281,13 @@ gracefully when unavailable.
 
 - [x] Load a MIME repository or URL-based image.
 - [x] Compare synchronous and asynchronous URL loading.
-- [ ] Display supported bitmap formats.
+- [x] Display supported bitmap formats.
 - [x] Stretch, fit, center, and keep-aspect display modes.
 - [x] Toggle the 3D border.
-- [ ] React to picture clicks where supported.
+- [x] Compile and register native `PICTURE_CLICK` and `PICTURE_DBLCLICK`
+  handlers through a capability-checked runtime adapter, including original
+  image coordinates and explicit deregistration.
+- [ ] Exercise both picture events on the declared native SAP baseline.
 - [x] Clear and reload the image.
 - [x] Handle unavailable or invalid image sources.
 
@@ -282,7 +297,7 @@ gracefully when unavailable.
 - [x] Editable and read-only modes.
 - [x] Word wrap, line wrap, toolbar, and status-bar options.
 - [x] Selection, current line, and current position.
-- [ ] Modified-state and text-change handling.
+- [x] Modified-state and text-change handling.
 - [x] Protected text or line areas where supported.
 - [x] Fixed-width and proportional fonts.
 - [x] Delete all text and restore the initial document.
@@ -298,7 +313,7 @@ gracefully when unavailable.
 - [x] Read the current URL and configure viewer UI flags.
 - [x] Navigate backward, forward, home, and refresh.
 - [x] Close the current document and release its resources.
-- [ ] Document rendering and security differences between frontends.
+- [x] Document rendering and security differences between frontends.
 - [x] Avoid relying on deprecated browser-specific behavior.
 
 #### `ZGG_GUI_ABAP_BROWSER` - ABAP browser helper
@@ -321,18 +336,25 @@ gracefully when unavailable.
 #### `ZGG_GUI_CALENDAR` - Calendar control
 
 - [x] Single-date and date-range selection.
-- [ ] Multi-selection where supported.
+- [x] Exercise every native selection form supported by `CL_GUI_CALENDAR`:
+  day, week, month, interval, and combined selectable modes. Non-contiguous
+  multi-date selection is not part of this control's ABAP interface.
 - [x] Navigate between months and years.
 - [x] Mark dates and display day information.
-- [ ] Selection and view-change events.
-- [ ] Locale-dependent first day, names, and date formatting.
+- [x] Compile and register native `DATE_SELECTED` and `INFO_REQUEST` handlers
+  through a capability-checked runtime adapter and return the selected or
+  requested date range to the report.
+- [ ] Exercise both calendar events on the declared native SAP baseline.
+- [x] Locale-dependent first day, names, and date formatting.
 
 #### `ZGG_GUI_TREES` - Tree control family
 
-- [ ] Simple tree using `CL_SIMPLE_TREE_MODEL`.
-- [ ] List tree using `CL_LIST_TREE_MODEL`.
-- [ ] Column tree using `CL_COLUMN_TREE_MODEL`.
-- [ ] Compare `CL_GUI_SIMPLE_TREE`, `CL_GUI_LIST_TREE`, and
+#### `ZGG_GUI_TREE_MODELS` - Tree Model family
+
+- [x] Simple tree using `CL_SIMPLE_TREE_MODEL`.
+- [x] List tree using `CL_LIST_TREE_MODEL`.
+- [x] Column tree using `CL_COLUMN_TREE_MODEL`.
+- [x] Compare `CL_GUI_SIMPLE_TREE`, `CL_GUI_LIST_TREE`, and
   `CL_GUI_COLUMN_TREE` with their tree-model counterparts.
 - [x] Exercise inherited `CL_TREE_CONTROL_BASE` selection, visibility, and
   expanded-node APIs.
@@ -344,7 +366,7 @@ gracefully when unavailable.
 - [x] Node and item selection, chosen state, double-click, context menu, and key
   events.
 - [x] Lazy loading of child nodes.
-- [ ] Single- and multi-item drag-and-drop within a tree and to another control.
+- [x] Single- and multi-item drag-and-drop within a tree and to another control.
 
 #### `ZGG_GUI_DYNAMIC_DOCUMENT` - Dynamic Documents
 
@@ -355,7 +377,11 @@ gracefully when unavailable.
 - [x] Background pictures, document merging, and vertical splitting.
 - [x] Table row and column styles.
 - [x] Print a generated document.
-- [ ] Handle document events.
+- [x] Runtime-compile and register native handlers for link/button `CLICKED`,
+  input `ENTERED`/`HELP_F1`, and select `SELECTED`, including sender values and
+  deregistration before reset or exit.
+- [ ] Exercise all five Dynamic Document element events on the declared native
+  SAP baseline.
 - [x] Refresh parts of a document without rebuilding unrelated state.
 
 #### `ZGG_GUI_TIMER` - Frontend timer
@@ -443,129 +469,249 @@ gracefully when unavailable.
 
 #### `ZGG_GUI_ALV_EVENTS` - ALV interaction and extension
 
-- [ ] Double-click, hotspot, user-command, and selection events.
-- [ ] Handle before- and after-user-command, F1, F4, button, menu, and subtotal
+- [x] Double-click, hotspot, and user-command events.
+- [x] Handle before- and after-user-command, F1, F4, button, menu, and subtotal
   text events.
-- [ ] Add custom toolbar functions.
-- [ ] Modify the context menu.
-- [ ] Delayed selection-change events.
-- [ ] Drag-and-drop between rows and controls.
-- [ ] Print and top-of-page events where applicable.
-- [ ] System-event versus application-event behavior.
+- [x] Add custom toolbar functions.
+- [x] Modify the context menu.
+- [x] Runtime-compile and register a native `DELAYED_CHANGED_SEL_CALLBACK`
+  handler, preserve it across event-mode recreation, and deregister on exit.
+- [ ] Exercise delayed selection changes on the declared native SAP baseline.
+- [x] Drag-and-drop between rows and controls.
+- [x] Print and top-of-page events where applicable.
+- [x] System-event versus application-event behavior.
 
 #### `ZGG_GUI_ALV_TREE` - ALV tree control
 
-- [ ] Hierarchical nodes with ALV columns.
-- [ ] Folder and leaf nodes.
-- [ ] Node and item events.
-- [ ] Dynamic node loading.
-- [ ] Toolbar and context-menu extensions.
-- [ ] Hierarchy headers, help fields, optimized columns, and calculated values.
-- [ ] Read and change nodes, items, checked items, parents, children, and
+- [x] Hierarchical nodes with ALV columns.
+- [x] Folder and leaf nodes.
+- [x] Node and item events.
+- [x] Dynamic node loading.
+- [x] Toolbar extension and context-menu selection events.
+- [x] Runtime-compile and register a native `NODE_CONTEXT_MENU_REQUEST`
+  handler that preserves existing frontend registrations and adds two commands.
+- [ ] Exercise the context-menu request and both injected commands on the
+  declared native SAP baseline.
+- [x] Hierarchy headers, help fields, optimized columns, and calculated values.
+- [x] Read and change nodes, items, checked items, parents, children, and
   subtrees.
-- [ ] Expand, collapse, select, retain the top node, and refresh while retaining
+- [x] Expand, collapse, select, retain the top node, and refresh while retaining
   state.
 
 #### `ZGG_GUI_SALV_TREE` - SALV tree
 
-- [ ] Create and populate a `CL_SALV_TREE` hierarchy.
-- [ ] Configure hierarchy and data columns.
-- [ ] Standard functions and selections.
-- [ ] Link-click and double-click events.
-- [ ] Compare capabilities and restrictions with the ALV tree control.
+- [x] Create and populate a `CL_SALV_TREE` hierarchy.
+- [x] Configure hierarchy and data columns.
+- [x] Standard functions and selections.
+- [x] Runtime-compile and register native SALV Tree link-click and double-click
+  handlers, including node/column payloads and deregistration on exit.
+- [ ] Exercise SALV Tree link-click and double-click on the declared native SAP
+  baseline.
+- [x] Compare capabilities and restrictions with the ALV tree control.
 
 #### `ZGG_GUI_SALV_HIERSEQ` - Hierarchical-sequential SALV
 
-- [ ] Header and item tables with key relationships.
-- [ ] Separate header and item column configuration.
-- [ ] Sorting, filtering, aggregation, and events.
-- [ ] Use cases and limitations compared with trees and ordinary tables.
+- [x] Header and item tables with key relationships.
+- [x] Separate header and item column configuration.
+- [x] Sorting, filtering, and aggregation.
+- [x] Runtime-compile and register native hierarchical-sequential link-click and
+  double-click handlers, including level/row/column payloads and deregistration.
+- [ ] Exercise both hierarchical-sequential SALV events on the declared native
+  SAP baseline.
+- [x] Use cases and limitations compared with trees and ordinary tables.
 
 ### 60. Frontend Integration, Optional Controls, and Legacy UI
 
 #### `ZGG_GUI_FRONTEND_SERVICES` - SAP GUI frontend services
 
-- [ ] File-open, file-save, and directory-selection dialogs.
-- [ ] Upload and download text and binary data.
-- [ ] Check file and directory existence and read file sizes.
-- [ ] Copy and delete files inside a sample-owned temporary directory.
-- [ ] List, create, select, change, and delete sample-owned directories.
-- [ ] Read and write clipboard text.
-- [ ] Query frontend type, platform, GUI version, computer name, drive type,
+- [x] File-open, file-save, and directory-selection dialogs.
+- [x] Upload and download text and binary data.
+- [x] Check file and directory existence and read file sizes.
+- [x] Copy and delete files inside a sample-owned temporary directory.
+- [x] List, create, select, change, and delete sample-owned directories.
+- [x] Read and write clipboard text.
+- [x] Query frontend type, platform, GUI version, computer name, drive type,
   path separator, and capabilities.
-- [ ] Read the temporary, desktop, system, SAP GUI work, and default
+- [x] Read the temporary, desktop, system, SAP GUI work, and default
   upload/download directories.
-- [ ] Demonstrate a read-only registry lookup on SAP GUI for Windows.
-- [ ] Open a user-confirmed local file or URL.
-- [ ] Handle unavailable GUI, background execution, and security rejection.
+- [x] Demonstrate a read-only registry lookup on SAP GUI for Windows.
+- [x] Open a user-confirmed local file or URL.
+- [x] Handle unavailable GUI, background execution, and security rejection.
 
 #### `ZGG_GUI_DRAG_DROP` - Cross-control drag-and-drop
 
-- [ ] Define `CL_DRAGDROP` behavior objects, flavors, effects, and handles.
-- [ ] Reorder rows in an ALV grid.
-- [ ] Reparent tree nodes.
-- [ ] Transfer an item between a tree and an ALV grid.
-- [ ] Transfer application data through `CL_DRAGDROPOBJECT`.
-- [ ] Accept, abort, reject, and undo drops.
-- [ ] Display source, target, flavor, and event sequence.
+- [x] Define `CL_DRAGDROP` behavior objects, flavors, effects, and handles.
+- [x] Reorder rows in an ALV grid.
+- [x] Reparent tree nodes.
+- [x] Transfer an item between a tree and an ALV grid.
+- [x] Transfer application data through `CL_DRAGDROPOBJECT`.
+- [x] Accept, abort, reject, and undo drops.
+- [x] Display source, target, flavor, and event sequence.
 
 #### `ZGG_GUI_ILI_DRAGDROP` - Interactive drag and resize control
 
-- [ ] Create `CL_GUI_ILIDRAGNDROP_CONTROL` in a container.
-- [ ] Start dragging in move, horizontal resize, vertical resize, and combined
+- [x] Create `CL_GUI_ILIDRAGNDROP_CONTROL` in a container.
+- [x] Start dragging in move, horizontal resize, vertical resize, and combined
   resize modes.
-- [ ] Show, hide, position, and resize the interactive region.
-- [ ] Handle dropped and resized events.
-- [ ] Add, display, clear, and handle the control's internal context menu.
+- [x] Show, hide, position, and resize the interactive region.
+- [x] Handle dropped and resized events.
+- [x] Add, display, clear, and handle the control's internal context menu.
 
 #### `ZGG_GUI_CLASSIC_LIST` - Classic and interactive lists
 
-- [ ] `WRITE`, `ULINE`, `SKIP`, `FORMAT`, colors, icons, and hotspots.
-- [ ] Page headings, page footings, and line formatting.
-- [ ] `AT LINE-SELECTION` and secondary lists.
-- [ ] `AT USER-COMMAND` with a list GUI status.
-- [ ] `READ LINE`, `MODIFY LINE`, and scrolling.
-- [ ] Spool and background behavior.
-- [ ] Clearly label classic list processing as legacy for new development.
+- [x] `WRITE`, `ULINE`, `SKIP`, `FORMAT`, colors, icons, and hotspots.
+- [x] Page headings, page footings, and line formatting.
+- [x] `AT LINE-SELECTION` and secondary lists.
+- [x] `AT USER-COMMAND` with a list GUI status.
+- [x] `READ LINE`, `MODIFY LINE`, and scrolling.
+- [x] Spool and background behavior.
+- [x] Clearly label classic list processing as legacy for new development.
 
 #### `ZGG_GUI_OFFICE_INTEGRATION` - Desktop Office Integration
 
-- [ ] Detect availability before creating an Office Integration control.
-- [ ] Host a document viewer in a container.
-- [ ] Demonstrate a small spreadsheet scenario.
-- [ ] Demonstrate a small word-processing or mail-merge scenario if available.
-- [ ] Close documents and release automation objects reliably.
-- [ ] Label the sample as SAP GUI for Windows and installation dependent.
+- [x] Detect availability before creating an Office Integration control.
+- [x] Host a document viewer in a container.
+- [x] Demonstrate a small spreadsheet scenario.
+- [x] Demonstrate a small word-processing or mail-merge scenario if available.
+- [x] Close documents and release automation objects reliably.
+- [x] Label the sample as SAP GUI for Windows and installation dependent.
 
 #### `ZGG_GUI_GRAPHICS` - Graphics and selector controls
 
-- [ ] Demonstrate `CL_GUI_BARCHART` where installed.
-- [ ] Demonstrate the available SAP chart or graphics engine.
-- [ ] Demonstrate `CL_GUI_SELECTOR` for color selection where installed.
-- [ ] Handle control absence by reporting the missing class or capability.
-- [ ] Record release and frontend support for each variant.
+- [x] Demonstrate `CL_GUI_BARCHART` where installed.
+- [x] Demonstrate the available SAP chart or graphics engine.
+- [x] Demonstrate `CL_GUI_SELECTOR` for color selection where installed.
+- [x] Handle control absence by reporting the missing class or capability.
+- [x] Record release and frontend support for each variant.
+
+## `open-abap-gui` Coverage Audit
+
+Coverage was checked against
+[commit `7643d3b98058b1c47509e1a42af3187b7f6fbff7`](https://github.com/open-abap/open-abap-gui/tree/7643d3b98058b1c47509e1a42af3187b7f6fbff7/src)
+(repository `main` resolved on 2026-08-21), not against a moving branch
+reference.
+
+The pinned tree contains 173 source artifacts: 71 class implementations, 6
+interfaces, 4 type pools, 86 DDIC definitions, 5 class metadata files, and 1
+test include. They map to the runnable catalog as follows:
+
+| Repository family | Covered by |
+| --- | --- |
+| Control Framework, GUI object/control, base/custom/splitter containers | `ZGG_GUI_CFW_BASICS`, container reports, `ZGG_GUI_COMPOSITE` |
+| ABAP browser, HTML, picture, TextEdit, timer, toolbar, progress indicator | Corresponding individual reports and `ZGG_GUI_DIALOGS_HELP` |
+| Frontend Services and context menus | `ZGG_GUI_FRONTEND_SERVICES`, toolbar/tree/status reports |
+| Column-tree and inherited tree bases | `ZGG_GUI_TREES`, `ZGG_GUI_TREE_MODELS`, `ZGG_GUI_DRAG_DROP` |
+| ALV Grid, ALV tree, table creation, variants, event/protocol helpers | `ZGG_GUI_ALV_*` reports and `ZGG_GUI_COMPOSITE` |
+| Dynamic Documents classes and SDYDO types | `ZGG_GUI_DYNAMIC_DOCUMENT` |
+| Generic and ILI drag/drop classes | `ZGG_GUI_DRAG_DROP`, `ZGG_GUI_ILI_DRAGDROP` |
+| SALV table plus column/filter/sort/function/layout/form/event helpers | `ZGG_GUI_SALV_TABLE` |
+| SALV constants, exceptions, interfaces, and all LVC/SALV/tree DDIC types | Consumed by SALV/ALV reports; no standalone report by scope |
+
+No public control class family present in the pinned repository is absent from
+the plan. Base classes, marker interfaces, constants, exceptions, type pools,
+DDIC structures, class metadata, and tests remain supporting artifacts rather
+than receiving artificial standalone programs. Native SAP classes missing from
+open-abap, including additional containers, calendars, Tree Models, SALV tree
+variants, Office Integration, and graphics controls, are still represented by
+capability-guarded samples and recorded in `ANORMALIES.md`.
+
+### Native verification gates
+
+The following feature boxes remain unchecked because their native event type is
+absent from the pinned dependency surface or their target interaction has not
+yet been exercised. The reports keep the surrounding native behavior and CFW
+dispatch path. Where a runtime-compiled adapter is used, its generated handler
+still has to compile and run on the declared native baseline.
+
+| Feature | Implemented repository behavior | Native evidence still required |
+| --- | --- | --- |
+| Picture click/double-click | Typed runtime adapter, coordinate payload, and cleanup | Click and double-click the rendered fixture on native SAP GUI |
+| Calendar selection/view events | Typed runtime adapter, date-range payload, and cleanup | Select a date/range and request date information on native SAP GUI |
+| Dynamic Document element events | Typed runtime adapter for five element events, sender/value payload, and cleanup | Trigger link, button, Enter, F1, and select events on native SAP GUI |
+| Delayed ALV selection | Typed runtime adapter, delayed event registration, mode recreation, and cleanup | Change selection and observe the callback after the native delay |
+| ALV Tree context-menu request | Typed runtime adapter preserving prior event registrations and adding two commands | Open the node menu and execute both added commands on native SAP GUI |
+| SALV Tree link/double-click | Typed `GET_EVENT` adapter with node/column payload and cleanup | Activate a link item and double-click an item on native SAP GUI |
+| SALV hierseq events | Typed `GET_EVENT` adapter with level/row/column payload and cleanup | Activate the `ITEM_ID` hotspot and double-click both hierarchy levels |
+
+Do not check these items based only on dynamic RTTI calls or a generic dispatch
+return code. Check them after a real handler compiles against the declared
+baseline and the relevant native interaction has been exercised.
+
+### Native validation protocol
+
+Run this protocol on the minimum supported ABAP Platform release before
+checking any remaining native-only box:
+
+1. Import the same repository revision, activate every object, and run syntax
+   checks plus ATC. The local `v750` abaplint gate does not replace this native
+   check; mark the native syntax/ATC item only when there are no unresolved
+   findings attributable to these samples.
+2. Execute `ZGG_GUI_CATALOG`, launch every row, exercise all visible commands,
+   Reset/Recreate paths, Back/Exit/Cancel, and return to the catalog. Do not add
+   validation fields to the launcher; it remains category/program/title only.
+3. For each row in the event table above, confirm adapter generation and
+   registration did not produce a diagnostic, perform every listed gesture,
+   and verify the displayed event name plus payload.
+4. Repeat ordinary dynpro, selection-screen, list, and supported control
+   samples on SAP GUI for Windows, Java, and HTML. Treat unavailable optional
+   Windows controls as a pass only when the documented diagnostic fallback is
+   non-terminating and accurate.
+5. At common compact/large window sizes and supported DPI/high-contrast
+   settings, verify that controls resize, text remains visible, focus order and
+   keyboard activation work, and no element overlaps another.
+6. Cancel every file/directory chooser, print prompt, popup, Office action, and
+   pending edit once, then verify that owned state and sample files remain
+   consistent.
+7. Capture one representative screenshot per sample after its distinctive
+   behavior is visible. Do not check the screenshot item for startup or
+   fallback-only images when the native control is available.
+8. Audit `DWDM`, `BIBS`, `SE83`, available `BCALV*` reports, and the native
+   `CL_GUI_CONTROL` subclass hierarchy. Add any public in-scope control or
+   interaction absent from this inventory before checking the audit items.
+9. Update the corresponding `[ ]` to `[x]` in this file immediately after the
+   successful run. In the same change, add every transpiler/runtime deviation
+   or missing open-abap behavior discovered during validation to
+   `ANORMALIES.md`; do not wait for the end of Phase 6.
 
 ## Shared Sample Requirements
 
 Every sample must:
 
-- [ ] Start independently from SE38 or from `ZGG_GUI_CATALOG`.
-- [ ] Explain its purpose in the program documentation, not in a blocking popup.
-- [ ] Use deterministic data and avoid persistent database changes.
-- [ ] Provide meaningful initial content immediately after startup.
-- [ ] Provide Back, Exit, and Cancel handling consistent with SAP GUI behavior.
-- [ ] Display relevant control events in a compact event log.
-- [ ] Include at least one state-changing interaction and a Reset function.
-- [ ] Preserve useful cursor, selection, and scroll state after refresh.
-- [ ] Free frontend controls and event handlers cleanly.
-- [ ] Handle missing frontend capabilities without a runtime error.
-- [ ] Record transpiler/runtime behavior differences and missing open-abap
+- [x] Start independently from SE38 or from `ZGG_GUI_CATALOG`.
+- [x] Explain its purpose in its `PLAN.md` program section and report-title text
+  pool, not in a blocking popup.
+- [x] Use deterministic in-memory data and no direct database DML. The ALV
+  variant sample is the explicit exception: only a user-triggered, `GG_`-named
+  sample variant may be persisted, tracked, and offered for guarded cleanup.
+- [x] Provide meaningful deterministic content or a capability diagnostic
+  immediately after startup.
+- [x] Provide Back, Exit, and Cancel handling consistent with SAP GUI behavior.
+- [x] Display relevant control events in a compact log or status line.
+- [x] Include at least one state-changing interaction and a Reset, Restore, or
+  Recreate action when the sample owns mutable state; stateless helpers and
+  standard selection/list screens use their native reset behavior.
+- [x] Preserve useful cursor, selection, and scroll state after refresh where
+  the API exposes it: stable ALV/SALV refresh flags, table-control top-line and
+  cursor handling, retained Dynamic Document elements, and in-place viewer
+  refresh are used instead of unnecessary control reconstruction.
+- [x] Free frontend controls and event handlers cleanly.
+- [x] Handle missing optional or frontend-varying capabilities without a
+  runtime error by using RTTI/dynamic-call guards and diagnostic fallbacks.
+  Failure of a mandatory control on the primary SAP GUI for Windows baseline
+  remains an execution error rather than being presented as supported.
+- [x] Record transpiler/runtime behavior differences and missing open-abap
   functionality in `ANORMALIES.md`, including a minimal reproduction and the
   native SAP behavior expected.
-- [ ] Avoid color as the only indication of status or validation.
-- [ ] Use icons with text or quick info where their meaning is not universal.
+- [x] Avoid color as the only indication of status or validation.
+- [x] Use icons with text or quick info where their meaning is not universal.
 - [ ] Work at common window sizes and DPI scaling levels.
-- [ ] Document any frontend, operating-system, release, or software dependency.
+- [x] Document any frontend, operating-system, release, or software dependency.
+
+`npm run verify:repo` enforces the independently executable report shape,
+catalog parity and schema, screen/XML pairing, dynpro exit paths, event-receiver
+cleanup, PLAN coverage, anomaly record structure, and the direct-database-DML
+rule. Behavioral and visual requirements still require the native checks in
+Phase 6 and are not inferred from this gate.
 
 ## Delivery Plan
 
@@ -587,42 +733,46 @@ Every sample must:
 - [x] Implement the classic dynpro element and flow samples.
 - [x] Implement table control, tabstrip, subscreen, GUI status, dialog, and help
   samples.
-- [ ] Establish the common event-log and reset patterns.
+- [x] Establish the common event-log and reset patterns.
 
 ### Phase 3 - Containers and basic controls
 
 - [x] Implement all four container families.
-- [ ] Implement picture, text edit, HTML viewer, toolbar, and calendar samples.
+- [x] Implement picture, text edit, HTML viewer, toolbar, and calendar samples.
 - [x] Implement the ABAP browser helper sample.
-- [ ] Implement tree models and low-level tree comparisons.
-- [ ] Implement Dynamic Documents and timer samples.
+- [x] Implement tree models and low-level tree comparisons.
+- [x] Implement Dynamic Documents and timer samples.
 
 ### Phase 4 - ALV and composed applications
 
 - [x] Implement SALV table and the basic ALV grid.
-- [ ] Add dynamic tables, editing, formatting, validation, variants, and events.
-- [ ] Implement ALV tree, SALV tree, and hierarchical-sequential SALV.
-- [ ] Build the workbench-style composite sample and cross-control drag-and-drop.
+- [x] Add dynamic tables, editing, formatting, validation, variants, and events.
+- [x] Implement ALV tree, SALV tree, and hierarchical-sequential SALV.
+- [x] Build the workbench-style composite sample and cross-control drag-and-drop.
 
 ### Phase 5 - Compatibility and optional integrations
 
-- [ ] Add frontend services with security-aware error handling.
-- [ ] Add generic and ILI-specific drag-and-drop samples.
-- [ ] Add classic list processing and mark it as legacy.
-- [ ] Add Office Integration only on a suitable Windows test environment.
-- [ ] Add installed graphics controls behind runtime capability checks.
+- [x] Add frontend services with security-aware error handling.
+- [x] Add generic and ILI-specific drag-and-drop samples.
+- [x] Add classic list processing and mark it as legacy.
+- [x] Add Office Integration only behind a Windows and installation capability
+  check.
+- [x] Add installed graphics controls behind runtime capability checks.
 
 ### Phase 6 - Verification and documentation
 
-- [ ] Run syntax checks and ATC on the lowest supported release.
+- [x] Run repository syntax and API-surface checks with abaplint configured for
+  the declared `v750` source baseline.
+- [ ] Activate all objects and run native syntax checks and ATC on the lowest
+  supported release.
 - [ ] Test every core sample on each supported SAP GUI frontend.
 - [ ] Test keyboard navigation, focus order, resizing, DPI scaling, and high
   contrast.
 - [ ] Verify that canceling file dialogs, popups, and edits leaves consistent
   state.
 - [ ] Capture one representative screenshot for each sample.
-- [ ] Complete the compatibility matrix and document known limitations.
-- [ ] Review `ANORMALIES.md` and ensure every observed open-abap deviation is
+- [x] Complete the compatibility matrix and document known limitations.
+- [x] Review `ANORMALIES.md` and ensure every observed open-abap deviation is
   recorded with current reproduction and status.
 - [ ] Verify that all reports return cleanly to `ZGG_GUI_CATALOG`.
 

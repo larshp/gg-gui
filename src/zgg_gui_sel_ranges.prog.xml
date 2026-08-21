@@ -15,6 +15,7 @@
     <item><ID>S</ID><KEY>S_SINGLE</KEY><ENTRY>Single value</ENTRY><LENGTH>12</LENGTH></item>
     <item><ID>S</ID><KEY>S_FIXED</KEY><ENTRY>Fixed ranges</ENTRY><LENGTH>12</LENGTH></item>
     <item><ID>S</ID><KEY>S_REQ</KEY><ENTRY>Required values</ENTRY><LENGTH>15</LENGTH></item>
+    <item><ID>S</ID><KEY>S_TEXT</KEY><ENTRY>Text patterns</ENTRY><LENGTH>13</LENGTH></item>
    </TPOOL>
   </asx:values>
  </asx:abap>

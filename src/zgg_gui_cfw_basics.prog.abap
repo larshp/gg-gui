@@ -196,4 +196,5 @@ FORM free_controls.
     go_container->free( ).
     FREE go_container.
   ENDIF.
+  FREE go_events.
 ENDFORM.

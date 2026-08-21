@@ -21,6 +21,9 @@ DATA gv_image_url TYPE ty_url.
 DATA gv_borderless TYPE abap_bool.
 DATA gv_status TYPE c LENGTH 108.
 DATA gv_event TYPE c LENGTH 108.
+DATA gv_platform TYPE i.
+DATA gv_frontend TYPE c LENGTH 60.
+DATA gv_version TYPE c LENGTH 60.
 
 CLASS lcl_events IMPLEMENTATION.
   METHOD on_sapevent.
@@ -61,6 +64,10 @@ MODULE user_command_0100 INPUT.
     WHEN 'EXTERNAL'.
       go_viewer->show_url( url = p_url in_place = abap_true ).
       gv_status = |External URL requested; frontend security policy applies: { p_url }|.
+    WHEN 'FRONTEND'.
+      PERFORM detect_frontend.
+      PERFORM show_generated USING abap_false.
+      gv_status = |Frontend audit refreshed: { gv_frontend }, version { gv_version }|.
     WHEN 'BACK'.
       go_viewer->go_back( ).
       gv_status = 'Back navigation requested'.
@@ -84,6 +91,12 @@ MODULE user_command_0100 INPUT.
       go_viewer->close_document( ).
       CLEAR gv_generated_url.
       gv_status = 'Current HTML document and its frontend resources were closed'.
+    WHEN 'RESET'.
+      CLEAR: gv_event, gv_borderless.
+      go_viewer->set_ui_flag( uiflag = 0 ).
+      PERFORM detect_frontend.
+      PERFORM show_generated USING abap_false.
+      gv_status = 'Generated home document, UI flags, navigation origin, and event status reset'.
     WHEN 'SAPEVENT'.
       gv_status = 'SAPEVENT was dispatched to the ABAP handler'.
   ENDCASE.
@@ -98,8 +111,49 @@ FORM create_controls.
   CREATE OBJECT go_viewer EXPORTING parent = go_host.
   CREATE OBJECT go_events.
   SET HANDLER go_events->on_sapevent FOR go_viewer.
+  PERFORM detect_frontend.
   PERFORM publish_image.
   PERFORM show_generated USING abap_false.
+ENDFORM.
+
+FORM detect_frontend.
+  DATA lt_version TYPE filetable.
+  DATA lv_rc TYPE i.
+
+  CLEAR: gv_frontend, gv_version.
+  TRY.
+      gv_platform = cl_gui_frontend_services=>get_platform( ).
+      CASE gv_platform.
+        WHEN cl_gui_frontend_services=>platform_nt351 OR
+             cl_gui_frontend_services=>platform_nt40 OR
+             cl_gui_frontend_services=>platform_nt50 OR
+             cl_gui_frontend_services=>platform_windows95 OR
+             cl_gui_frontend_services=>platform_windows98 OR
+             cl_gui_frontend_services=>platform_windowsxp.
+          gv_frontend = |SAP GUI for Windows platform id { gv_platform }|.
+        WHEN OTHERS.
+          gv_frontend = |Frontend platform id { gv_platform }|.
+      ENDCASE.
+
+      cl_gui_frontend_services=>get_gui_version(
+        CHANGING version_table = lt_version rc = lv_rc ).
+      LOOP AT lt_version INTO DATA(ls_version).
+        IF gv_version IS INITIAL.
+          gv_version = ls_version-filename.
+        ELSE.
+          gv_version = |{ gv_version }.{ ls_version-filename }|.
+        ENDIF.
+        IF sy-tabix = 3.
+          EXIT.
+        ENDIF.
+      ENDLOOP.
+      IF gv_version IS INITIAL.
+        gv_version = |not reported (rc { lv_rc })|.
+      ENDIF.
+    CATCH cx_root INTO DATA(lx_frontend).
+      gv_frontend = 'Frontend query unavailable'.
+      gv_version = lx_frontend->get_text( ).
+  ENDTRY.
 ENDFORM.
 
 FORM publish_image.
@@ -114,9 +168,19 @@ ENDFORM.
 FORM build_html CHANGING ct_html TYPE ty_html.
   CLEAR ct_html.
   APPEND '<!doctype html><html><head><meta charset="utf-8">' TO ct_html.
-  APPEND '<style>body{font-family:sans-serif;margin:24px;color:#1f2933}button{padding:6px 10px}</style>' TO ct_html.
+  APPEND '<style>body{font-family:sans-serif;margin:24px;color:#1f2933}table{border-collapse:collapse}' TO ct_html.
+  APPEND 'th,td{border:1px solid #bcc5ce;padding:6px;text-align:left}th{background:#eef2f5}</style>' TO ct_html.
   APPEND '</head><body><h2>SAP GUI HTML Viewer</h2>' TO ct_html.
   APPEND '<p>This page was generated from an ABAP internal table.</p>' TO ct_html.
+  APPEND |<p><strong>Detected:</strong> { gv_frontend }; version { gv_version }</p>| TO ct_html.
+  APPEND '<table><caption>Rendering and security capability matrix</caption>' TO ct_html.
+  APPEND '<tr><th>Frontend</th><th>Renderer</th><th>Security and navigation</th></tr>' TO ct_html.
+  APPEND '<tr><td>Windows</td><td>Configured IE or WebView2 control</td>' TO ct_html.
+  APPEND '<td>External URL zones, certificates, and local policy apply</td></tr>' TO ct_html.
+  APPEND '<tr><td>Java</td><td>Platform browser implementation</td>' TO ct_html.
+  APPEND '<td>Rendering and supported methods can differ from Windows</td></tr>' TO ct_html.
+  APPEND '<tr><td>HTML</td><td>Browser-hosted SAP GUI</td>' TO ct_html.
+  APPEND '<td>Back/forward/refresh/current-URL APIs can be unavailable</td></tr></table>' TO ct_html.
   IF gv_image_url IS NOT INITIAL.
     APPEND |<img src="{ gv_image_url }" alt="Published SAP MIME object" style="max-width:240px">| TO ct_html.
   ENDIF.

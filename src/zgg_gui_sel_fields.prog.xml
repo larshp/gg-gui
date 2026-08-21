@@ -14,8 +14,13 @@
     <item><ID>S</ID><KEY>P_TEXT</KEY><ENTRY>Free text</ENTRY><LENGTH>9</LENGTH></item>
     <item><ID>S</ID><KEY>P_COUNT</KEY><ENTRY>Integer</ENTRY><LENGTH>7</LENGTH></item>
     <item><ID>S</ID><KEY>P_AMOUNT</KEY><ENTRY>Amount</ENTRY><LENGTH>6</LENGTH></item>
+    <item><ID>S</ID><KEY>P_QTY</KEY><ENTRY>Quantity</ENTRY><LENGTH>8</LENGTH></item>
+    <item><ID>S</ID><KEY>P_CURR</KEY><ENTRY>Currency</ENTRY><LENGTH>8</LENGTH></item>
     <item><ID>S</ID><KEY>P_DATE</KEY><ENTRY>Date</ENTRY><LENGTH>4</LENGTH></item>
     <item><ID>S</ID><KEY>P_TIME</KEY><ENTRY>Time</ENTRY><LENGTH>4</LENGTH></item>
+    <item><ID>S</ID><KEY>P_USER</KEY><ENTRY>User (DDIC/F4)</ENTRY><LENGTH>15</LENGTH></item>
+    <item><ID>S</ID><KEY>P_LANG</KEY><ENTRY>Language (DDIC)</ENTRY><LENGTH>15</LENGTH></item>
+    <item><ID>S</ID><KEY>P_ALPHA</KEY><ENTRY>ALPHA conversion</ENTRY><LENGTH>16</LENGTH></item>
     <item><ID>S</ID><KEY>P_CHECK</KEY><ENTRY>Enabled</ENTRY><LENGTH>7</LENGTH></item>
     <item><ID>S</ID><KEY>P_RED</KEY><ENTRY>Red</ENTRY><LENGTH>3</LENGTH></item>
     <item><ID>S</ID><KEY>P_GREEN</KEY><ENTRY>Green</ENTRY><LENGTH>5</LENGTH></item>

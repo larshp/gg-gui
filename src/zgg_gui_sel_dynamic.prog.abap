@@ -1,10 +1,16 @@
 REPORT zgg_gui_sel_dynamic.
 
+TABLES sscrfields.
+
+DATA gt_views TYPE vrm_values.
+
 SELECTION-SCREEN BEGIN OF BLOCK b_options WITH FRAME TITLE g_opttit.
   PARAMETERS:
     p_enable AS CHECKBOX DEFAULT abap_true USER-COMMAND toggle,
     p_basic  RADIOBUTTON GROUP mode DEFAULT 'X' USER-COMMAND mode,
-    p_adv    RADIOBUTTON GROUP mode.
+    p_adv    RADIOBUTTON GROUP mode,
+    p_view   TYPE c LENGTH 10 AS LISTBOX VISIBLE LENGTH 18 USER-COMMAND view.
+  SELECTION-SCREEN PUSHBUTTON /1(20) gv_actxt USER-COMMAND action.
 SELECTION-SCREEN END OF BLOCK b_options.
 
 SELECTION-SCREEN BEGIN OF BLOCK b_adv WITH FRAME TITLE g_advtit.
@@ -18,8 +24,18 @@ SELECTION-SCREEN END OF BLOCK b_adv.
 INITIALIZATION.
   g_opttit = 'Screen State'.
   g_advtit = 'Dynamic Fields'.
+  gv_actxt = 'Apply screen state'.
 
 AT SELECTION-SCREEN OUTPUT.
+  IF gt_views IS INITIAL.
+    gt_views = VALUE #(
+      ( key = 'COMPACT' text = 'Compact fields' )
+      ( key = 'DETAIL' text = 'Detailed fields' ) ).
+  ENDIF.
+  CALL FUNCTION 'VRM_SET_VALUES'
+    EXPORTING id = 'P_VIEW' values = gt_views
+    EXCEPTIONS OTHERS = 1.
+
   LOOP AT SCREEN.
     CASE screen-group1.
       WHEN 'ADV'.
@@ -38,8 +54,22 @@ AT SELECTION-SCREEN OUTPUT.
       screen-input = '0'.
       screen-output = '1'.
     ENDIF.
+    IF p_view = 'COMPACT' AND screen-name = 'P_NOTE'.
+      screen-active = '0'.
+    ENDIF.
     MODIFY SCREEN.
   ENDLOOP.
+
+AT SELECTION-SCREEN.
+  CASE sscrfields-ucomm.
+    WHEN 'ACTION'.
+      p_note = |Applied { COND string( WHEN p_adv = abap_true THEN 'advanced' ELSE 'basic' ) } state|.
+      MESSAGE 'Selection-screen pushbutton handled without leaving the screen' TYPE 'S'.
+    WHEN 'VIEW'.
+      MESSAGE |List-box view changed to { p_view }| TYPE 'S'.
+    WHEN 'TOGGLE' OR 'MODE'.
+      MESSAGE 'Checkbox or radio-button command reapplied dynamic field state' TYPE 'S'.
+  ENDCASE.
 
 AT SELECTION-SCREEN ON RADIOBUTTON GROUP mode.
   IF p_adv = abap_true AND p_enable = abap_false.
@@ -99,6 +129,7 @@ START-OF-SELECTION.
   WRITE: / 'Input enabled:', p_enable,
          / 'Basic mode:', p_basic,
          / 'Advanced mode:', p_adv,
+         / 'View:', p_view,
          / 'Required value:', p_req,
          / 'City:', p_city,
          / 'Note:', p_note.

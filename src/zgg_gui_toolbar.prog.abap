@@ -106,6 +106,15 @@ MODULE user_command_0100 INPUT.
       PERFORM free_toolbar.
       PERFORM create_toolbar.
       gv_status = |Toolbar rebuilt; vertical mode={ gv_vertical }|.
+    WHEN 'RESET'.
+      gv_enabled = abap_true.
+      gv_checked = abap_false.
+      gv_visible = abap_true.
+      gv_vertical = abap_false.
+      CLEAR gv_event.
+      PERFORM free_toolbar.
+      PERFORM create_toolbar.
+      gv_status = 'Toolbar buttons, states, visibility, groups, and orientation reset'.
     WHEN 'TOOL_EVENT'.
       gv_status = 'Toolbar control event dispatched to ABAP'.
   ENDCASE.

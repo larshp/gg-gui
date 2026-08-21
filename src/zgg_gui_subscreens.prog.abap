@@ -6,6 +6,7 @@ DATA gv_left_value TYPE c LENGTH 30 VALUE 'Shared left value'.
 DATA gv_right_a TYPE c LENGTH 30 VALUE 'Details variant A'.
 DATA gv_right_b TYPE c LENGTH 30 VALUE 'Details variant B'.
 DATA gv_summary TYPE c LENGTH 70.
+DATA gv_navigation_request TYPE sy-dynnr.
 
 START-OF-SELECTION.
   CALL SCREEN 100.
@@ -40,9 +41,26 @@ MODULE user_command_0100 INPUT.
       gv_right_a = 'Details variant A'.
       gv_right_b = 'Details variant B'.
       gv_right_screen = '0120'.
+      CLEAR gv_navigation_request.
+    WHEN 'SUBNAV'.
+      IF gv_navigation_request IS NOT INITIAL.
+        gv_right_screen = gv_navigation_request.
+        gv_summary = |Parent accepted subscreen request for screen { gv_navigation_request }|.
+        CLEAR gv_navigation_request.
+      ENDIF.
     WHEN 'APPLY'.
       MESSAGE 'Parent and both active subscreens completed PAI' TYPE 'S'.
   ENDCASE.
+ENDMODULE.
+
+MODULE request_parent_navigation INPUT.
+  IF gv_ok_code = 'SUBNAV'.
+    IF gv_right_screen = '0120'.
+      gv_navigation_request = '0130'.
+    ELSE.
+      gv_navigation_request = '0120'.
+    ENDIF.
+  ENDIF.
 ENDMODULE.
 
 MODULE validate_left INPUT.

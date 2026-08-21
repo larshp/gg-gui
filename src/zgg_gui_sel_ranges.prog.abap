@@ -1,17 +1,25 @@
 REPORT zgg_gui_sel_ranges.
 
 DATA gv_number TYPE i.
+DATA gv_text TYPE c LENGTH 20.
 
 SELECT-OPTIONS:
   s_number FOR gv_number DEFAULT 10 TO 50,
   s_single FOR gv_number NO-EXTENSION NO INTERVALS,
   s_fixed  FOR gv_number DEFAULT 100 NO-EXTENSION,
-  s_req    FOR gv_number OBLIGATORY.
+  s_req    FOR gv_number OBLIGATORY,
+  s_text   FOR gv_text.
 
 INITIALIZATION.
   DATA ls_restriction TYPE sscr_restrict.
   DATA ls_option_list TYPE sscr_opt_list.
   DATA ls_assignment TYPE sscr_ass.
+
+  s_text[] = VALUE #(
+    ( sign = 'I' option = 'EQ' low = 'Exact value' )
+    ( sign = 'I' option = 'BT' low = 'A' high = 'M' )
+    ( sign = 'I' option = 'CP' low = 'Sample*' )
+    ( sign = 'E' option = 'EQ' low = 'Blocked' ) ).
 
   ls_option_list-name = 'NUMBERS'.
   ls_option_list-options-eq = abap_true.
@@ -68,4 +76,8 @@ START-OF-SELECTION.
   LOOP AT s_req.
     WRITE: / 'S_REQ', 14 s_req-sign, 21 s_req-option,
              31 s_req-low, 48 s_req-high.
+  ENDLOOP.
+  LOOP AT s_text.
+    WRITE: / 'S_TEXT', 14 s_text-sign, 21 s_text-option,
+             31 s_text-low, 48 s_text-high.
   ENDLOOP.

@@ -24,6 +24,8 @@ START-OF-SELECTION.
       title = 'Nested standard and easy splitter containers' )
     ( category = 'Container' program = 'ZGG_GUI_DIALOG_CONTAINER'
       title = 'Modeless dialog container lifecycle' )
+    ( category = 'Container' program = 'ZGG_GUI_COMPOSITE'
+      title = 'Workbench tree, grid, toolbar, and details' )
     ( category = 'Control' program = 'ZGG_GUI_PICTURE'
       title = 'Picture sources and display modes' )
     ( category = 'Control' program = 'ZGG_GUI_TEXTEDIT'
@@ -38,6 +40,8 @@ START-OF-SELECTION.
       title = 'Calendar selection and day information' )
     ( category = 'Control' program = 'ZGG_GUI_TREES'
       title = 'Column tree items, events, and mutations' )
+    ( category = 'Control' program = 'ZGG_GUI_TREE_MODELS'
+      title = 'Simple, list, and column Tree Models' )
     ( category = 'Control' program = 'ZGG_GUI_DYNAMIC_DOCUMENT'
       title = 'Dynamic Documents content and forms' )
     ( category = 'Control' program = 'ZGG_GUI_TIMER'
@@ -54,6 +58,26 @@ START-OF-SELECTION.
       title = 'Editable cells, validation, and row changes' )
     ( category = 'ALV' program = 'ZGG_GUI_ALV_FORMAT'
       title = 'Colors, styles, symbols, groups, and totals' )
+    ( category = 'ALV' program = 'ZGG_GUI_ALV_EVENTS'
+      title = 'Grid events, extensions, and drag-drop' )
+    ( category = 'ALV' program = 'ZGG_GUI_ALV_TREE'
+      title = 'Hierarchical ALV nodes, state, and calculations' )
+    ( category = 'ALV' program = 'ZGG_GUI_SALV_TREE'
+      title = 'High-level SALV hierarchy and comparison' )
+    ( category = 'ALV' program = 'ZGG_GUI_SALV_HIERSEQ'
+      title = 'Two-level hierarchical-sequential SALV' )
+    ( category = 'Frontend' program = 'ZGG_GUI_FRONTEND_SERVICES'
+      title = 'Files, directories, clipboard, and capabilities' )
+    ( category = 'Legacy' program = 'ZGG_GUI_CLASSIC_LIST'
+      title = 'Classic interactive lists and spool behavior' )
+    ( category = 'Frontend' program = 'ZGG_GUI_ILI_DRAGDROP'
+      title = 'Interactive move, resize, and context menu' )
+    ( category = 'Frontend' program = 'ZGG_GUI_DRAG_DROP'
+      title = 'Tree, grid, and cross-control drag and drop' )
+    ( category = 'Optional' program = 'ZGG_GUI_OFFICE_INTEGRATION'
+      title = 'Desktop Office spreadsheet and word processing' )
+    ( category = 'Optional' program = 'ZGG_GUI_GRAPHICS'
+      title = 'Installed graphics engines and color selector' )
     ( category = 'Selection' program = 'ZGG_GUI_SEL_FIELDS'
       title = 'Parameter field variants' )
     ( category = 'Selection' program = 'ZGG_GUI_SEL_RANGES'

@@ -5,7 +5,8 @@
   "description": "Curated ABAP samples for SAP GUI controls and screen elements",
   "scripts": {
     "lint": "abaplint --format codeframe",
-    "test": "npm run lint"
+    "verify:repo": "node scripts/verify-repo.mjs",
+    "test": "npm run verify:repo && npm run lint"
   },
   "devDependencies": {
     "@abaplint/cli": "2.120.27"
