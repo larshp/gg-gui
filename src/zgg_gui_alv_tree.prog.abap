@@ -20,20 +20,7 @@ TYPES:
   ty_rows TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY.
 
 TYPES:
-  BEGIN OF ty_item_layout,
-    fieldname  TYPE lvc_fname,
-    class      TYPE i,
-    font       TYPE i,
-    disabled   TYPE abap_bool,
-    editable   TYPE abap_bool,
-    hidden     TYPE abap_bool,
-    alignment  TYPE i,
-    t_image    TYPE tv_image,
-    chosen     TYPE abap_bool,
-    togg_right TYPE abap_bool,
-    style      TYPE i,
-  END OF ty_item_layout,
-  ty_item_layouts TYPE STANDARD TABLE OF ty_item_layout WITH EMPTY KEY,
+  ty_item_layouts TYPE lvc_t_layi,
   ty_text_line TYPE c LENGTH 255,
   ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
 
@@ -355,7 +342,7 @@ ENDFORM.
 FORM change_nodes_and_items.
   DATA ls_row TYPE ty_row.
   DATA ls_item_layout TYPE lvc_s_laci.
-  DATA lt_item_layout TYPE ty_item_layouts.
+  DATA lt_item_layout TYPE lvc_t_laci.
 
   IF gt_leaf_keys IS INITIAL.
     RETURN.
