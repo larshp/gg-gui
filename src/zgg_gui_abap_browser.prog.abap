@@ -1,6 +1,6 @@
 REPORT zgg_gui_abap_browser.
 
-DATA go_host TYPE REF TO cl_gui_custom_container.
+DATA go_host TYPE REF TO cl_gui_container.
 DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_status TYPE c LENGTH 100.
 
@@ -9,7 +9,8 @@ START-OF-SELECTION.
 
 MODULE status_0100 OUTPUT.
   IF go_host IS NOT BOUND.
-    CREATE OBJECT go_host EXPORTING container_name = 'CC_MAIN'.
+    CREATE OBJECT go_host TYPE cl_gui_custom_container
+      EXPORTING container_name = 'CC_MAIN'.
     PERFORM show_html USING go_host abap_false.
   ENDIF.
 ENDMODULE.

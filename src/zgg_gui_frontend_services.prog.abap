@@ -195,6 +195,7 @@ ENDFORM.
 FORM create_sample_files.
   DATA lt_text TYPE ty_text_lines.
   DATA lt_binary TYPE ty_bin_lines.
+  DATA lv_binary TYPE ty_bin_line.
   DATA lv_rc TYPE i.
 
   IF gv_gui_available = abap_false.
@@ -204,7 +205,8 @@ FORM create_sample_files.
     ( 'ZGG_GUI_FRONTEND_SERVICES deterministic sample' )
     ( |User: { sy-uname }| )
     ( |Date: { sy-datum DATE = ISO }| ) ).
-  lt_binary = VALUE #( ( '00010203040506070809AABBCCDDEEFF' ) ).
+  lv_binary = '00010203040506070809AABBCCDDEEFF'.
+  APPEND lv_binary TO lt_binary.
   TRY.
       cl_gui_frontend_services=>directory_create(
         EXPORTING directory = gv_sample_dir CHANGING rc = lv_rc ).
@@ -466,7 +468,9 @@ FORM reset_log.
 ENDFORM.
 
 FORM add_log USING iv_text TYPE c.
-  zcl_gg_gui_demo_helper=>add_log( EXPORTING event = iv_text CHANGING log = gt_log ).
+  zcl_gg_gui_demo_helper=>add_log(
+    EXPORTING event = CONV string( iv_text )
+    CHANGING  log   = gt_log ).
 ENDFORM.
 
 FORM refresh_log.
