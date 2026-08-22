@@ -42,29 +42,15 @@ MODULE user_command_0100 INPUT.
     WHEN 'LINK_NAME'.
       go_container->link(
         EXPORTING
-          repid = sy-repid
-          dynnr = sy-dynnr
-          container = 'CC_MAIN'
+          repid                       = sy-repid
+          dynnr                       = sy-dynnr
+          container                   = 'CC_MAIN'
         EXCEPTIONS
-          cntl_error = 1
-          cntl_system_error = 2
+          cntl_error                  = 1
+          cntl_system_error           = 2
           lifetime_dynpro_dynpro_link = 3
-          OTHERS = 4 ).
+          OTHERS                      = 4 ).
       gv_link_state = |Linked by program, screen, and custom-control name; rc { sy-subrc }|.
-    WHEN 'LINK_PARENT'.
-      IF cl_gui_container=>default_screen IS BOUND.
-        go_container->link(
-          EXPORTING
-            parent = cl_gui_container=>default_screen
-          EXCEPTIONS
-            cntl_error = 1
-            cntl_system_error = 2
-            lifetime_dynpro_dynpro_link = 3
-            OTHERS = 4 ).
-        gv_link_state = |Linked to DEFAULT_SCREEN parent; rc { sy-subrc }|.
-      ELSE.
-        gv_link_state = 'DEFAULT_SCREEN is not bound in this frontend session'.
-      ENDIF.
     WHEN 'LIFETIME'.
       CASE gv_lifetime.
         WHEN c_lifetime_default.
@@ -81,11 +67,17 @@ MODULE user_command_0100 INPUT.
       gv_large = xsdbool( gv_large = abap_false ).
       IF gv_large = abap_true.
         go_editor->set_position(
-          EXPORTING left = 4 top = 4 width = 560 height = 300
+          EXPORTING left = 4
+                    top = 4
+                    width = 560
+                    height = 300
           EXCEPTIONS cntl_error = 1 cntl_system_error = 2 OTHERS = 3 ).
       ELSE.
         go_editor->set_position(
-          EXPORTING left = 16 top = 12 width = 380 height = 180
+          EXPORTING left = 16
+                    top = 12
+                    width = 380
+                    height = 180
           EXCEPTIONS cntl_error = 1 cntl_system_error = 2 OTHERS = 3 ).
       ENDIF.
       gv_link_state = |Child geometry changed; rc { sy-subrc }|.
@@ -109,11 +101,11 @@ FORM create_container.
 
   CREATE OBJECT go_container
     EXPORTING
-      container_name = 'CC_MAIN'
-      repid = sy-repid
-      dynnr = sy-dynnr
+      container_name          = 'CC_MAIN'
+      repid                   = sy-repid
+      dynnr                   = sy-dynnr
       no_autodef_progid_dynnr = abap_true
-      lifetime = gv_lifetime.
+      lifetime                = gv_lifetime.
   PERFORM create_child.
   gv_link_state = 'Custom container created from explicit dynpro coordinates'.
 ENDFORM.
@@ -130,7 +122,7 @@ FORM create_child.
     ( |Child generation: { gv_generation }| )
     ( 'Resize this SAP GUI window to exercise the custom-control area.' )
     ( 'Use the buttons below to relink, resize, or replace the child.' ) ).
-  go_editor->set_text_as_r3table( table = lt_text ).
+  go_editor->set_text_as_r3table( lt_text ).
 ENDFORM.
 
 FORM describe_hosts.

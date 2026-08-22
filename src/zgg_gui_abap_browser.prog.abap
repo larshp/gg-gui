@@ -1,6 +1,6 @@
 REPORT zgg_gui_abap_browser.
 
-DATA go_host TYPE REF TO cl_gui_custom_container.
+DATA go_host TYPE REF TO cl_gui_container.
 DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_status TYPE c LENGTH 100.
 
@@ -9,7 +9,8 @@ START-OF-SELECTION.
 
 MODULE status_0100 OUTPUT.
   IF go_host IS NOT BOUND.
-    CREATE OBJECT go_host EXPORTING container_name = 'CC_MAIN'.
+    CREATE OBJECT go_host TYPE cl_gui_custom_container
+      EXPORTING container_name = 'CC_MAIN'.
     PERFORM show_html USING go_host abap_false.
   ENDIF.
 ENDMODULE.
@@ -55,10 +56,10 @@ FORM show_html USING io_container TYPE REF TO cl_gui_container
   TRY.
       cl_abap_browser=>show_html(
         html_string = lv_html
-        title = 'ABAP Browser HTML'
-        container = io_container
-        dialog = iv_dialog
-        printing = abap_true ).
+        title       = 'ABAP Browser HTML'
+        container   = io_container
+        dialog      = iv_dialog
+        printing    = abap_true ).
       gv_status = |HTML displayed; dialog={ iv_dialog }, supplied container={ xsdbool( io_container IS BOUND ) }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SHOW_HTML failed: { lx_error->get_text( ) }|.
@@ -71,8 +72,10 @@ FORM show_xml_string.
   lv_xml = '<?xml version="1.0"?><catalog><sample id="1">String XML</sample></catalog>'.
   TRY.
       cl_abap_browser=>show_xml(
-        xml_string = lv_xml title = 'XML from STRING'
-        container = go_host printing = abap_true ).
+        xml_string = lv_xml
+        title      = 'XML from STRING'
+        container  = go_host
+        printing   = abap_true ).
       gv_status = 'Well-formed XML STRING displayed in the supplied container'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SHOW_XML with STRING failed: { lx_error->get_text( ) }|.
@@ -84,11 +87,14 @@ FORM show_xml_xstring.
   DATA lv_xxml TYPE xstring.
 
   lv_xml = '<?xml version="1.0" encoding="utf-8"?><catalog><sample id="2">XSTRING XML</sample></catalog>'.
-  lv_xxml = cl_abap_codepage=>convert_to( source = lv_xml ).
+  lv_xxml = cl_abap_codepage=>convert_to( lv_xml ).
   TRY.
       cl_abap_browser=>show_xml(
-        xml_string = '' xml_xstring = lv_xxml title = 'XML from XSTRING'
-        container = go_host printing = abap_true ).
+        xml_string  = ''
+        xml_xstring = lv_xxml
+        title       = 'XML from XSTRING'
+        container   = go_host
+        printing    = abap_true ).
       gv_status = |XML XSTRING displayed; byte length { xstrlen( lv_xxml ) }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SHOW_XML with XSTRING failed: { lx_error->get_text( ) }|.
@@ -98,8 +104,10 @@ ENDFORM.
 FORM show_malformed.
   TRY.
       cl_abap_browser=>show_xml(
-        xml_string = '<catalog><unclosed>' title = 'Malformed XML'
-        container = go_host dialog = abap_false ).
+        xml_string = '<catalog><unclosed>'
+        title      = 'Malformed XML'
+        container  = go_host
+        dialog     = abap_false ).
       gv_status = 'Malformed XML was passed without terminating the caller'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Malformed XML was rejected safely: { lx_error->get_text( ) }|.
@@ -109,8 +117,10 @@ ENDFORM.
 FORM show_empty.
   TRY.
       cl_abap_browser=>show_html(
-        html_string = '' title = 'Empty HTML'
-        container = go_host dialog = abap_false ).
+        html_string = ''
+        title       = 'Empty HTML'
+        container   = go_host
+        dialog      = abap_false ).
       gv_status = 'Empty HTML was passed without terminating the caller'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Empty HTML was rejected safely: { lx_error->get_text( ) }|.

@@ -28,7 +28,7 @@ DATA gv_version TYPE c LENGTH 60.
 CLASS lcl_events IMPLEMENTATION.
   METHOD on_sapevent.
     gv_event = |SAPEVENT action={ action } frame={ frame } data={ getdata }|.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'SAPEVENT' ).
+    cl_gui_cfw=>set_new_ok_code( 'SAPEVENT' ).
   ENDMETHOD.
 ENDCLASS.
 
@@ -62,7 +62,8 @@ MODULE user_command_0100 INPUT.
     WHEN 'SHOW_DATA'.
       PERFORM show_generated USING abap_true.
     WHEN 'EXTERNAL'.
-      go_viewer->show_url( url = p_url in_place = abap_true ).
+      go_viewer->show_url( url      = p_url
+                           in_place = abap_true ).
       gv_status = |External URL requested; frontend security policy applies: { p_url }|.
     WHEN 'FRONTEND'.
       PERFORM detect_frontend.
@@ -84,7 +85,7 @@ MODULE user_command_0100 INPUT.
     WHEN 'UI'.
       gv_borderless = xsdbool( gv_borderless = abap_false ).
       go_viewer->set_ui_flag(
-        uiflag = COND #( WHEN gv_borderless = abap_true
+        COND #( WHEN gv_borderless = abap_true
           THEN cl_gui_html_viewer=>uiflag_no3dborder ELSE 0 ) ).
       gv_status = |No-3D-border UI flag enabled: { gv_borderless }|.
     WHEN 'CLOSE'.
@@ -93,7 +94,7 @@ MODULE user_command_0100 INPUT.
       gv_status = 'Current HTML document and its frontend resources were closed'.
     WHEN 'RESET'.
       CLEAR: gv_event, gv_borderless.
-      go_viewer->set_ui_flag( uiflag = 0 ).
+      go_viewer->set_ui_flag( 0 ).
       PERFORM detect_frontend.
       PERFORM show_generated USING abap_false.
       gv_status = 'Generated home document, UI flags, navigation origin, and event status reset'.
@@ -194,14 +195,17 @@ FORM show_generated USING iv_direct TYPE abap_bool.
 
   PERFORM build_html CHANGING lt_html.
   go_viewer->load_data(
-    EXPORTING type = 'text' subtype = 'html'
+    EXPORTING type         = 'text'
+              subtype      = 'html'
     IMPORTING assigned_url = gv_generated_url
-    CHANGING data_table = lt_html ).
+    CHANGING data_table    = lt_html ).
   IF iv_direct = abap_true.
-    go_viewer->show_data( url = gv_generated_url in_place = abap_true ).
+    go_viewer->show_data( url      = gv_generated_url
+                          in_place = abap_true ).
     gv_status = 'Generated document displayed with SHOW_DATA'.
   ELSE.
-    go_viewer->show_url( url = gv_generated_url in_place = abap_true ).
+    go_viewer->show_url( url      = gv_generated_url
+                         in_place = abap_true ).
     gv_status = 'Generated document loaded with LOAD_DATA and displayed with SHOW_URL'.
   ENDIF.
 ENDFORM.

@@ -1,21 +1,6 @@
 REPORT zgg_gui_trees.
 
-TYPES:
-  BEGIN OF ty_node,
-    node_key  TYPE tv_nodekey,
-    relatkey  TYPE tv_nodekey,
-    relatship TYPE i,
-    hidden    TYPE abap_bool,
-    disabled  TYPE abap_bool,
-    isfolder  TYPE abap_bool,
-    n_image   TYPE tv_image,
-    exp_image TYPE tv_image,
-    style     TYPE i,
-    no_branch TYPE abap_bool,
-    expander  TYPE abap_bool,
-    dragdropid TYPE i,
-  END OF ty_node,
-  ty_nodes TYPE STANDARD TABLE OF ty_node WITH EMPTY KEY.
+TYPES ty_nodes TYPE treev_ntab.
 TYPES:
   BEGIN OF ty_item,
     node_key   TYPE tv_nodekey,
@@ -115,13 +100,16 @@ CLASS lcl_events IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD on_node_menu.
-    menu->add_function( fcode = 'NODE_INFO' text = |Describe { node_key }| ).
-    menu->add_function( fcode = 'NODE_EXPAND' text = 'Expand subtree' ).
+    menu->add_function( fcode = 'NODE_INFO'
+                        text  = |Describe { node_key }| ).
+    menu->add_function( fcode = 'NODE_EXPAND'
+                        text  = 'Expand subtree' ).
     gv_event = |Node context menu requested for { node_key }|.
   ENDMETHOD.
 
   METHOD on_item_menu.
-    menu->add_function( fcode = 'ITEM_INFO' text = |Describe { item_name }| ).
+    menu->add_function( fcode = 'ITEM_INFO'
+                        text  = |Describe { item_name }| ).
     gv_event = |Item context menu requested for { node_key }/{ item_name }|.
   ENDMETHOD.
 
@@ -170,10 +158,12 @@ MODULE user_command_0100 INPUT.
     WHEN 'DELETE'.
       PERFORM delete_node.
     WHEN 'EXPAND'.
-      go_tree->expand_node( node_key = 'ROOT' level_count = 3 expand_subtree = abap_true ).
+      go_tree->expand_node( node_key       = 'ROOT'
+                            level_count    = 3
+                            expand_subtree = abap_true ).
       gv_status = 'Root expanded through the column-tree API'.
     WHEN 'COLLAPSE'.
-      go_tree->collapse_subtree( node_key = 'ROOT' ).
+      go_tree->collapse_subtree( 'ROOT' ).
       gv_status = 'Root subtree collapsed'.
     WHEN 'SELECT'.
       PERFORM select_nodes.
@@ -205,10 +195,11 @@ FORM create_controls.
   ls_header-width = 30.
   TRY.
       CREATE OBJECT go_tree
-        EXPORTING parent = go_host
-          node_selection_mode = cl_gui_column_tree=>node_sel_mode_multiple
-          item_selection = abap_true hierarchy_column_name = 'NODE'
-          hierarchy_header = ls_header.
+        EXPORTING parent                = go_host
+          node_selection_mode           = cl_gui_column_tree=>node_sel_mode_multiple
+          item_selection                = abap_true
+                  hierarchy_column_name = 'NODE'
+          hierarchy_header              = ls_header.
       CREATE OBJECT go_events.
       SET HANDLER go_events->on_selection FOR go_tree.
       SET HANDLER go_events->on_node_double FOR go_tree.
@@ -235,14 +226,21 @@ ENDFORM.
 
 FORM add_columns.
   go_tree->add_column(
-    name = 'NAME' width = 28 header_text = 'Example'
+    name           = 'NAME'
+    width          = 28
+    header_text    = 'Example'
     header_tooltip = 'Control or behavior demonstrated' ).
   go_tree->add_column(
-    name = 'KIND' width = 18 header_text = 'Item class'
+    name           = 'KIND'
+    width          = 18
+    header_text    = 'Item class'
     header_tooltip = 'Text, checkbox, link, or button' ).
   go_tree->add_column(
-    name = 'STATE' width = 18 alignment = cl_gui_column_tree=>align_center
-    header_text = 'State' header_tooltip = 'Editable and chosen state' ).
+    name           = 'STATE'
+    width          = 18
+    alignment      = cl_gui_column_tree=>align_center
+    header_text    = 'State'
+    header_tooltip = 'Editable and chosen state' ).
 ENDFORM.
 
 FORM register_events.
@@ -259,8 +257,8 @@ FORM register_events.
     ( eventid = cl_gui_column_tree=>eventid_node_context_menu_req appl_event = abap_true )
     ( eventid = cl_gui_column_tree=>eventid_item_context_menu_req appl_event = abap_true )
     ( eventid = cl_gui_column_tree=>eventid_item_keypress appl_event = abap_true ) ).
-  go_tree->set_registered_events( events = lt_events ).
-  go_tree->set_ctx_menu_select_event_appl( appl_event = abap_true ).
+  go_tree->set_registered_events( lt_events ).
+  go_tree->set_ctx_menu_select_event_appl( abap_true ).
 ENDFORM.
 
 FORM build_initial_data.
@@ -307,7 +305,8 @@ ENDFORM.
 
 FORM transfer_all_data.
   go_tree->add_nodes_and_items(
-    node_table = gt_nodes item_table = gt_items
+    node_table                = gt_nodes
+    item_table                = gt_items
     item_table_structure_name = 'MTREEITM' ).
 ENDFORM.
 
@@ -327,12 +326,13 @@ FORM add_node.
     ( node_key = lv_key item_name = 'STATE' class = cl_gui_column_tree=>item_class_checkbox
       text = 'new' editable = abap_true ) ).
   go_tree->add_nodes_and_items(
-    node_table = lt_nodes item_table = lt_items
+    node_table                = lt_nodes
+    item_table                = lt_items
     item_table_structure_name = 'MTREEITM' ).
   APPEND LINES OF lt_nodes TO gt_nodes.
   APPEND LINES OF lt_items TO gt_items.
   APPEND lv_key TO gt_added_keys.
-  go_tree->ensure_visible( node_key = lv_key ).
+  go_tree->ensure_visible( lv_key ).
   gv_status = |Node { lv_key } added under ROOT and scrolled into view|.
 ENDFORM.
 
@@ -346,11 +346,18 @@ FORM change_item.
       THEN 'Updated without rebuilding' ELSE 'Inherited tree methods' ).
     APPEND <item> TO lt_items.
     go_tree->update_nodes_and_items(
-      item_table = lt_items item_table_structure_name = 'MTREEITM' ).
+      item_table                = lt_items
+      item_table_structure_name = 'MTREEITM' ).
   ENDIF.
-  go_tree->item_set_chosen( node_key = 'CORE' item_name = 'STATE' chosen = abap_true ).
-  go_tree->item_set_editable( node_key = 'CORE' item_name = 'STATE' editable = abap_true ).
-  go_tree->item_set_t_image( node_key = 'CORE' item_name = 'NAME' t_image = '@0V@' ).
+  go_tree->item_set_chosen( node_key  = 'CORE'
+                            item_name = 'STATE'
+                            chosen    = abap_true ).
+  go_tree->item_set_editable( node_key  = 'CORE'
+                              item_name = 'STATE'
+                              editable  = abap_true ).
+  go_tree->item_set_t_image( node_key  = 'CORE'
+                             item_name = 'NAME'
+                             t_image   = '@0V@' ).
   gv_status = 'CORE item text, icon, chosen state, and editability updated in place'.
 ENDFORM.
 
@@ -361,7 +368,8 @@ FORM move_node.
   lv_parent = COND #( WHEN gv_moved = abap_true THEN 'LAZY' ELSE 'ROOT' ).
   TRY.
       CALL METHOD go_tree->('MOVE_NODE')
-        EXPORTING node_key = 'EVENTS' relative_node_key = lv_parent
+        EXPORTING node_key = 'EVENTS'
+                  relative_node_key = lv_parent
           relationship = cl_gui_column_tree=>relat_last_child.
       gv_status = |EVENTS moved under { lv_parent }|.
     CATCH cx_root INTO DATA(lx_error).
@@ -379,7 +387,7 @@ FORM delete_node.
   ENDIF.
   READ TABLE gt_added_keys INDEX lines( gt_added_keys ) INTO lv_key.
   APPEND lv_key TO lt_keys.
-  go_tree->delete_nodes( node_key_table = lt_keys ).
+  go_tree->delete_nodes( lt_keys ).
   DELETE gt_nodes WHERE node_key = lv_key.
   DELETE gt_items WHERE node_key = lv_key.
   DELETE gt_added_keys INDEX lines( gt_added_keys ).
@@ -390,9 +398,9 @@ FORM select_nodes.
   DATA lt_keys TYPE treev_nks.
 
   lt_keys = VALUE #( ( 'CORE' ) ( 'EVENTS' ) ).
-  go_tree->select_nodes( node_key_table = lt_keys ).
-  go_tree->ensure_visible( node_key = 'EVENTS' ).
-  go_tree->set_top_node( node_key = 'ROOT' ).
+  go_tree->select_nodes( lt_keys ).
+  go_tree->ensure_visible( 'EVENTS' ).
+  go_tree->set_top_node( 'ROOT' ).
   gv_status = 'CORE and EVENTS selected; EVENTS made visible and ROOT retained as top node'.
 ENDFORM.
 
@@ -407,8 +415,10 @@ ENDFORM.
 
 FORM toggle_column.
   gv_hidden = xsdbool( gv_hidden = abap_false ).
-  go_tree->column_set_hidden( column_name = 'STATE' hidden = gv_hidden ).
-  go_tree->adjust_column_width( all_columns = abap_true include_heading = abap_true ).
+  go_tree->column_set_hidden( column_name = 'STATE'
+                              hidden      = gv_hidden ).
+  go_tree->adjust_column_width( all_columns     = abap_true
+                                include_heading = abap_true ).
   gv_status = |STATE column hidden: { gv_hidden }; visible columns optimized|.
 ENDFORM.
 
@@ -417,11 +427,11 @@ FORM change_header.
 
   gv_header_alt = xsdbool( gv_header_alt = abap_false ).
   go_tree->hierarchy_header_set_text(
-    text = COND string( WHEN gv_header_alt = abap_true
+    COND tv_heading( WHEN gv_header_alt = abap_true
       THEN 'Runtime hierarchy' ELSE 'Tree subject' ) ).
-  go_tree->hierarchy_header_set_tooltip( tooltip = 'Header text and width changed at runtime' ).
+  go_tree->hierarchy_header_set_tooltip( 'Header text and width changed at runtime' ).
   go_tree->hierarchy_header_set_width(
-    width = COND #( WHEN gv_header_alt = abap_true THEN 40 ELSE 30 ) ).
+    COND #( WHEN gv_header_alt = abap_true THEN 40 ELSE 30 ) ).
   go_tree->hierarchy_header_get_width( IMPORTING width = lv_width ).
   gv_status = |Hierarchy heading changed; reported width { lv_width }|.
 ENDFORM.
@@ -449,7 +459,8 @@ FORM add_lazy_children.
     ( node_key = 'LAZY_B' item_name = 'KIND' class = cl_gui_column_tree=>item_class_text text = 'link' )
     ( node_key = 'LAZY_B' item_name = 'STATE' class = cl_gui_column_tree=>item_class_text text = 'loaded' ) ).
   go_tree->add_nodes_and_items(
-    node_table = lt_nodes item_table = lt_items
+    node_table                = lt_nodes
+    item_table                = lt_items
     item_table_structure_name = 'MTREEITM' ).
   APPEND LINES OF lt_nodes TO gt_nodes.
   APPEND LINES OF lt_items TO gt_items.
@@ -483,9 +494,10 @@ FORM reset_tree.
   CLEAR: gv_sequence, gv_hidden, gv_moved, gv_lazy_loaded, gv_header_alt.
   PERFORM build_initial_data.
   PERFORM transfer_all_data.
-  go_tree->column_set_hidden( column_name = 'STATE' hidden = abap_false ).
-  go_tree->hierarchy_header_set_text( text = 'Tree subject' ).
-  go_tree->hierarchy_header_set_width( width = 30 ).
+  go_tree->column_set_hidden( column_name = 'STATE'
+                              hidden      = abap_false ).
+  go_tree->hierarchy_header_set_text( 'Tree subject' ).
+  go_tree->hierarchy_header_set_width( 30 ).
   go_tree->expand_root_nodes( level_count = 2 ).
   gv_status = 'Tree nodes, items, columns, header, selection assumptions, and lazy state reset'.
 ENDFORM.
@@ -498,7 +510,7 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'CL_GUI_COLUMN_TREE is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP sample remains syntax checked and guarded by a capability check.' )
     ( 'Use Audit classes to inspect the tree control and tree model family.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
+  go_fallback->set_text_as_r3table( lt_text ).
   gv_status = 'Column tree unavailable; a non-terminating text fallback is displayed'.
   gv_event = io_error->get_text( ).
 ENDFORM.

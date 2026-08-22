@@ -13,22 +13,7 @@ TYPES:
     currency TYPE c LENGTH 3,
   END OF ty_row,
   ty_rows TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY.
-TYPES:
-  BEGIN OF ty_node,
-    node_key   TYPE tv_nodekey,
-    relatkey   TYPE tv_nodekey,
-    relatship  TYPE i,
-    hidden     TYPE abap_bool,
-    disabled   TYPE abap_bool,
-    isfolder   TYPE abap_bool,
-    n_image    TYPE tv_image,
-    exp_image  TYPE tv_image,
-    style      TYPE i,
-    no_branch  TYPE abap_bool,
-    expander   TYPE abap_bool,
-    dragdropid TYPE i,
-  END OF ty_node,
-  ty_nodes TYPE STANDARD TABLE OF ty_node WITH EMPTY KEY.
+TYPES ty_nodes TYPE treev_ntab.
 TYPES:
   BEGIN OF ty_item,
     node_key   TYPE tv_nodekey,
@@ -152,8 +137,10 @@ CLASS lcl_events IMPLEMENTATION.
       RETURN.
     ENDIF.
     CREATE OBJECT drag_drop_object->object TYPE lcl_payload
-      EXPORTING iv_source = 'TREE' iv_node_key = node_key
-        iv_id = CONV char8( node_key ) iv_name = |Navigation item { node_key }|.
+      EXPORTING iv_source   = 'TREE'
+                iv_node_key = node_key
+        iv_id               = CONV char8( node_key )
+                iv_name     = |Navigation item { node_key }|.
     drag_drop_object->effect = cl_dragdrop=>copy.
     gv_status = |Tree drag { node_key }/{ item_name } started|.
     PERFORM add_log USING gv_status.
@@ -188,8 +175,10 @@ CLASS lcl_events IMPLEMENTATION.
       RETURN.
     ENDIF.
     CREATE OBJECT e_dragdropobj->object TYPE lcl_payload
-      EXPORTING iv_source = 'GRID' iv_row_index = es_row_no-row_id
-        iv_id = ls_row-id iv_name = ls_row-name.
+      EXPORTING iv_source    = 'GRID'
+                iv_row_index = es_row_no-row_id
+        iv_id                = ls_row-id
+                iv_name      = ls_row-name.
     e_dragdropobj->effect = cl_dragdrop=>move.
     gv_status = |Grid drag { ls_row-id }, row { e_row-index }, column { e_column-fieldname }|.
     PERFORM add_log USING gv_status.
@@ -273,26 +262,42 @@ FORM create_controls.
   ENDIF.
   PERFORM build_data.
   TRY.
-      CREATE OBJECT go_root_splitter EXPORTING parent = go_host rows = 1 columns = 2.
-      go_root_splitter->get_container( EXPORTING row = 1 column = 1 RECEIVING container = go_nav_host ).
-      go_root_splitter->get_container( EXPORTING row = 1 column = 2 RECEIVING container = go_right_host ).
-      go_root_splitter->set_column_width( id = 1 width = 28 ).
-      CREATE OBJECT go_right_splitter EXPORTING parent = go_right_host rows = 3 columns = 1.
-      go_right_splitter->get_container( EXPORTING row = 1 column = 1 RECEIVING container = go_toolbar_host ).
-      go_right_splitter->get_container( EXPORTING row = 2 column = 1 RECEIVING container = go_grid_host ).
-      go_right_splitter->get_container( EXPORTING row = 3 column = 1 RECEIVING container = go_detail_host ).
-      go_right_splitter->set_row_height( id = 1 height = 8 ).
-      go_right_splitter->set_row_height( id = 2 height = 58 ).
-      go_right_splitter->set_row_height( id = 3 height = 34 ).
+      CREATE OBJECT go_root_splitter EXPORTING parent  = go_host
+                                               rows    = 1
+                                               columns = 2.
+      go_root_splitter->get_container( EXPORTING row = 1
+                                                 column = 1 RECEIVING container = go_nav_host ).
+      go_root_splitter->get_container( EXPORTING row = 1
+                                                 column = 2 RECEIVING container = go_right_host ).
+      go_root_splitter->set_column_width( id    = 1
+                                          width = 28 ).
+      CREATE OBJECT go_right_splitter EXPORTING parent  = go_right_host
+                                                rows    = 3
+                                                columns = 1.
+      go_right_splitter->get_container( EXPORTING row = 1
+                                                  column = 1 RECEIVING container = go_toolbar_host ).
+      go_right_splitter->get_container( EXPORTING row = 2
+                                                  column = 1 RECEIVING container = go_grid_host ).
+      go_right_splitter->get_container( EXPORTING row = 3
+                                                  column = 1 RECEIVING container = go_detail_host ).
+      go_right_splitter->set_row_height( id     = 1
+                                         height = 8 ).
+      go_right_splitter->set_row_height( id     = 2
+                                         height = 58 ).
+      go_right_splitter->set_row_height( id     = 3
+                                         height = 34 ).
       PERFORM configure_dragdrop.
       ls_header = VALUE #( heading = 'Navigation' width = 28 tooltip = 'Select a category or drag products' ).
-      CREATE OBJECT go_tree EXPORTING parent = go_nav_host
-        node_selection_mode = cl_gui_column_tree=>node_sel_mode_single
-        item_selection = abap_true hierarchy_column_name = 'NODE'
-        hierarchy_header = ls_header.
-      go_tree->add_column( name = 'NAME' width = 20 header_text = 'Scope' ).
+      CREATE OBJECT go_tree EXPORTING parent                = go_nav_host
+        node_selection_mode                                 = cl_gui_column_tree=>node_sel_mode_single
+        item_selection                                      = abap_true
+                                      hierarchy_column_name = 'NODE'
+        hierarchy_header                                    = ls_header.
+      go_tree->add_column( name        = 'NAME'
+                           width       = 20
+                           header_text = 'Scope' ).
       CREATE OBJECT go_toolbar EXPORTING parent = go_toolbar_host
-        display_mode = cl_gui_toolbar=>m_mode_horizontal.
+        display_mode                            = cl_gui_toolbar=>m_mode_horizontal.
       CREATE OBJECT go_grid EXPORTING i_parent = go_grid_host.
       CREATE OBJECT go_details EXPORTING parent = go_detail_host.
       CREATE OBJECT go_events.
@@ -304,15 +309,15 @@ FORM create_controls.
       SET HANDLER go_events->on_grid_drag FOR go_grid.
       SET HANDLER go_events->on_grid_drop FOR go_grid.
       lt_events = VALUE #( ( eventid = cl_gui_column_tree=>eventid_selection_changed appl_event = abap_true ) ).
-      go_tree->set_registered_events( events = lt_events ).
+      go_tree->set_registered_events( lt_events ).
       lt_events = VALUE #( ( eventid = cl_gui_toolbar=>m_id_function_selected appl_event = abap_true ) ).
-      go_toolbar->set_registered_events( events = lt_events ).
+      go_toolbar->set_registered_events( lt_events ).
       PERFORM populate_tree.
       PERFORM populate_toolbar.
       go_grid->set_table_for_first_display(
         EXPORTING is_layout = VALUE lvc_s_layo( zebra = abap_true grid_title = 'Products in active navigation scope' )
         CHANGING it_outtab = gt_rows it_fieldcatalog = gt_fieldcat ).
-      go_details->set_readonly_mode( readonly_mode = 1 ).
+      go_details->set_readonly_mode( 1 ).
       go_tree->expand_root_nodes( level_count = 3 ).
       gv_status = 'Workbench ready: select navigation, inspect grid rows, use toolbar commands, or drag between panes'.
       PERFORM add_log USING gv_status.
@@ -324,8 +329,11 @@ ENDFORM.
 
 FORM configure_dragdrop.
   CREATE OBJECT go_dragdrop.
-  go_dragdrop->add( flavor = 'GG_COMPOSITE' dragsrc = abap_true droptarget = abap_true
-    effect = cl_dragdrop=>move effect_in_ctrl = cl_dragdrop=>move ).
+  go_dragdrop->add( flavor         = 'GG_COMPOSITE'
+                    dragsrc        = abap_true
+                    droptarget     = abap_true
+    effect                         = cl_dragdrop=>move
+                    effect_in_ctrl = cl_dragdrop=>move ).
   go_dragdrop->get_handle( IMPORTING handle = gv_drag_handle ).
 ENDFORM.
 
@@ -367,27 +375,50 @@ FORM populate_tree.
     ( node_key = 'P110' item_name = 'NAME' class = cl_gui_column_tree=>item_class_text text = 'Mouse' )
     ( node_key = 'P200' item_name = 'NODE' class = cl_gui_column_tree=>item_class_text text = 'P200' )
     ( node_key = 'P200' item_name = 'NAME' class = cl_gui_column_tree=>item_class_text text = 'Display' ) ).
-  go_tree->add_nodes_and_items( node_table = gt_nodes item_table = gt_items
-    item_table_structure_name = 'MTREEITM' ).
+  go_tree->add_nodes_and_items( node_table = gt_nodes
+                                item_table = gt_items
+    item_table_structure_name              = 'MTREEITM' ).
 ENDFORM.
 
 FORM populate_toolbar.
-  go_toolbar->add_button( fcode = 'TREE' icon = '@3P@' butn_type = c_button
-    text = 'Tree' quickinfo = 'Make the navigation tree active' ).
-  go_toolbar->add_button( fcode = 'GRID' icon = '@3Y@' butn_type = c_button
-    text = 'Grid' quickinfo = 'Make the ALV grid active' ).
-  go_toolbar->add_button( fcode = 'DETAIL' icon = '@0S@' butn_type = c_button
-    text = 'Details' quickinfo = 'Make the detail editor active' ).
-  go_toolbar->add_button( fcode = '' icon = '' butn_type = c_separator ).
-  go_toolbar->add_button( fcode = 'REFRESH' icon = '@42@' butn_type = c_button
-    text = 'Refresh' quickinfo = 'Refresh the active child control' ).
-  go_toolbar->add_button( fcode = 'TOGGLE' icon = '@3Z@' butn_type = c_button
-    text = 'Details pane' quickinfo = 'Show or hide the lower detail pane' ).
-  go_toolbar->add_button( fcode = 'RESET' icon = '@18@' butn_type = c_button
-    text = 'Reset' quickinfo = 'Reset data, filters, details, and pane sizes' ).
+  go_toolbar->add_button( fcode     = 'TREE'
+                          icon      = '@3P@'
+                          butn_type = c_button
+    text                            = 'Tree'
+                          quickinfo = 'Activate navigation tree' ).
+  go_toolbar->add_button( fcode     = 'GRID'
+                          icon      = '@3Y@'
+                          butn_type = c_button
+    text                            = 'Grid'
+                          quickinfo = 'Make the ALV grid active' ).
+  go_toolbar->add_button( fcode     = 'DETAIL'
+                          icon      = '@0S@'
+                          butn_type = c_button
+    text                            = 'Details'
+                          quickinfo = 'Make the detail editor active' ).
+  go_toolbar->add_button( fcode     = ''
+                          icon      = ''
+                          butn_type = c_separator ).
+  go_toolbar->add_button( fcode     = 'REFRESH'
+                          icon      = '@42@'
+                          butn_type = c_button
+    text                            = 'Refresh'
+                          quickinfo = 'Refresh active child control' ).
+  go_toolbar->add_button( fcode     = 'TOGGLE'
+                          icon      = '@3Z@'
+                          butn_type = c_button
+    text                            = 'Details pane'
+                          quickinfo = 'Show or hide detail pane' ).
+  go_toolbar->add_button( fcode     = 'RESET'
+                          icon      = '@18@'
+                          butn_type = c_button
+    text                            = 'Reset'
+                          quickinfo = 'Reset data, filters, and panes' ).
 ENDFORM.
 
 FORM select_navigation USING iv_node TYPE tv_nodekey.
+  DATA ls_product TYPE ty_row.
+
   IF iv_node = 'INPUT'.
     gv_filter = 'Input'.
   ELSEIF iv_node = 'DISPLAY'.
@@ -395,11 +426,12 @@ FORM select_navigation USING iv_node TYPE tv_nodekey.
   ELSEIF iv_node = 'ROOT'.
     CLEAR gv_filter.
   ELSE.
-    READ TABLE gt_all_rows WITH KEY id = iv_node INTO DATA(ls_product).
+    READ TABLE gt_all_rows WITH KEY id = iv_node INTO ls_product.
     IF sy-subrc = 0.
       gv_filter = ls_product-category.
       gt_rows = VALUE #( ( ls_product ) ).
-      PERFORM show_row_detail USING ls_product.
+      PERFORM show_row_detail USING ls_product-id ls_product-name
+        ls_product-category ls_product-quantity ls_product-price ls_product-currency.
       go_grid->refresh_table_display(
         is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
       gv_status = |Navigation leaf { iv_node } selected; one matching product shown|.
@@ -421,12 +453,18 @@ FORM select_navigation USING iv_node TYPE tv_nodekey.
 ENDFORM.
 
 FORM show_product USING iv_index TYPE i.
-  READ TABLE gt_rows INDEX iv_index INTO DATA(ls_row).
-  IF sy-subrc = 0. PERFORM show_row_detail USING ls_row. ENDIF.
+  DATA ls_row TYPE ty_row.
+
+  READ TABLE gt_rows INDEX iv_index INTO ls_row.
+  IF sy-subrc = 0.
+    PERFORM show_row_detail USING ls_row-id ls_row-name ls_row-category
+      ls_row-quantity ls_row-price ls_row-currency.
+  ENDIF.
 ENDFORM.
 
-FORM show_row_detail USING is_row TYPE ty_row.
-  gv_detail = |{ is_row-id } { is_row-name }; { is_row-category }; quantity { is_row-quantity }; { is_row-price } { is_row-currency }|.
+FORM show_row_detail USING iv_id TYPE c iv_name TYPE c iv_category TYPE c
+    iv_quantity TYPE i iv_price TYPE p iv_currency TYPE c.
+  gv_detail = |{ iv_id } { iv_name }; { iv_category }; quantity { iv_quantity }; { iv_price } { iv_currency }|.
   PERFORM refresh_details.
 ENDFORM.
 
@@ -448,7 +486,7 @@ FORM toolbar_action USING iv_fcode TYPE sy-ucomm.
     WHEN 'TOGGLE'.
       gv_details_visible = xsdbool( gv_details_visible = abap_false ).
       go_right_splitter->set_row_height( id = 3
-        height = COND #( WHEN gv_details_visible = abap_true THEN 34 ELSE 0 ) ).
+        height                              = COND #( WHEN gv_details_visible = abap_true THEN 34 ELSE 0 ) ).
       gv_status = |Toolbar detail-pane visibility { gv_details_visible }|.
     WHEN 'RESET'.
       PERFORM reset_workbench.
@@ -472,7 +510,7 @@ FORM refresh_details.
     ( |Detail: { gv_detail }| )
     ( 'Recent events' ) ).
   APPEND LINES OF gt_log TO lt_text.
-  go_details->set_text_as_r3table( table = lt_text ).
+  go_details->set_text_as_r3table( lt_text ).
 ENDFORM.
 
 FORM save_layout.
@@ -494,9 +532,12 @@ FORM restore_layout.
   IF gv_layout_saved = abap_false.
     gv_status = 'No session layout has been saved'.
   ELSE.
-    go_root_splitter->set_column_width( id = 1 width = gv_saved_nav_width ).
-    go_right_splitter->set_row_height( id = 2 height = gv_saved_grid_height ).
-    go_right_splitter->set_row_height( id = 3 height = gv_saved_detail_height ).
+    go_root_splitter->set_column_width( id    = 1
+                                        width = gv_saved_nav_width ).
+    go_right_splitter->set_row_height( id     = 2
+                                       height = gv_saved_grid_height ).
+    go_right_splitter->set_row_height( id     = 3
+                                       height = gv_saved_detail_height ).
     gv_details_visible = xsdbool( gv_saved_detail_height > 0 ).
     gv_status = 'Saved splitter proportions restored for the current report session'.
   ENDIF.
@@ -509,10 +550,14 @@ FORM reset_workbench.
   CLEAR: gv_filter, gv_detail, gt_log.
   gv_active = 'TREE'.
   gv_details_visible = abap_true.
-  go_root_splitter->set_column_width( id = 1 width = 28 ).
-  go_right_splitter->set_row_height( id = 1 height = 8 ).
-  go_right_splitter->set_row_height( id = 2 height = 58 ).
-  go_right_splitter->set_row_height( id = 3 height = 34 ).
+  go_root_splitter->set_column_width( id    = 1
+                                      width = 28 ).
+  go_right_splitter->set_row_height( id     = 1
+                                     height = 8 ).
+  go_right_splitter->set_row_height( id     = 2
+                                     height = 58 ).
+  go_right_splitter->set_row_height( id     = 3
+                                     height = 34 ).
   go_grid->refresh_table_display(
     is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
   gv_status = 'Workbench data, active child, filter, event log, and default splitter proportions reset'.
@@ -530,8 +575,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'The composed workbench controls are unavailable in this runtime.' )
     ( 'The native report retains nested splitters, navigation, toolbar, grid, details, coordinated events, drag/drop, and session layout state.' )
     ( 'The pinned open-abap hosted controls currently terminate in runtime assertions.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Composite workbench unavailable; diagnostic fallback shown'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

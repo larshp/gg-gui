@@ -76,11 +76,15 @@ FORM create_controls.
 
   TRY.
       CREATE OBJECT go_variant
-        EXPORTING it_outtab = gr_rows it_fieldcatalog = gt_fieldcat
-          is_variant = gs_variant is_layout = gs_layout.
+        EXPORTING it_outtab       = gr_rows
+                  it_fieldcatalog = gt_fieldcat
+          is_variant              = gs_variant
+                  is_layout       = gs_layout.
       CREATE OBJECT go_grid EXPORTING i_parent = go_host.
       go_grid->set_table_for_first_display(
-        EXPORTING is_variant = gs_variant i_save = 'A' i_default = abap_false
+        EXPORTING is_variant = gs_variant
+                  i_save = 'A'
+                  i_default = abap_false
           is_layout = gs_layout
         CHANGING it_outtab = gt_rows it_fieldcatalog = gt_fieldcat ).
       gv_status = 'CL_ALV_VARIANT and its owning ALV Grid were created for report-local handle GGV1'.
@@ -130,8 +134,9 @@ FORM read_variant_info.
   PERFORM current_key CHANGING ls_key.
   TRY.
       go_variant->get_variant_info_from_db(
-        EXPORTING is_variant = ls_key it_def_fcat = gt_fieldcat
-        IMPORTING et_fcat = lt_stored_catalog ).
+        EXPORTING is_variant  = ls_key
+                  it_def_fcat = gt_fieldcat
+        IMPORTING et_fcat     = lt_stored_catalog ).
       gv_status = |Variant { gv_variant_name } returned { lines( lt_stored_catalog ) } stored field-catalog entries|.
       gv_detail = |Default catalog fallback contains { lines( gt_fieldcat ) } entries|.
     CATCH cx_root INTO DATA(lx_error).
@@ -149,7 +154,8 @@ FORM apply_variant.
   ENDIF.
   PERFORM current_key CHANGING ls_key.
   TRY.
-      go_grid->set_variant( is_variant = ls_key i_save = 'A' ).
+      go_grid->set_variant( is_variant = ls_key
+                            i_save     = 'A' ).
       go_grid->refresh_table_display(
         is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
       gv_status = |Variant { gv_variant_name } applied to the current grid|.
@@ -170,7 +176,8 @@ FORM save_variant.
   ENDIF.
   PERFORM current_key CHANGING ls_key.
   TRY.
-      go_grid->set_variant( is_variant = ls_key i_save = 'A' ).
+      go_grid->set_variant( is_variant = ls_key
+                            i_save     = 'A' ).
       go_grid->save_variant( EXPORTING i_dialog = abap_false IMPORTING e_exit = lv_exit ).
       IF lv_exit = abap_false.
         READ TABLE gt_owned_variants WITH KEY variant = ls_key-variant TRANSPORTING NO FIELDS.
@@ -274,8 +281,8 @@ FORM reset_layout.
   gv_variant_name = 'GG_DEMO'.
   IF go_grid IS BOUND.
     TRY.
-        go_grid->set_frontend_fieldcatalog( it_fieldcatalog = gt_fieldcat ).
-        go_grid->set_frontend_layout( is_layout = gs_layout ).
+        go_grid->set_frontend_fieldcatalog( gt_fieldcat ).
+        go_grid->set_frontend_layout( gs_layout ).
         go_grid->refresh_table_display(
           is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
         gv_status = 'Frontend layout and in-memory ownership tracking reset; stored variants were not deleted'.
@@ -293,8 +300,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'The ALV variant sample cannot display its owning grid in this runtime.' )
     ( 'CL_ALV_VARIANT is declared, but its methods do not persist or retrieve state in open-abap.' )
     ( 'The native SAP code remains syntax checked and all deletion is constrained to tracked GG_ keys.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'ALV variants unavailable; a non-terminating text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

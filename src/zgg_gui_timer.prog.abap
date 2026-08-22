@@ -27,7 +27,7 @@ CLASS lcl_events IMPLEMENTATION.
     PERFORM refresh_document.
     go_timer->interval = gv_interval.
     go_timer->run( ).
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'TICK' ).
+    cl_gui_cfw=>set_new_ok_code( 'TICK' ).
   ENDMETHOD.
 ENDCLASS.
 
@@ -64,7 +64,8 @@ MODULE user_command_0100 INPUT.
       go_timer->cancel( ).
       gv_status = 'Timer stopped'.
     WHEN 'FASTER'.
-      gv_interval = nmax( val1 = 1 val2 = gv_interval - 1 ).
+      gv_interval = nmax( val1 = 1
+                          val2 = gv_interval - 1 ).
       go_timer->interval = gv_interval.
       gv_status = |Interval changed to { gv_interval } seconds|.
     WHEN 'SLOWER'.
@@ -105,7 +106,7 @@ FORM refresh_document.
     ( |Completed ticks: { gv_ticks }| )
     ( |Current interval: { gv_interval } seconds| )
     ( |Running: { gv_running }| ) ).
-  go_editor->set_text_as_r3table( table = lt_text ).
+  go_editor->set_text_as_r3table( lt_text ).
   cl_gui_cfw=>flush( ).
 ENDFORM.
 

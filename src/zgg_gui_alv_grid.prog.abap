@@ -85,17 +85,21 @@ FORM create_controls.
   PERFORM build_manual_catalog.
   PERFORM build_configuration.
   TRY.
-      CREATE OBJECT go_grid EXPORTING i_parent = go_host i_appl_events = abap_true.
+      CREATE OBJECT go_grid EXPORTING i_parent      = go_host
+                                      i_appl_events = abap_true.
       go_grid->set_table_for_first_display(
-        EXPORTING is_variant = gs_variant i_save = 'A' i_default = abap_true
-          is_layout = gs_layout is_print = gs_print
+        EXPORTING is_variant = gs_variant
+                  i_save = 'A'
+                  i_default = abap_true
+          is_layout = gs_layout
+                  is_print = gs_print
           it_toolbar_excluding = VALUE ui_functions(
             ( cl_gui_alv_grid=>mc_fc_graph )
             ( cl_gui_alv_grid=>mc_fc_word_processor ) )
         CHANGING it_outtab = gt_rows it_fieldcatalog = gt_fieldcat
           it_sort = gt_sort it_filter = gt_filter ).
       go_grid->set_gridtitle( 'Basic ALV Grid Control - deterministic products' ).
-      go_grid->set_3d_border( border = 1 ).
+      go_grid->set_3d_border( 1 ).
       gv_status = 'ALV Grid created with a manual catalog, layout, exclusions, sort, filter, totals, print, and variant key'.
       gv_detail = 'The standard toolbar provides sort, filter, subtotal, aggregate, print, layout, and export commands'.
     CATCH cx_root INTO DATA(lx_error).
@@ -186,10 +190,10 @@ FORM selection_roundtrip.
         ( row_id-index = 1 col_id-fieldname = 'ID' )
         ( row_id-index = 3 col_id-fieldname = 'PRICE' ) ).
       go_grid->set_selected_rows( it_index_rows = lt_rows ).
-      go_grid->set_selected_columns( it_col_table = lt_columns ).
-      go_grid->set_selected_cells( it_cells = lt_cells ).
+      go_grid->set_selected_columns( lt_columns ).
+      go_grid->set_selected_cells( lt_cells ).
       go_grid->set_current_cell_via_id(
-        is_row_id = VALUE #( index = 1 )
+        is_row_id    = VALUE #( index = 1 )
         is_column_id = VALUE #( fieldname = 'NAME' ) ).
       gv_status = |Read rows { lines( lt_row_numbers ) }, columns { lines( lt_columns ) }, cells { lines( lt_cells ) }; then selected examples|.
       gv_detail = |Previous current cell: row { lv_row }, column { ls_column-fieldname }, value { lv_value }|.
@@ -219,8 +223,8 @@ FORM frontend_roundtrip.
       ls_frontend_layout-grid_title = COND #(
         WHEN gv_alternate_layout = abap_true THEN 'Frontend catalog and layout replaced'
         ELSE 'Basic ALV Grid Control' ).
-      go_grid->set_frontend_fieldcatalog( it_fieldcatalog = lt_frontend_catalog ).
-      go_grid->set_frontend_layout( is_layout = ls_frontend_layout ).
+      go_grid->set_frontend_fieldcatalog( lt_frontend_catalog ).
+      go_grid->set_frontend_layout( ls_frontend_layout ).
       gv_status = |Read and replaced { lines( lt_frontend_catalog ) } frontend catalog entries and the current frontend layout|.
       gv_detail = |Alternate frontend presentation active: { gv_alternate_layout }|.
     CATCH cx_root INTO DATA(lx_error).
@@ -241,7 +245,9 @@ FORM scroll_roundtrip.
       go_grid->get_scroll_info_via_id(
         IMPORTING es_row_no = ls_row_number es_row_info = ls_row es_col_info = ls_column ).
       go_grid->set_scroll_info_via_id(
-        is_row_info = ls_row is_col_info = ls_column is_row_no = ls_row_number ).
+        is_row_info = ls_row
+        is_col_info = ls_column
+        is_row_no   = ls_row_number ).
       gv_status = |Scroll position read and restored: row { ls_row-index }, column { ls_column-fieldname }|.
       gv_detail = 'The control keeps its top row and left column across refresh-oriented operations'.
     CATCH cx_root INTO DATA(lx_error).
@@ -291,10 +297,10 @@ FORM criteria_roundtrip.
       ELSE.
         CLEAR lt_current_filter.
       ENDIF.
-      go_grid->set_sort_criteria( it_sort = gt_sort ).
-      go_grid->set_filter_criteria( it_filter = lt_current_filter ).
+      go_grid->set_sort_criteria( gt_sort ).
+      go_grid->set_filter_criteria( lt_current_filter ).
       go_grid->refresh_table_display(
-        is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true )
+        is_stable      = VALUE lvc_s_stbl( row = abap_true col = abap_true )
         i_soft_refresh = abap_false ).
       gv_status = |Sort, subtotal, and aggregate criteria restored; filter count is now { lines( lt_current_filter ) }|.
       gv_detail = 'Quantity and price total fields remain active while category supplies subtotal groups'.
@@ -316,7 +322,8 @@ FORM variant_roundtrip.
       go_grid->get_variant( IMPORTING es_variant = ls_current e_save = lv_save ).
       go_grid->save_variant( EXPORTING i_dialog = abap_true IMPORTING e_exit = lv_exit ).
       IF lv_exit = abap_false AND ls_current-variant IS NOT INITIAL.
-        go_grid->set_variant( is_variant = ls_current i_save = lv_save ).
+        go_grid->set_variant( is_variant = ls_current
+                              i_save     = lv_save ).
       ENDIF.
       gv_status = |Variant dialog exit flag { lv_exit }; current variant { ls_current-variant }|.
       gv_detail = 'Only the current report and BSC1 handle are used by this sample'.
@@ -337,7 +344,7 @@ FORM refresh_grid.
   ENDIF.
   TRY.
       go_grid->refresh_table_display(
-        is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true )
+        is_stable      = VALUE lvc_s_stbl( row = abap_true col = abap_true )
         i_soft_refresh = abap_true ).
       gv_status = |Stable soft refresh complete; P100 quantity is { <row>-quantity }|.
     CATCH cx_root INTO DATA(lx_error).
@@ -351,7 +358,7 @@ FORM request_export.
     RETURN.
   ENDIF.
   TRY.
-      go_grid->set_user_command( i_ucomm = '&XXL' ).
+      go_grid->set_user_command( '&XXL' ).
       gv_status = 'The standard spreadsheet export command was sent to the ALV Grid'.
       gv_detail = 'Frontend security and installed spreadsheet integration determine the resulting dialog'.
     CATCH cx_root INTO DATA(lx_error).
@@ -391,7 +398,7 @@ FORM toggle_presentation.
         WHEN gv_input_ready = abap_true THEN 'Ready-for-input state enabled'
         ELSE 'Read-only Basic ALV Grid Control' ) ).
       go_grid->set_ready_for_input( COND #( WHEN gv_input_ready = abap_true THEN 1 ELSE 0 ) ).
-      go_grid->set_3d_border( border = COND #( WHEN gv_input_ready = abap_true THEN 0 ELSE 1 ) ).
+      go_grid->set_3d_border( COND #( WHEN gv_input_ready = abap_true THEN 0 ELSE 1 ) ).
       lv_ready = go_grid->is_ready_for_input( ).
       gv_status = |Grid title, ready-for-input state, and 3D border changed; reported input state { lv_ready }|.
       gv_detail = 'This basic report changes control state but leaves editable-cell behavior to ZGG_GUI_ALV_EDIT'.
@@ -407,14 +414,15 @@ FORM reset_grid.
   PERFORM build_configuration.
   IF go_grid IS BOUND.
     TRY.
-        go_grid->set_frontend_fieldcatalog( it_fieldcatalog = gt_fieldcat ).
-        go_grid->set_frontend_layout( is_layout = gs_layout ).
-        go_grid->set_sort_criteria( it_sort = gt_sort ).
-        go_grid->set_filter_criteria( it_filter = gt_filter ).
-        go_grid->set_variant( is_variant = gs_variant i_save = 'A' ).
+        go_grid->set_frontend_fieldcatalog( gt_fieldcat ).
+        go_grid->set_frontend_layout( gs_layout ).
+        go_grid->set_sort_criteria( gt_sort ).
+        go_grid->set_filter_criteria( gt_filter ).
+        go_grid->set_variant( is_variant = gs_variant
+                              i_save     = 'A' ).
         go_grid->set_gridtitle( 'Basic ALV Grid Control - deterministic products' ).
         go_grid->set_ready_for_input( 0 ).
-        go_grid->set_3d_border( border = 1 ).
+        go_grid->set_3d_border( 1 ).
         go_grid->refresh_table_display(
           is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
         gv_status = 'Rows, catalog, layout, sort, filter, variant key, title, input state, and border reset'.
@@ -434,8 +442,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'CL_GUI_ALV_GRID is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP report remains syntax checked and guards grid construction.' )
     ( 'The pinned open-abap-gui grid constructor currently terminates with an assertion.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'ALV Grid unavailable; a non-terminating text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

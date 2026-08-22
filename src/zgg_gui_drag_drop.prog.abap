@@ -8,22 +8,7 @@ TYPES:
     quantity TYPE i,
   END OF ty_row,
   ty_rows TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY.
-TYPES:
-  BEGIN OF ty_node,
-    node_key   TYPE tv_nodekey,
-    relatkey   TYPE tv_nodekey,
-    relatship  TYPE i,
-    hidden     TYPE abap_bool,
-    disabled   TYPE abap_bool,
-    isfolder   TYPE abap_bool,
-    n_image    TYPE tv_image,
-    exp_image  TYPE tv_image,
-    style      TYPE i,
-    no_branch  TYPE abap_bool,
-    expander   TYPE abap_bool,
-    dragdropid TYPE i,
-  END OF ty_node,
-  ty_nodes TYPE STANDARD TABLE OF ty_node WITH EMPTY KEY.
+TYPES ty_nodes TYPE treev_ntab.
 TYPES:
   BEGIN OF ty_item,
     node_key   TYPE tv_nodekey,
@@ -145,8 +130,10 @@ CLASS lcl_events IMPLEMENTATION.
       RETURN.
     ENDIF.
     CREATE OBJECT e_dragdropobj->object TYPE lcl_drag_payload
-      EXPORTING iv_source = 'GRID' iv_row_index = es_row_no-row_id
-        iv_id = ls_row-id iv_name = ls_row-name.
+      EXPORTING iv_source    = 'GRID'
+                iv_row_index = es_row_no-row_id
+        iv_id                = ls_row-id
+                iv_name      = ls_row-name.
     e_dragdropobj->effect = cl_dragdrop=>move.
     lcl_log=>add( |GRID drag row { e_row-index }, column { e_column-fieldname }, flavor GG_ITEMS| ).
   ENDMETHOD.
@@ -201,7 +188,8 @@ CLASS lcl_events IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD on_grid_flavor.
-    lcl_log=>add( |GRID flavor query { e_flavors } at row { e_row-index }/{ es_row_no-row_id }, { e_column-fieldname }| ).
+    lcl_log=>add( |GRID flavor query { concat_lines_of( table = e_flavors
+                                                        sep   = ',' ) } at row { e_row-index }/{ es_row_no-row_id }, { e_column-fieldname }| ).
     gv_detail = |Payload bound { xsdbool( e_dragdropobj IS BOUND ) }|.
   ENDMETHOD.
 
@@ -213,8 +201,10 @@ CLASS lcl_events IMPLEMENTATION.
     ENDIF.
     DATA(lv_id) = CONV char8( node_key ).
     CREATE OBJECT drag_drop_object->object TYPE lcl_drag_payload
-      EXPORTING iv_source = 'TREE' iv_node_key = node_key
-        iv_id = lv_id iv_name = |Tree item { node_key }|.
+      EXPORTING iv_source   = 'TREE'
+                iv_node_key = node_key
+        iv_id               = lv_id
+                iv_name     = |Tree item { node_key }|.
     drag_drop_object->effect = cl_dragdrop=>move.
     lcl_log=>add( |TREE drag { node_key }/{ item_name }, flavor GG_ITEMS| ).
   ENDMETHOD.
@@ -229,9 +219,11 @@ CLASS lcl_events IMPLEMENTATION.
     ENDLOOP.
     READ TABLE node_key_table INDEX 1 INTO DATA(lv_first).
     CREATE OBJECT drag_drop_object->object TYPE lcl_drag_payload
-      EXPORTING iv_source = 'TREE' iv_node_key = lv_first
-        iv_id = CONV char8( lv_first ) iv_name = |Tree item { lv_first }|
-        it_node_keys = node_key_table.
+      EXPORTING iv_source   = 'TREE'
+                iv_node_key = lv_first
+        iv_id               = CONV char8( lv_first )
+                iv_name     = |Tree item { lv_first }|
+        it_node_keys        = node_key_table.
     drag_drop_object->effect = cl_dragdrop=>move.
     lcl_log=>add( |TREE multi-drag { lines( node_key_table ) } nodes/{ item_name }, flavor GG_ITEMS| ).
   ENDMETHOD.
@@ -258,12 +250,14 @@ CLASS lcl_events IMPLEMENTATION.
           ENDIF.
           IF lo_payload->node_keys IS INITIAL.
             CALL METHOD go_tree->('MOVE_NODE')
-              EXPORTING node_key = lo_payload->node_key relative_node_key = node_key
+              EXPORTING node_key = lo_payload->node_key
+                        relative_node_key = node_key
                 relationship = cl_gui_column_tree=>relat_last_child.
           ELSE.
             LOOP AT lo_payload->node_keys INTO DATA(lv_key).
               CALL METHOD go_tree->('MOVE_NODE')
-                EXPORTING node_key = lv_key relative_node_key = node_key
+                EXPORTING node_key = lv_key
+                          relative_node_key = node_key
                   relationship = cl_gui_column_tree=>relat_last_child.
             ENDLOOP.
           ENDIF.
@@ -288,7 +282,7 @@ CLASS lcl_events IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD on_tree_flavor.
-    lcl_log=>add( |TREE flavor query { flavors } at node { node_key }| ).
+    lcl_log=>add( |TREE flavor query returned { lines( flavors ) } entries at node { node_key }| ).
     gv_detail = |Payload bound { xsdbool( drag_drop_object IS BOUND ) }|.
   ENDMETHOD.
 ENDCLASS.
@@ -341,18 +335,26 @@ FORM create_controls.
   ENDIF.
   PERFORM build_data.
   TRY.
-      CREATE OBJECT go_splitter EXPORTING parent = go_host rows = 1 columns = 2.
-      go_splitter->get_container( EXPORTING row = 1 column = 1 RECEIVING container = go_tree_host ).
-      go_splitter->get_container( EXPORTING row = 1 column = 2 RECEIVING container = go_grid_host ).
-      go_splitter->set_column_width( id = 1 width = 38 ).
+      CREATE OBJECT go_splitter EXPORTING parent  = go_host
+                                          rows    = 1
+                                          columns = 2.
+      go_splitter->get_container( EXPORTING row = 1
+                                            column = 1 RECEIVING container = go_tree_host ).
+      go_splitter->get_container( EXPORTING row = 1
+                                            column = 2 RECEIVING container = go_grid_host ).
+      go_splitter->set_column_width( id    = 1
+                                     width = 38 ).
       PERFORM configure_behaviors.
       ls_header = VALUE #( heading = 'Drop target hierarchy' width = 28
         tooltip = 'Drag leaf nodes or drop grid rows on a target node' ).
-      CREATE OBJECT go_tree EXPORTING parent = go_tree_host
-        node_selection_mode = cl_gui_column_tree=>node_sel_mode_multiple
-        item_selection = abap_true hierarchy_column_name = 'NODE'
-        hierarchy_header = ls_header.
-      go_tree->add_column( name = 'NAME' width = 24 header_text = 'Payload' ).
+      CREATE OBJECT go_tree EXPORTING parent                = go_tree_host
+        node_selection_mode                                 = cl_gui_column_tree=>node_sel_mode_multiple
+        item_selection                                      = abap_true
+                                      hierarchy_column_name = 'NODE'
+        hierarchy_header                                    = ls_header.
+      go_tree->add_column( name        = 'NAME'
+                           width       = 24
+                           header_text = 'Payload' ).
       CREATE OBJECT go_grid EXPORTING i_parent = go_grid_host.
       CREATE OBJECT go_events.
       SET HANDLER go_events->on_grid_drag FOR go_grid.
@@ -377,10 +379,16 @@ ENDFORM.
 
 FORM configure_behaviors.
   CREATE OBJECT go_dragdrop.
-  go_dragdrop->add( flavor = 'GG_ITEMS' dragsrc = abap_true droptarget = abap_true
-    effect = cl_dragdrop=>move effect_in_ctrl = cl_dragdrop=>move ).
-  go_dragdrop->add( flavor = 'GG_COPY' dragsrc = abap_true droptarget = abap_true
-    effect = cl_dragdrop=>copy effect_in_ctrl = cl_dragdrop=>copy ).
+  go_dragdrop->add( flavor         = 'GG_ITEMS'
+                    dragsrc        = abap_true
+                    droptarget     = abap_true
+    effect                         = cl_dragdrop=>move
+                    effect_in_ctrl = cl_dragdrop=>move ).
+  go_dragdrop->add( flavor         = 'GG_COPY'
+                    dragsrc        = abap_true
+                    droptarget     = abap_true
+    effect                         = cl_dragdrop=>copy
+                    effect_in_ctrl = cl_dragdrop=>copy ).
   go_dragdrop->get_handle( IMPORTING handle = gv_handle ).
 ENDFORM.
 
@@ -417,8 +425,9 @@ FORM build_data.
 ENDFORM.
 
 FORM transfer_tree.
-  go_tree->add_nodes_and_items( node_table = gt_nodes item_table = gt_items
-    item_table_structure_name = 'MTREEITM' ).
+  go_tree->add_nodes_and_items( node_table = gt_nodes
+                                item_table = gt_items
+    item_table_structure_name              = 'MTREEITM' ).
 ENDFORM.
 
 FORM add_grid_item_to_tree USING iv_parent TYPE tv_nodekey iv_id TYPE c iv_name TYPE c.
@@ -432,8 +441,9 @@ FORM add_grid_item_to_tree USING iv_parent TYPE tv_nodekey iv_id TYPE c iv_name 
   lt_items = VALUE #(
     ( node_key = gv_added_node item_name = 'NODE' class = cl_gui_column_tree=>item_class_text text = iv_id )
     ( node_key = gv_added_node item_name = 'NAME' class = cl_gui_column_tree=>item_class_text text = iv_name ) ).
-  go_tree->add_nodes_and_items( node_table = lt_nodes item_table = lt_items
-    item_table_structure_name = 'MTREEITM' ).
+  go_tree->add_nodes_and_items( node_table = lt_nodes
+                                item_table = lt_items
+    item_table_structure_name              = 'MTREEITM' ).
 ENDFORM.
 
 FORM undo_last_drop.
@@ -449,14 +459,15 @@ FORM undo_last_drop.
             DATA(lv_parent) = COND tv_nodekey(
               WHEN lv_key = 'P100' OR lv_key = 'P110' THEN 'INPUT' ELSE 'DISPLAY' ).
             CALL METHOD go_tree->('MOVE_NODE')
-              EXPORTING node_key = lv_key relative_node_key = lv_parent
+              EXPORTING node_key = lv_key
+                        relative_node_key = lv_parent
                 relationship = cl_gui_column_tree=>relat_last_child.
           ENDLOOP.
           lcl_log=>add( |Undo restored { lines( gt_last_nodes ) } tree nodes to their initial parents| ).
         WHEN 'ADDNODE'.
           DATA lt_keys TYPE treev_nks.
           APPEND gv_added_node TO lt_keys.
-          go_tree->delete_nodes( node_key_table = lt_keys ).
+          go_tree->delete_nodes( lt_keys ).
           lcl_log=>add( |Undo removed transferred tree node { gv_added_node }| ).
         WHEN OTHERS.
           lcl_log=>add( 'Nothing to undo' ).
@@ -472,8 +483,10 @@ FORM simulate_payload.
   DATA lo_payload TYPE REF TO lcl_drag_payload.
 
   CREATE OBJECT lo_object.
-  CREATE OBJECT lo_payload EXPORTING iv_source = 'GRID' iv_row_index = 1
-    iv_id = 'P100' iv_name = 'Mechanical Keyboard'.
+  CREATE OBJECT lo_payload EXPORTING iv_source    = 'GRID'
+                                     iv_row_index = 1
+    iv_id                                         = 'P100'
+                                     iv_name      = 'Mechanical Keyboard'.
   lo_object->object = lo_payload.
   lo_object->effect = cl_dragdrop=>copy.
   lcl_log=>add( 'Created a CL_DRAGDROPOBJECT application payload with COPY effect; no UI drop required' ).
@@ -506,8 +519,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'Cross-control drag-and-drop is unavailable in this runtime.' )
     ( 'The native report defines flavors/effects/handles, grid reorder, tree reparenting, cross-control payloads, rejection, and undo.' )
     ( 'The pinned open-abap drag/drop and hosted controls currently contain runtime stubs.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Cross-control drag/drop unavailable; diagnostic fallback shown'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

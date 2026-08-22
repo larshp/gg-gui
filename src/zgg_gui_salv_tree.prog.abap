@@ -1,12 +1,18 @@
 REPORT zgg_gui_salv_tree.
 
+TYPES ty_price TYPE p LENGTH 8 DECIMALS 2.
+CONSTANTS c_price_129 TYPE ty_price VALUE '129.90'.
+CONSTANTS c_price_74 TYPE ty_price VALUE '74.50'.
+CONSTANTS c_price_389 TYPE ty_price VALUE '389.00'.
+CONSTANTS c_price_42 TYPE ty_price VALUE '42.00'.
+
 TYPES:
   BEGIN OF ty_row,
     id       TYPE c LENGTH 8,
     name     TYPE c LENGTH 30,
     category TYPE c LENGTH 20,
     quantity TYPE i,
-    price    TYPE p LENGTH 8 DECIMALS 2,
+    price    TYPE ty_price,
     currency TYPE c LENGTH 3,
   END OF ty_row,
   ty_rows TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY,
@@ -30,11 +36,12 @@ DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_status TYPE c LENGTH 108.
 DATA gv_detail TYPE c LENGTH 108.
 DATA gv_sequence TYPE i VALUE 500.
-DATA gv_native_event_program TYPE c LENGTH 8.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_salv_event TYPE c LENGTH 24.
 DATA gv_event_node TYPE string.
 DATA gv_event_column TYPE c LENGTH 40.
+
+INCLUDE zgg_native_salv_tree.
 
 START-OF-SELECTION.
   CALL SCREEN 100.
@@ -98,7 +105,8 @@ FORM create_controls.
 
   TRY.
       CALL METHOD (lv_class)=>(lv_factory)
-        EXPORTING r_container = go_host container_name = 'CC_MAIN'
+        EXPORTING r_container = go_host
+                  container_name = 'CC_MAIN'
         IMPORTING r_salv_tree = go_tree
         CHANGING t_table = gt_rows.
       CALL METHOD go_tree->('GET_NODES') RECEIVING value = go_nodes.
@@ -113,12 +121,12 @@ FORM create_controls.
       PERFORM configure_columns.
       CALL METHOD go_functions->('SET_ALL') EXPORTING value = abap_true.
       CALL METHOD go_selections->('SET_SELECTION_MODE') EXPORTING value = 2.
-      PERFORM register_native_salv_tree_events.
+      PERFORM register_salv_tree_events.
       CALL METHOD go_tree->('DISPLAY').
       IF gv_native_events_registered = abap_true.
         gv_status = 'Native SALV tree created with link-click and double-click events'.
       ELSE.
-        gv_status = 'Native SALV tree created; native event adapter unavailable'.
+        gv_status = 'Native SALV tree created; native event handler unavailable'.
       ENDIF.
       gv_detail = 'The report uses dynamic calls because the complete SALV tree class family is missing from open-abap'.
     CATCH cx_root INTO DATA(lx_error).
@@ -128,85 +136,6 @@ FORM create_controls.
   ENDTRY.
 ENDFORM.
 
-FORM register_native_salv_tree_events.
-  DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
-  DATA lv_message TYPE string.
-
-  IF gv_native_event_program IS INITIAL.
-    lt_source = VALUE #(
-      ( `PROGRAM SUBPOOL.` )
-      ( `CLASS lcl_events DEFINITION DEFERRED.` )
-      ( `DATA go_events TYPE REF TO lcl_events.` )
-      ( `DATA go_tree TYPE REF TO cl_salv_tree.` )
-      ( `DATA go_salv_events TYPE REF TO cl_salv_events_tree.` )
-      ( `CLASS lcl_events DEFINITION.` )
-      ( `  PUBLIC SECTION.` )
-      ( `    METHODS on_link FOR EVENT link_click OF cl_salv_events_tree` )
-      ( `      IMPORTING columnname node_key.` )
-      ( `    METHODS on_double FOR EVENT double_click OF cl_salv_events_tree` )
-      ( `      IMPORTING columnname node_key.` )
-      ( `ENDCLASS.` )
-      ( `CLASS lcl_events IMPLEMENTATION.` )
-      ( `  METHOD on_link.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'LINK_CLICK'.` )
-      ( `    EXPORT event = lv_event node_key = node_key columnname = columnname` )
-      ( `      TO MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'SALV_EVT' ).` )
-      ( `  ENDMETHOD.` )
-      ( `  METHOD on_double.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'DOUBLE_CLICK'.` )
-      ( `    EXPORT event = lv_event node_key = node_key columnname = columnname` )
-      ( `      TO MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'SALV_EVT' ).` )
-      ( `  ENDMETHOD.` )
-      ( `ENDCLASS.` )
-      ( `FORM register USING io_tree TYPE REF TO object` )
-      ( `    CHANGING cv_registered TYPE abap_bool.` )
-      ( `  CLEAR cv_registered.` )
-      ( `  go_tree ?= io_tree.` )
-      ( `  go_salv_events = go_tree->get_event( ).` )
-      ( `  CREATE OBJECT go_events.` )
-      ( `  SET HANDLER go_events->on_link FOR go_salv_events.` )
-      ( `  SET HANDLER go_events->on_double FOR go_salv_events.` )
-      ( `  cv_registered = abap_true.` )
-      ( `ENDFORM.` )
-      ( `FORM unregister.` )
-      ( `  IF go_events IS BOUND AND go_salv_events IS BOUND.` )
-      ( `    SET HANDLER go_events->on_link FOR go_salv_events ACTIVATION space.` )
-      ( `    SET HANDLER go_events->on_double FOR go_salv_events ACTIVATION space.` )
-      ( `  ENDIF.` )
-      ( `  FREE: go_events, go_salv_events, go_tree.` )
-      ( `ENDFORM.` ) ).
-
-    GENERATE SUBROUTINE POOL lt_source
-      NAME gv_native_event_program MESSAGE lv_message.
-    IF sy-subrc <> 0 OR gv_native_event_program IS INITIAL.
-      CLEAR: gv_native_event_program, gv_native_events_registered.
-      gv_detail = |Native SALV tree event adapter did not compile: { lv_message }|.
-      RETURN.
-    ENDIF.
-  ENDIF.
-
-  TRY.
-      PERFORM register IN PROGRAM (gv_native_event_program)
-        USING go_tree CHANGING gv_native_events_registered.
-    CATCH cx_root INTO DATA(lx_event_error).
-      CLEAR gv_native_events_registered.
-      gv_detail = |Native SALV tree event registration failed: { lx_event_error->get_text( ) }|.
-  ENDTRY.
-ENDFORM.
-
-FORM unregister_native_salv_tree_events.
-  IF gv_native_event_program IS NOT INITIAL AND
-      gv_native_events_registered = abap_true.
-    TRY.
-        PERFORM unregister IN PROGRAM (gv_native_event_program) IF FOUND.
-      CATCH cx_root.
-    ENDTRY.
-  ENDIF.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.
-ENDFORM.
 
 FORM populate_nodes.
   DATA ls_empty TYPE ty_row.
@@ -214,32 +143,46 @@ FORM populate_nodes.
 
   CLEAR: gt_rows, gt_leaf_keys.
   CALL METHOD go_nodes->('ADD_NODE')
-    EXPORTING related_node = space relationship = 2 data_row = ls_empty
-      text = 'Product catalog' folder = abap_true expander = abap_true
-      collapsed_icon = '@3Y@' expanded_icon = '@3W@'
+    EXPORTING related_node = space
+              relationship = 2
+              data_row = ls_empty
+      text = 'Product catalog'
+              folder = abap_true
+              expander = abap_true
+      collapsed_icon = '@3Y@'
+              expanded_icon = '@3W@'
     RECEIVING node = lo_node.
   CALL METHOD lo_node->('GET_KEY') RECEIVING value = gv_root_key.
 
   CALL METHOD go_nodes->('ADD_NODE')
-    EXPORTING related_node = gv_root_key relationship = 2 data_row = ls_empty
-      text = 'Input devices' folder = abap_true expander = abap_true
+    EXPORTING related_node = gv_root_key
+              relationship = 2
+              data_row = ls_empty
+      text = 'Input devices'
+              folder = abap_true
+              expander = abap_true
     RECEIVING node = lo_node.
   CALL METHOD lo_node->('GET_KEY') RECEIVING value = gv_input_key.
 
   CALL METHOD go_nodes->('ADD_NODE')
-    EXPORTING related_node = gv_root_key relationship = 2 data_row = ls_empty
-      text = 'Displays' folder = abap_true expander = abap_true
+    EXPORTING related_node = gv_root_key
+              relationship = 2
+              data_row = ls_empty
+      text = 'Displays'
+              folder = abap_true
+              expander = abap_true
     RECEIVING node = lo_node.
   CALL METHOD lo_node->('GET_KEY') RECEIVING value = gv_display_key.
 
-  PERFORM add_leaf USING gv_input_key 'P100' 'Mechanical Keyboard' 'Input' 12 '129.90' 'EUR'.
-  PERFORM add_leaf USING gv_input_key 'P110' 'Ergonomic Mouse' 'Input' 7 '74.50' 'EUR'.
-  PERFORM add_leaf USING gv_display_key 'P200' '27 Inch Display' 'Display' 4 '389.00' 'EUR'.
+  PERFORM add_leaf USING gv_input_key 'P100' 'Mechanical Keyboard' 'Input' 12 c_price_129 'EUR'.
+  PERFORM add_leaf USING gv_input_key 'P110' 'Ergonomic Mouse' 'Input' 7 c_price_74 'EUR'.
+  PERFORM add_leaf USING gv_display_key 'P200' '27 Inch Display' 'Display' 4 c_price_389 'EUR'.
   CALL METHOD go_nodes->('EXPAND_ALL').
 ENDFORM.
 
 FORM add_leaf USING iv_parent TYPE string iv_id TYPE c iv_name TYPE c
-    iv_category TYPE c iv_quantity TYPE i iv_price TYPE p iv_currency TYPE c.
+    iv_category TYPE c iv_quantity TYPE i iv_price TYPE ty_price
+    iv_currency TYPE c.
   DATA ls_row TYPE ty_row.
   DATA lo_node TYPE REF TO object.
   DATA lo_item TYPE REF TO object.
@@ -249,8 +192,11 @@ FORM add_leaf USING iv_parent TYPE string iv_id TYPE c iv_name TYPE c
     id = iv_id name = iv_name category = iv_category quantity = iv_quantity
     price = iv_price currency = iv_currency ).
   CALL METHOD go_nodes->('ADD_NODE')
-    EXPORTING related_node = iv_parent relationship = 2 data_row = ls_row
-      text = iv_name folder = abap_false
+    EXPORTING related_node = iv_parent
+              relationship = 2
+              data_row = ls_row
+      text = iv_name
+              folder = abap_false
     RECEIVING node = lo_node.
   CALL METHOD lo_node->('GET_KEY') RECEIVING value = lv_key.
   APPEND lv_key TO gt_leaf_keys.
@@ -279,10 +225,12 @@ FORM add_runtime_leaf.
     RETURN.
   ENDIF.
   ADD 1 TO gv_sequence.
-  DATA(lv_id) = |P{ gv_sequence }|.
+  DATA lv_id TYPE c LENGTH 8.
+
+  lv_id = |P{ gv_sequence }|.
   TRY.
       PERFORM add_leaf USING gv_root_key lv_id 'Runtime SALV tree node'
-        'Runtime' gv_sequence '42.00' 'EUR'.
+        'Runtime' gv_sequence c_price_42 'EUR'.
       CALL METHOD go_tree->('REFRESH').
       gv_status = |SALV node { lv_id } added under the root and refreshed|.
     CATCH cx_root INTO DATA(lx_error).
@@ -377,15 +325,14 @@ FORM show_fallback USING iv_error TYPE string.
     ( 'CL_SALV_TREE and its helper classes are unavailable in this runtime.' )
     ( 'The native SAP sample keeps factory, node, column, function, and selection calls behind capability checks.' )
     ( 'Static link-click and double-click handlers require the missing SALV tree event class.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'SALV tree unavailable; a non-terminating text fallback is displayed'.
   gv_detail = iv_error.
 ENDFORM.
 
 FORM free_controls.
-  PERFORM unregister_native_salv_tree_events.
-  CLEAR gv_native_event_program.
+  PERFORM unregister_salv_tree_events.
   FREE: go_nodes, go_columns, go_functions, go_selections, go_tree.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
   IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.

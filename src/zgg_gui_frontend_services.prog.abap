@@ -76,7 +76,7 @@ FORM create_controls.
     TRY.
         CREATE OBJECT go_host EXPORTING container_name = 'CC_MAIN'.
         CREATE OBJECT go_log EXPORTING parent = go_host.
-        go_log->set_readonly_mode( readonly_mode = 1 ).
+        go_log->set_readonly_mode( 1 ).
       CATCH cx_root INTO DATA(lx_error).
         gv_status = |Event log control unavailable: { lx_error->get_text( ) }|.
     ENDTRY.
@@ -128,12 +128,12 @@ FORM inspect_gui_available.
       CALL METHOD (lv_class)=>(lv_method) RECEIVING return = gv_gui_available.
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |GUI_IS_AVAILABLE returned { gv_gui_available }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
     CATCH cx_root INTO DATA(lx_error).
       gv_gui_available = abap_false.
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |GUI availability method missing or failed: { lx_error->get_text( ) }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
   ENDTRY.
   gv_status = COND #( WHEN gv_gui_available = abap_true
     THEN 'Interactive frontend detected; operations still require explicit buttons and may trigger security prompts'
@@ -153,12 +153,13 @@ FORM run_dialogs.
   TRY.
       cl_gui_frontend_services=>file_open_dialog(
         EXPORTING window_title = 'Select a file for read-only inspection'
-          multiselection = abap_false initial_directory = gv_temp_dir
+          multiselection = abap_false
+                  initial_directory = gv_temp_dir
           file_filter = 'Text files (*.txt)|*.txt|All files (*.*)|*.*|'
         CHANGING file_table = lt_files rc = lv_rc user_action = lv_action ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Open dialog action { lv_action }, selected entries { lv_rc }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
       IF lv_rc > 0.
         READ TABLE lt_files INDEX 1 INTO DATA(ls_file).
         gv_target = ls_file-filename.
@@ -166,22 +167,24 @@ FORM run_dialogs.
 
       cl_gui_frontend_services=>file_save_dialog(
         EXPORTING window_title = 'Choose a sample export path'
-          default_extension = 'txt' default_file_name = 'zgg-gui-sample.txt'
-          initial_directory = gv_temp_dir prompt_on_overwrite = abap_true
+          default_extension = 'txt'
+                  default_file_name = 'zgg-gui-sample.txt'
+          initial_directory = gv_temp_dir
+                  prompt_on_overwrite = abap_true
         CHANGING filename = lv_filename path = lv_path fullpath = lv_fullpath
           user_action = lv_action ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Save dialog action { lv_action }, path { lv_fullpath }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
 
       cl_gui_frontend_services=>directory_browse(
-        EXPORTING window_title = 'Select a directory without changing it'
-          initial_folder = gv_temp_dir
+        EXPORTING window_title   = 'Select a directory without changing it'
+          initial_folder         = gv_temp_dir
         CHANGING selected_folder = lv_selected ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = COND string( WHEN lv_selected IS INITIAL
           THEN 'Directory selection canceled' ELSE |Directory selected: { lv_selected }| )
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
       gv_status = 'Open, save, and directory-selection dialogs completed or were canceled consistently'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Frontend dialog unavailable or rejected: { lx_error->get_text( ) }|.
@@ -192,6 +195,7 @@ ENDFORM.
 FORM create_sample_files.
   DATA lt_text TYPE ty_text_lines.
   DATA lt_binary TYPE ty_bin_lines.
+  DATA lv_binary TYPE ty_bin_line.
   DATA lv_rc TYPE i.
 
   IF gv_gui_available = abap_false.
@@ -201,26 +205,31 @@ FORM create_sample_files.
     ( 'ZGG_GUI_FRONTEND_SERVICES deterministic sample' )
     ( |User: { sy-uname }| )
     ( |Date: { sy-datum DATE = ISO }| ) ).
-  lt_binary = VALUE #( ( '00010203040506070809AABBCCDDEEFF' ) ).
+  lv_binary = '00010203040506070809AABBCCDDEEFF'.
+  APPEND lv_binary TO lt_binary.
   TRY.
       cl_gui_frontend_services=>directory_create(
         EXPORTING directory = gv_sample_dir CHANGING rc = lv_rc ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Create directory rc { lv_rc }: { gv_sample_dir }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
       cl_gui_frontend_services=>gui_download(
-        EXPORTING filename = gv_text_file filetype = 'ASC'
-          write_lf = abap_true confirm_overwrite = abap_true
-        CHANGING data_tab = lt_text ).
+        EXPORTING filename          = gv_text_file
+                  filetype          = 'ASC'
+          write_lf                  = abap_true
+                  confirm_overwrite = abap_true
+        CHANGING data_tab           = lt_text ).
       cl_gui_frontend_services=>gui_download(
-        EXPORTING filename = gv_binary_file filetype = 'BIN' bin_filesize = 16
-          confirm_overwrite = abap_true
-        CHANGING data_tab = lt_binary ).
+        EXPORTING filename     = gv_binary_file
+                  filetype     = 'BIN'
+                  bin_filesize = 16
+          confirm_overwrite    = abap_true
+        CHANGING data_tab      = lt_binary ).
       gv_status = 'Sample-owned text and binary files written after explicit action'.
       gv_detail = gv_sample_dir.
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Downloaded text { gv_text_file } and binary { gv_binary_file }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Directory creation or download unavailable/rejected: { lx_error->get_text( ) }|.
       PERFORM add_log USING gv_status.
@@ -245,17 +254,24 @@ FORM inspect_sample_files.
       cl_gui_frontend_services=>file_get_size(
         EXPORTING file_name = gv_text_file IMPORTING file_size = lv_size ).
       cl_gui_frontend_services=>gui_upload(
-        EXPORTING filename = gv_text_file filetype = 'ASC' read_by_line = abap_true
+        EXPORTING filename = gv_text_file
+                  filetype = 'ASC'
+                  read_by_line = abap_true
         IMPORTING filelength = lv_text_length header = lv_header
         CHANGING data_tab = lt_text ).
       cl_gui_frontend_services=>gui_upload(
-        EXPORTING filename = gv_binary_file filetype = 'BIN'
+        EXPORTING filename = gv_binary_file
+                  filetype = 'BIN'
         IMPORTING filelength = lv_binary_length header = lv_header
         CHANGING data_tab = lt_binary ).
       cl_gui_frontend_services=>file_copy(
-        source = gv_text_file destination = gv_copy_file overwrite = abap_true ).
+        source      = gv_text_file
+        destination = gv_copy_file
+        overwrite   = abap_true ).
       cl_gui_frontend_services=>directory_list_files(
-        EXPORTING directory = gv_sample_dir files_only = abap_true filter = '*.*'
+        EXPORTING directory = gv_sample_dir
+                  files_only = abap_true
+                  filter = '*.*'
         CHANGING file_table = lt_files count = lv_count ).
       gv_status = |Directory exists { lv_dir_exists }; text exists { lv_exists }; size { lv_size }; listed files { lv_count }|.
       gv_detail = |Uploaded text bytes { lv_text_length }; binary bytes { lv_binary_length }; copied to sample-copy.txt|.
@@ -342,13 +358,13 @@ FORM inspect_directories.
       CALL METHOD (lv_class)=>(lv_method) CHANGING sapgui_directory = lv_sapgui.
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Temp { gv_temp_dir }; Desktop { lv_desktop }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |System { lv_system }; SAP GUI { lv_sapgui }; Work { lv_work }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Upload { lv_upload }; Download { lv_download }; Current { lv_current }|
-        CHANGING log = gt_log ).
+        CHANGING log    = gt_log ).
 
       lv_method = 'DIRECTORY_SET_CURRENT'.
       CALL METHOD (lv_class)=>(lv_method) EXPORTING current_directory = gv_sample_dir.
@@ -365,8 +381,9 @@ FORM read_registry.
 
   TRY.
       cl_gui_frontend_services=>registry_get_value(
-        EXPORTING root = cl_gui_frontend_services=>hkey_current_user
-          key = 'Software\SAP\General' value = 'Theme'
+        EXPORTING root      = cl_gui_frontend_services=>hkey_current_user
+          key               = 'Software\SAP\General'
+                  value     = 'Theme'
         IMPORTING reg_value = lv_value ).
       gv_status = |Read-only registry lookup completed; value length { strlen( lv_value ) }|.
       gv_detail = 'HKCU\Software\SAP\General\Theme was read; no registry write API is used'.
@@ -397,7 +414,8 @@ FORM open_target.
     RETURN.
   ENDIF.
   TRY.
-      cl_gui_frontend_services=>execute( document = lv_target operation = 'OPEN' ).
+      cl_gui_frontend_services=>execute( document  = lv_target
+                                         operation = 'OPEN' ).
       gv_status = |Frontend open requested for { lv_target }|.
       gv_detail = 'The SAP GUI security policy and local application association control execution'.
       PERFORM add_log USING gv_status.
@@ -444,19 +462,21 @@ FORM reset_log.
   gv_target = 'https://help.sap.com'.
   zcl_gg_gui_demo_helper=>reset_log(
     EXPORTING initial_event = 'Event log and target reset; existing sample-owned files were not deleted'
-    CHANGING log = gt_log ).
+    CHANGING log            = gt_log ).
   gv_status = 'Log reset; use Cleanup explicitly to remove sample-owned frontend files'.
   gv_detail = gv_sample_dir.
 ENDFORM.
 
-FORM add_log USING iv_text TYPE string.
-  zcl_gg_gui_demo_helper=>add_log( EXPORTING event = iv_text CHANGING log = gt_log ).
+FORM add_log USING iv_text TYPE c.
+  zcl_gg_gui_demo_helper=>add_log(
+    EXPORTING event = CONV string( iv_text )
+    CHANGING  log   = gt_log ).
 ENDFORM.
 
 FORM refresh_log.
   IF go_log IS BOUND.
     TRY.
-        go_log->set_text_as_stream( text = gt_log ).
+        go_log->set_text_as_stream( gt_log ).
         CALL METHOD go_log->('GO_TO_LINE') EXPORTING line = lines( gt_log ).
       CATCH cx_root.
     ENDTRY.

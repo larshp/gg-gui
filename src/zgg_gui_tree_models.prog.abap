@@ -141,7 +141,8 @@ FORM show_simple_model.
     ( node_key = 'P110' relatkey = 'INPUT' relatship = 6 text = 'Ergonomic Mouse' ) ).
   TRY.
       CREATE OBJECT go_model TYPE (lv_class)
-        EXPORTING node_selection_mode = 1 hide_selection = abap_false.
+        EXPORTING node_selection_mode = 1
+                  hide_selection      = abap_false.
       CALL METHOD go_model->('ADD_NODES') EXPORTING nodes_table = lt_nodes.
       CALL METHOD go_model->('CREATE_TREE_CONTROL') EXPORTING parent = go_host.
       CALL METHOD go_model->('EXPAND_NODE') EXPORTING node_key = 'ROOT'.
@@ -181,8 +182,10 @@ FORM show_list_model.
     ( node_key = 'P200' item_name = 'NAME' class = 1 text = '27 Inch Display' ) ).
   TRY.
       CREATE OBJECT go_model TYPE (lv_class)
-        EXPORTING node_selection_mode = 1 hide_selection = abap_false
-          item_selection = abap_true hierarchy_header = ls_header.
+        EXPORTING node_selection_mode = 1
+                  hide_selection      = abap_false
+          item_selection              = abap_true
+                  hierarchy_header    = ls_header.
       CALL METHOD go_model->('ADD_NODES') EXPORTING node_table = lt_nodes.
       CALL METHOD go_model->('ADD_ITEMS') EXPORTING item_table = lt_items.
       CALL METHOD go_model->('CREATE_TREE_CONTROL') EXPORTING parent = go_host.
@@ -227,13 +230,19 @@ FORM show_column_model.
     ( node_key = 'P200' item_name = 'STATE' class = 1 text = 'Ready' ) ).
   TRY.
       CREATE OBJECT go_model TYPE (lv_class)
-        EXPORTING node_selection_mode = 1 hide_selection = abap_false
-          item_selection = abap_true hierarchy_column_name = 'NODE'
-          hierarchy_header = ls_header.
+        EXPORTING node_selection_mode   = 1
+                  hide_selection        = abap_false
+          item_selection                = abap_true
+                  hierarchy_column_name = 'NODE'
+          hierarchy_header              = ls_header.
       CALL METHOD go_model->('ADD_COLUMN')
-        EXPORTING name = 'NAME' width = 28 header_text = 'Product'.
+        EXPORTING name = 'NAME'
+                  width = 28
+                  header_text = 'Product'.
       CALL METHOD go_model->('ADD_COLUMN')
-        EXPORTING name = 'STATE' width = 14 header_text = 'State'.
+        EXPORTING name = 'STATE'
+                  width = 14
+                  header_text = 'State'.
       CALL METHOD go_model->('ADD_NODES') EXPORTING node_table = lt_nodes.
       CALL METHOD go_model->('ADD_ITEMS') EXPORTING item_table = lt_items.
       CALL METHOD go_model->('CREATE_TREE_CONTROL') EXPORTING parent = go_host.
@@ -266,8 +275,8 @@ FORM show_comparison.
     APPEND CONV ty_text_line( |{ lv_name }: available { lv_available }| ) TO lt_text.
   ENDLOOP.
   CREATE OBJECT go_fallback EXPORTING parent = go_host.
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   CLEAR gv_active_model.
   gv_status = 'Tree control versus Tree Model capability comparison displayed'.
   gv_detail = 'Use Simple, List, or Column to create an installed model; missing classes are reported without terminating'.
@@ -290,8 +299,8 @@ FORM show_failure USING iv_class TYPE string iv_reason TYPE string.
     ( |Reason: { iv_reason }| )
     ( 'The native backend-model, node/item, CREATE_TREE_CONTROL, expand, reset, and cleanup calls remain in this report.' ) ).
   CREATE OBJECT go_fallback EXPORTING parent = go_host.
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   CLEAR gv_active_model.
   gv_status = |{ iv_class } unavailable; diagnostic fallback shown|.
   gv_detail = iv_reason.

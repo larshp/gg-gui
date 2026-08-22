@@ -1,6 +1,8 @@
 REPORT zgg_gui_sel_dynamic.
 
-TABLES sscrfields.
+" USER-COMMAND cannot be combined with the LENGTH addition, so the list-box
+" parameter takes its length from a locally declared type instead.
+TYPES ty_view TYPE c LENGTH 10.
 
 DATA gt_views TYPE vrm_values.
 
@@ -9,7 +11,7 @@ SELECTION-SCREEN BEGIN OF BLOCK b_options WITH FRAME TITLE g_opttit.
     p_enable AS CHECKBOX DEFAULT abap_true USER-COMMAND toggle,
     p_basic  RADIOBUTTON GROUP mode DEFAULT 'X' USER-COMMAND mode,
     p_adv    RADIOBUTTON GROUP mode,
-    p_view   TYPE c LENGTH 10 AS LISTBOX VISIBLE LENGTH 18 USER-COMMAND view.
+    p_view   TYPE ty_view AS LISTBOX VISIBLE LENGTH 18 USER-COMMAND view.
   SELECTION-SCREEN PUSHBUTTON /1(20) gv_actxt USER-COMMAND action.
 SELECTION-SCREEN END OF BLOCK b_options.
 
@@ -61,7 +63,7 @@ AT SELECTION-SCREEN OUTPUT.
   ENDLOOP.
 
 AT SELECTION-SCREEN.
-  CASE sscrfields-ucomm.
+  CASE sy-ucomm.
     WHEN 'ACTION'.
       p_note = |Applied { COND string( WHEN p_adv = abap_true THEN 'advanced' ELSE 'basic' ) } state|.
       MESSAGE 'Selection-screen pushbutton handled without leaving the screen' TYPE 'S'.
@@ -105,15 +107,15 @@ AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_city.
 
   CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'
     EXPORTING
-      retfield    = 'CITY'
-      value_org   = 'S'
+      retfield        = 'CITY'
+      value_org       = 'S'
     TABLES
-      value_tab   = lt_cities
-      return_tab  = lt_return
+      value_tab       = lt_cities
+      return_tab      = lt_return
     EXCEPTIONS
-      parameter_error        = 1
-      no_values_found        = 2
-      OTHERS                 = 3.
+      parameter_error = 1
+      no_values_found = 2
+      OTHERS          = 3.
 
   IF sy-subrc = 0.
     READ TABLE lt_return INTO ls_return INDEX 1.

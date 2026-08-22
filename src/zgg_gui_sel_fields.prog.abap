@@ -15,9 +15,9 @@ PARAMETERS:
   p_lang   TYPE sylangu DEFAULT sy-langu MEMORY ID spr,
   p_alpha  TYPE c LENGTH 10 DEFAULT '123' VISIBLE LENGTH 10,
   p_check  AS CHECKBOX DEFAULT abap_true USER-COMMAND update,
-  p_red    RADIOBUTTON GROUP color DEFAULT 'X',
-  p_green  RADIOBUTTON GROUP color,
-  p_blue   RADIOBUTTON GROUP color,
+  p_red    RADIOBUTTON GROUP col DEFAULT 'X',
+  p_green  RADIOBUTTON GROUP col,
+  p_blue   RADIOBUTTON GROUP col,
   p_list   TYPE c LENGTH 10 AS LISTBOX VISIBLE LENGTH 20,
   p_secret TYPE c LENGTH 20 LOWER CASE MODIF ID sec.
 
@@ -36,10 +36,10 @@ START-OF-SELECTION.
   DATA lv_alpha_external TYPE c LENGTH 10.
 
   CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
-    EXPORTING input = p_alpha
+    EXPORTING input  = p_alpha
     IMPORTING output = lv_alpha_internal.
   CALL FUNCTION 'CONVERSION_EXIT_ALPHA_OUTPUT'
-    EXPORTING input = lv_alpha_internal
+    EXPORTING input  = lv_alpha_internal
     IMPORTING output = lv_alpha_external.
 
   WRITE: / 'Text:', p_text,

@@ -1,43 +1,26 @@
 REPORT zgg_gui_alv_tree.
 
+TYPES ty_price TYPE p LENGTH 8 DECIMALS 2.
+CONSTANTS c_price_129 TYPE ty_price VALUE '129.90'.
+CONSTANTS c_price_74 TYPE ty_price VALUE '74.50'.
+CONSTANTS c_price_389 TYPE ty_price VALUE '389.00'.
+CONSTANTS c_price_219 TYPE ty_price VALUE '219.00'.
+CONSTANTS c_price_159 TYPE ty_price VALUE '159.00'.
+
 TYPES:
   BEGIN OF ty_row,
     id       TYPE c LENGTH 8,
     name     TYPE c LENGTH 30,
     category TYPE c LENGTH 20,
     quantity TYPE i,
-    price    TYPE p LENGTH 8 DECIMALS 2,
+    price    TYPE ty_price,
     currency TYPE c LENGTH 3,
     active   TYPE abap_bool,
   END OF ty_row,
   ty_rows TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY.
 
 TYPES:
-  BEGIN OF ty_node_layout,
-    isfolder   TYPE abap_bool,
-    expander   TYPE abap_bool,
-    n_image    TYPE tv_image,
-    exp_image  TYPE tv_image,
-    style      TYPE i,
-    disabled   TYPE abap_bool,
-    dragdropid TYPE i,
-  END OF ty_node_layout.
-
-TYPES:
-  BEGIN OF ty_item_layout,
-    fieldname TYPE lvc_fname,
-    class     TYPE i,
-    font      TYPE i,
-    disabled  TYPE abap_bool,
-    editable  TYPE abap_bool,
-    hidden    TYPE abap_bool,
-    alignment TYPE i,
-    t_image   TYPE tv_image,
-    chosen    TYPE abap_bool,
-    togg_right TYPE abap_bool,
-    style     TYPE i,
-  END OF ty_item_layout,
-  ty_item_layouts TYPE STANDARD TABLE OF ty_item_layout WITH EMPTY KEY,
+  ty_item_layouts TYPE lvc_t_layi,
   ty_text_line TYPE c LENGTH 255,
   ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
 
@@ -76,9 +59,10 @@ DATA gv_status TYPE c LENGTH 108.
 DATA gv_detail TYPE c LENGTH 108.
 DATA gv_lazy_loaded TYPE abap_bool.
 DATA gv_changed TYPE abap_bool.
-DATA gv_native_event_program TYPE c LENGTH 8.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_context_node TYPE lvc_nkey.
+
+INCLUDE zgg_native_alv_tree.
 
 CLASS lcl_events IMPLEMENTATION.
   METHOD on_link.
@@ -183,9 +167,11 @@ FORM create_controls.
   PERFORM build_field_catalog.
   TRY.
       CREATE OBJECT go_tree
-        EXPORTING parent = go_host
-          node_selection_mode = cl_gui_column_tree=>node_sel_mode_multiple
-          item_selection = abap_true no_toolbar = abap_false no_html_header = abap_false.
+        EXPORTING parent         = go_host
+          node_selection_mode    = cl_gui_column_tree=>node_sel_mode_multiple
+          item_selection         = abap_true
+                  no_toolbar     = abap_false
+                  no_html_header = abap_false.
       CREATE OBJECT go_events.
       SET HANDLER go_events->on_link FOR go_tree.
       SET HANDLER go_events->on_item_double FOR go_tree.
@@ -203,8 +189,10 @@ FORM create_controls.
         CHANGING it_outtab = gt_outtab it_fieldcatalog = gt_fieldcat ).
       PERFORM register_native_context_event.
       go_tree->set_hierarchy_help_fields(
-        i_ref_table = 'MARA' i_ref_field = 'MATNR'
-        i_doktitle = 'Hierarchy' i_rollname = 'MATNR' ).
+        i_ref_table = 'MARA'
+        i_ref_field = 'MATNR'
+        i_doktitle  = 'Hierarchy'
+        i_rollname  = 'MATNR' ).
       PERFORM add_initial_nodes.
       PERFORM extend_toolbar.
       go_tree->column_optimize( i_include_heading = abap_true ).
@@ -212,7 +200,7 @@ FORM create_controls.
       IF gv_native_events_registered = abap_true.
         gv_status = 'ALV tree created with node, item, and context-menu request events'.
       ELSE.
-        gv_status = 'ALV tree created; native context-menu request adapter unavailable'.
+        gv_status = 'ALV tree created; native context-menu request handler unavailable'.
       ENDIF.
       gv_detail = 'Lazy children are loaded only by the Load lazy action; duplicate loads are prevented'.
     CATCH cx_root INTO DATA(lx_error).
@@ -221,86 +209,6 @@ FORM create_controls.
   ENDTRY.
 ENDFORM.
 
-FORM register_native_context_event.
-  DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
-  DATA lv_message TYPE string.
-
-  IF gv_native_event_program IS INITIAL.
-    lt_source = VALUE #(
-      ( `PROGRAM SUBPOOL.` )
-      ( `CLASS lcl_events DEFINITION DEFERRED.` )
-      ( `DATA go_events TYPE REF TO lcl_events.` )
-      ( `DATA go_tree TYPE REF TO cl_gui_alv_tree.` )
-      ( `CLASS lcl_events DEFINITION.` )
-      ( `  PUBLIC SECTION.` )
-      ( `    METHODS on_request FOR EVENT node_context_menu_request` )
-      ( `      OF cl_gui_alv_tree IMPORTING node_key menu.` )
-      ( `ENDCLASS.` )
-      ( `CLASS lcl_events IMPLEMENTATION.` )
-      ( `  METHOD on_request.` )
-      ( `    menu->add_separator( ).` )
-      ( `    menu->add_function( fcode = 'ZDETAIL' text = 'Show node details' ).` )
-      ( `    menu->add_function( fcode = 'ZRESET' text = 'Reset sample' ).` )
-      ( `    EXPORT node_key = node_key TO MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'TREE_CTX' ).` )
-      ( `  ENDMETHOD.` )
-      ( `ENDCLASS.` )
-      ( `FORM register USING io_tree TYPE REF TO object` )
-      ( `    CHANGING cv_registered TYPE abap_bool.` )
-      ( `  DATA lt_events TYPE cntl_simple_events.` )
-      ( `  CLEAR cv_registered.` )
-      ( `  go_tree ?= io_tree.` )
-      ( `  CREATE OBJECT go_events.` )
-      ( `  CALL METHOD go_tree->get_registered_events` )
-      ( `    IMPORTING events = lt_events EXCEPTIONS cntl_error = 1 OTHERS = 2.` )
-      ( `  IF sy-subrc <> 0. RETURN. ENDIF.` )
-      ( `  DELETE lt_events WHERE eventid = cl_gui_column_tree=>eventid_node_context_menu_req.` )
-      ( `  APPEND VALUE #( eventid = cl_gui_column_tree=>eventid_node_context_menu_req` )
-      ( `    appl_event = abap_true ) TO lt_events.` )
-      ( `  CALL METHOD go_tree->set_registered_events` )
-      ( `    EXPORTING events = lt_events` )
-      ( `    EXCEPTIONS cntl_error = 1 cntl_system_error = 2` )
-      ( `      illegal_event_combination = 3 OTHERS = 4.` )
-      ( `  IF sy-subrc <> 0. RETURN. ENDIF.` )
-      ( `  SET HANDLER go_events->on_request FOR go_tree.` )
-      ( `  cv_registered = abap_true.` )
-      ( `ENDFORM.` )
-      ( `FORM unregister.` )
-      ( `  IF go_events IS BOUND AND go_tree IS BOUND.` )
-      ( `    SET HANDLER go_events->on_request FOR go_tree ACTIVATION space.` )
-      ( `  ENDIF.` )
-      ( `  FREE: go_events, go_tree.` )
-      ( `ENDFORM.` ) ).
-
-    GENERATE SUBROUTINE POOL lt_source
-      NAME gv_native_event_program MESSAGE lv_message.
-    IF sy-subrc <> 0 OR gv_native_event_program IS INITIAL.
-      CLEAR: gv_native_event_program, gv_native_events_registered.
-      gv_detail = |Native tree context-event adapter did not compile: { lv_message }|.
-      RETURN.
-    ENDIF.
-  ENDIF.
-
-  TRY.
-      PERFORM register IN PROGRAM (gv_native_event_program)
-        USING go_tree CHANGING gv_native_events_registered.
-    CATCH cx_root INTO DATA(lx_event_error).
-      CLEAR gv_native_events_registered.
-      gv_detail = |Native tree context-event registration failed: { lx_event_error->get_text( ) }|.
-  ENDTRY.
-ENDFORM.
-
-FORM unregister_native_context_event.
-  IF gv_native_event_program IS NOT INITIAL AND
-      gv_native_events_registered = abap_true.
-    TRY.
-        PERFORM unregister IN PROGRAM (gv_native_event_program) IF FOUND.
-      CATCH cx_root.
-    ENDTRY.
-  ENDIF.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.
-ENDFORM.
 
 FORM build_field_catalog.
   gt_fieldcat = VALUE #(
@@ -317,13 +225,16 @@ ENDFORM.
 FORM configure_dragdrop.
   CREATE OBJECT go_dragdrop.
   go_dragdrop->add(
-    flavor = 'GG_TREE_ROWS' dragsrc = abap_true droptarget = abap_true
-    effect = cl_dragdrop=>move effect_in_ctrl = cl_dragdrop=>move ).
-  go_tree->set_default_drop( i_drag_drop = go_dragdrop ).
+    flavor         = 'GG_TREE_ROWS'
+    dragsrc        = abap_true
+    droptarget     = abap_true
+    effect         = cl_dragdrop=>move
+    effect_in_ctrl = cl_dragdrop=>move ).
+  go_tree->set_default_drop( go_dragdrop ).
 ENDFORM.
 
 FORM add_initial_nodes.
-  DATA ls_folder TYPE ty_node_layout.
+  DATA ls_folder TYPE lvc_s_layn.
   DATA lt_item_layout TYPE ty_item_layouts.
 
   CLEAR: gt_outtab, gt_leaf_keys.
@@ -331,38 +242,44 @@ FORM add_initial_nodes.
     n_image = '@3Y@' exp_image = '@3W@' ).
   go_tree->add_node(
     EXPORTING i_relat_node_key = space
-      i_relationship = cl_gui_column_tree=>relat_last_child
-      is_node_layout = ls_folder i_node_text = 'Product catalog'
-    IMPORTING e_new_node_key = gv_root_key ).
+      i_relationship           = cl_gui_column_tree=>relat_last_child
+      is_node_layout           = ls_folder
+              i_node_text      = 'Product catalog'
+    IMPORTING e_new_node_key   = gv_root_key ).
   go_tree->add_node(
     EXPORTING i_relat_node_key = gv_root_key
-      i_relationship = cl_gui_column_tree=>relat_last_child
-      is_node_layout = ls_folder i_node_text = 'Input devices'
-    IMPORTING e_new_node_key = gv_input_key ).
+      i_relationship           = cl_gui_column_tree=>relat_last_child
+      is_node_layout           = ls_folder
+              i_node_text      = 'Input devices'
+    IMPORTING e_new_node_key   = gv_input_key ).
   go_tree->add_node(
     EXPORTING i_relat_node_key = gv_root_key
-      i_relationship = cl_gui_column_tree=>relat_last_child
-      is_node_layout = ls_folder i_node_text = 'Displays'
-    IMPORTING e_new_node_key = gv_display_key ).
+      i_relationship           = cl_gui_column_tree=>relat_last_child
+      is_node_layout           = ls_folder
+              i_node_text      = 'Displays'
+    IMPORTING e_new_node_key   = gv_display_key ).
   go_tree->add_node(
     EXPORTING i_relat_node_key = gv_root_key
-      i_relationship = cl_gui_column_tree=>relat_last_child
-      is_node_layout = ls_folder i_node_text = 'Lazy-loaded products'
-    IMPORTING e_new_node_key = gv_lazy_key ).
+      i_relationship           = cl_gui_column_tree=>relat_last_child
+      is_node_layout           = ls_folder
+              i_node_text      = 'Lazy-loaded products'
+    IMPORTING e_new_node_key   = gv_lazy_key ).
 
   lt_item_layout = VALUE #(
     ( fieldname = 'NAME' class = cl_gui_column_tree=>item_class_link style = 1 )
     ( fieldname = 'ACTIVE' class = cl_gui_column_tree=>item_class_checkbox editable = abap_true ) ).
-  PERFORM add_leaf USING gv_input_key 'P100' 'Mechanical Keyboard' 'Input' 12 '129.90' 'EUR' abap_true lt_item_layout.
-  PERFORM add_leaf USING gv_input_key 'P110' 'Ergonomic Mouse' 'Input' 7 '74.50' 'EUR' abap_true lt_item_layout.
-  PERFORM add_leaf USING gv_display_key 'P200' '27 Inch Display' 'Display' 4 '389.00' 'EUR' abap_true lt_item_layout.
-  go_tree->expand_node( i_node_key = gv_root_key i_level_count = 2 ).
-  go_tree->set_top_node( i_node_key = gv_root_key ).
+  PERFORM add_leaf USING gv_input_key 'P100' 'Mechanical Keyboard' 'Input' 12 c_price_129 'EUR' abap_true lt_item_layout.
+  PERFORM add_leaf USING gv_input_key 'P110' 'Ergonomic Mouse' 'Input' 7 c_price_74 'EUR' abap_true lt_item_layout.
+  PERFORM add_leaf USING gv_display_key 'P200' '27 Inch Display' 'Display' 4 c_price_389 'EUR' abap_true lt_item_layout.
+  go_tree->expand_node( i_node_key    = gv_root_key
+                        i_level_count = 2 ).
+  go_tree->set_top_node( gv_root_key ).
 ENDFORM.
 
 FORM add_leaf USING iv_parent TYPE lvc_nkey iv_id TYPE c iv_name TYPE c
-    iv_category TYPE c iv_quantity TYPE i iv_price TYPE p iv_currency TYPE c
-    iv_active TYPE abap_bool it_item_layout TYPE ty_item_layouts.
+    iv_category TYPE c iv_quantity TYPE i iv_price TYPE ty_price
+    iv_currency TYPE c iv_active TYPE abap_bool
+    it_item_layout TYPE ty_item_layouts.
   DATA ls_row TYPE ty_row.
   DATA lv_key TYPE lvc_nkey.
 
@@ -372,9 +289,11 @@ FORM add_leaf USING iv_parent TYPE lvc_nkey iv_id TYPE c iv_name TYPE c
   APPEND ls_row TO gt_outtab.
   go_tree->add_node(
     EXPORTING i_relat_node_key = iv_parent
-      i_relationship = cl_gui_column_tree=>relat_last_child
-      is_outtab_line = ls_row it_item_layout = it_item_layout i_node_text = iv_name
-    IMPORTING e_new_node_key = lv_key ).
+      i_relationship           = cl_gui_column_tree=>relat_last_child
+      is_outtab_line           = ls_row
+              it_item_layout   = it_item_layout
+              i_node_text      = iv_name
+    IMPORTING e_new_node_key   = lv_key ).
   APPEND lv_key TO gt_leaf_keys.
 ENDFORM.
 
@@ -384,11 +303,17 @@ FORM extend_toolbar.
   go_tree->get_toolbar_object( IMPORTING er_toolbar = lo_toolbar ).
   IF lo_toolbar IS BOUND.
     lo_toolbar->add_button(
-      fcode = 'ZLOAD' icon = '@17@' butn_type = 0
-      text = 'Load lazy' quickinfo = 'Load the children of the lazy folder' ).
+      fcode     = 'ZLOAD'
+      icon      = '@17@'
+      butn_type = 0
+      text      = 'Load lazy'
+      quickinfo = 'Load lazy-folder children' ).
     lo_toolbar->add_button(
-      fcode = 'ZCALC' icon = '@15@' butn_type = 0
-      text = 'Calculate' quickinfo = 'Update calculated ALV tree columns' ).
+      fcode     = 'ZCALC'
+      icon      = '@15@'
+      butn_type = 0
+      text      = 'Calculate'
+      quickinfo = 'Update calculated columns' ).
   ENDIF.
 ENDFORM.
 
@@ -405,17 +330,19 @@ FORM load_lazy_nodes.
   lt_item_layout = VALUE #(
     ( fieldname = 'NAME' class = cl_gui_column_tree=>item_class_link )
     ( fieldname = 'ACTIVE' class = cl_gui_column_tree=>item_class_checkbox editable = abap_true ) ).
-  PERFORM add_leaf USING gv_lazy_key 'P300' 'USB-C Dock' 'Connectivity' 0 '219.00' 'EUR' abap_false lt_item_layout.
-  PERFORM add_leaf USING gv_lazy_key 'P400' 'Conference Speaker' 'Audio' 9 '159.00' 'EUR' abap_true lt_item_layout.
+  PERFORM add_leaf USING gv_lazy_key 'P300' 'USB-C Dock' 'Connectivity' 0 c_price_219 'EUR' abap_false lt_item_layout.
+  PERFORM add_leaf USING gv_lazy_key 'P400' 'Conference Speaker' 'Audio' 9 c_price_159 'EUR' abap_true lt_item_layout.
   gv_lazy_loaded = abap_true.
-  go_tree->expand_node( i_node_key = gv_lazy_key i_level_count = 1 ).
+  go_tree->expand_node( i_node_key    = gv_lazy_key
+                        i_level_count = 1 ).
   go_tree->frontend_update( ).
   gv_status = 'Two product leaves loaded under the lazy folder and expanded'.
 ENDFORM.
 
 FORM change_nodes_and_items.
   DATA ls_row TYPE ty_row.
-  DATA lt_item_layout TYPE ty_item_layouts.
+  DATA ls_item_layout TYPE lvc_s_laci.
+  DATA lt_item_layout TYPE lvc_t_laci.
 
   IF gt_leaf_keys IS INITIAL.
     RETURN.
@@ -427,12 +354,17 @@ FORM change_nodes_and_items.
   ls_row-quantity = COND #( WHEN gv_changed = abap_true THEN 15 ELSE 12 ).
   lt_item_layout = VALUE #(
     ( fieldname = 'NAME' class = cl_gui_column_tree=>item_class_link chosen = gv_changed ) ).
+  ls_item_layout = VALUE #(
+    fieldname = 'NAME' class = cl_gui_column_tree=>item_class_link chosen = gv_changed ).
   go_tree->change_node(
-    i_node_key = lv_key i_outtab_line = ls_row it_item_layout = lt_item_layout ).
+    i_node_key     = lv_key
+    i_outtab_line  = ls_row
+    it_item_layout = lt_item_layout ).
   go_tree->change_item(
-    i_node_key = lv_key i_fieldname = 'NAME' i_data = ls_row-name
-    is_item_layout = VALUE ty_item_layout( fieldname = 'NAME'
-      class = cl_gui_column_tree=>item_class_link chosen = gv_changed ) ).
+    i_node_key     = lv_key
+    i_fieldname    = 'NAME'
+    i_data         = ls_row-name
+    is_item_layout = ls_item_layout ).
   go_tree->frontend_update( ).
   gv_status = |Node output row and NAME item changed in place; alternate state { gv_changed }|.
 ENDFORM.
@@ -472,17 +404,17 @@ FORM expand_and_select.
   DATA lt_select TYPE lvc_t_nkey.
 
   lt_select = VALUE #( ( gv_input_key ) ( gv_display_key ) ).
-  go_tree->expand_nodes( it_node_key = lt_select ).
-  go_tree->set_selected_nodes( it_selected_nodes = lt_select ).
-  go_tree->set_top_node( i_node_key = gv_root_key ).
+  go_tree->expand_nodes( lt_select ).
+  go_tree->set_selected_nodes( lt_select ).
+  go_tree->set_top_node( gv_root_key ).
   go_tree->frontend_update( ).
   gv_status = 'Input and Display folders expanded and selected; root retained as top node'.
 ENDFORM.
 
 FORM collapse_tree.
-  go_tree->collapse_subtree( i_node_key = gv_root_key ).
-  go_tree->unselect_nodes( it_node_key = VALUE lvc_t_nkey( ( gv_input_key ) ( gv_display_key ) ) ).
-  go_tree->set_top_node( i_node_key = gv_root_key ).
+  go_tree->collapse_subtree( gv_root_key ).
+  go_tree->unselect_nodes( VALUE lvc_t_nkey( ( gv_input_key ) ( gv_display_key ) ) ).
+  go_tree->set_top_node( gv_root_key ).
   go_tree->frontend_update( ).
   gv_status = 'Root subtree collapsed, folder selections cleared, and top node retained'.
 ENDFORM.
@@ -504,7 +436,7 @@ FORM delete_lazy_subtree.
 ENDFORM.
 
 FORM update_calculations.
-  go_tree->update_calculations( no_frontend_update = abap_false ).
+  go_tree->update_calculations( abap_false ).
   go_tree->column_optimize( i_include_heading = abap_true ).
   go_tree->frontend_update( ).
   gv_status = 'Calculated quantity and price columns updated and all columns optimized with headings'.
@@ -531,15 +463,14 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'CL_GUI_ALV_TREE is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP report retains hierarchy, data columns, events, mutations, and state round trips.' )
     ( 'The pinned open-abap tree constructor currently terminates with an assertion.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'ALV tree unavailable; a non-terminating text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.
 
 FORM free_controls.
-  PERFORM unregister_native_context_event.
-  CLEAR gv_native_event_program.
+  PERFORM unregister_context_event.
   FREE: go_events, go_dragdrop.
   IF go_tree IS BOUND. go_tree->free( ). FREE go_tree. ENDIF.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.

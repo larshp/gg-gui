@@ -99,13 +99,13 @@ FORM create_dialog.
   TRY.
       CREATE OBJECT go_dialog TYPE (lv_class_name)
         EXPORTING
-          repid = sy-repid
-          dynnr = sy-dynnr
-          left = gv_left
-          top = gv_top
-          width = gv_width
-          height = gv_height
-          caption = gv_caption
+          repid    = sy-repid
+          dynnr    = sy-dynnr
+          left     = gv_left
+          top      = gv_top
+          width    = gv_width
+          height   = gv_height
+          caption  = gv_caption
           lifetime = c_lifetime_dynpro.
       go_container ?= go_dialog.
       CREATE OBJECT go_editor EXPORTING parent = go_container.
@@ -113,7 +113,7 @@ FORM create_dialog.
         ( 'CL_GUI_DIALOGBOX_CONTAINER' )
         ( 'This is a modeless control window; the owning dynpro remains active.' )
         ( 'Move or resize this window, then use Read geometry on the main screen.' ) ).
-      go_editor->set_text_as_r3table( table = lt_text ).
+      go_editor->set_text_as_r3table( lt_text ).
       gv_status = 'Modeless dialog and hosted text editor created'.
     CATCH cx_root INTO DATA(lx_error).
       FREE: go_dialog, go_container, go_editor.
@@ -127,7 +127,10 @@ FORM apply_geometry.
     RETURN.
   ENDIF.
   go_container->set_position(
-    EXPORTING left = gv_left top = gv_top width = gv_width height = gv_height
+    EXPORTING left = gv_left
+              top = gv_top
+              width = gv_width
+              height = gv_height
     EXCEPTIONS cntl_error = 1 cntl_system_error = 2 OTHERS = 3 ).
   gv_status = |Position and size sent to the frontend; rc { sy-subrc }|.
   PERFORM read_geometry.

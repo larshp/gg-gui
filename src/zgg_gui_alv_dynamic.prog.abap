@@ -2,6 +2,12 @@ REPORT zgg_gui_alv_dynamic.
 
 TYPES ty_text_line TYPE c LENGTH 255.
 TYPES ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
+TYPES ty_price TYPE p LENGTH 8 DECIMALS 2.
+
+CONSTANTS c_price_129 TYPE ty_price VALUE '129.90'.
+CONSTANTS c_price_389 TYPE ty_price VALUE '389.00'.
+CONSTANTS c_price_219 TYPE ty_price VALUE '219.00'.
+CONSTANTS c_price_42 TYPE ty_price VALUE '42.00'.
 
 DATA gt_fieldcat TYPE lvc_t_fcat.
 DATA gr_table TYPE REF TO data.
@@ -61,7 +67,8 @@ FORM create_controls.
   PERFORM build_field_catalog.
   TRY.
       cl_alv_table_create=>create_dynamic_table(
-        EXPORTING it_fieldcatalog = gt_fieldcat i_style_table = abap_true
+        EXPORTING it_fieldcatalog = gt_fieldcat
+                  i_style_table = abap_true
           i_length_in_byte = abap_true
         IMPORTING ep_table = gr_table e_style_fname = gv_style_field ).
       IF gr_table IS NOT BOUND.
@@ -106,14 +113,14 @@ FORM build_field_catalog.
 ENDFORM.
 
 FORM populate_initial_rows.
-  PERFORM append_row USING 'D100' 'Runtime keyboard' 12 '129.90' 'EUR' abap_true.
-  PERFORM append_row USING 'D200' 'Runtime display' 4 '389.00' 'EUR' abap_true.
-  PERFORM append_row USING 'D300' 'Runtime dock' 0 '219.00' 'EUR' abap_false.
+  PERFORM append_row USING 'D100' 'Runtime keyboard' 12 c_price_129 'EUR' abap_true.
+  PERFORM append_row USING 'D200' 'Runtime display' 4 c_price_389 'EUR' abap_true.
+  PERFORM append_row USING 'D300' 'Runtime dock' 0 c_price_219 'EUR' abap_false.
   gv_sequence = 3.
 ENDFORM.
 
 FORM append_row USING iv_id TYPE c iv_name TYPE c iv_quantity TYPE i
-    iv_price TYPE p iv_currency TYPE c iv_active TYPE abap_bool.
+    iv_price TYPE ty_price iv_currency TYPE c iv_active TYPE abap_bool.
   FIELD-SYMBOLS <ls_row> TYPE any.
   FIELD-SYMBOLS <lv_component> TYPE any.
 
@@ -158,9 +165,11 @@ FORM append_runtime_row.
     RETURN.
   ENDIF.
   ADD 1 TO gv_sequence.
-  DATA(lv_id) = |D{ gv_sequence WIDTH = 3 PAD = '0' }|.
+  DATA lv_id TYPE c LENGTH 8.
+
+  lv_id = |D{ gv_sequence WIDTH = 3 PAD = '0' }|.
   PERFORM append_row USING lv_id 'Appended through field symbols'
-    gv_sequence 42 'EUR' abap_true.
+    gv_sequence c_price_42 'EUR' abap_true.
   PERFORM refresh_grid.
   gv_status = |Generic field-symbol population appended row { lv_id }|.
 ENDFORM.
@@ -239,8 +248,8 @@ FORM show_fallback USING iv_error TYPE string.
     ( 'CL_ALV_TABLE_CREATE is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP sample keeps the static factory and generic population code syntax checked.' )
     ( 'The pinned open-abap-gui implementation currently terminates with an assertion.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Dynamic ALV table unavailable; a non-terminating text fallback is displayed'.
   gv_detail = iv_error.
 ENDFORM.

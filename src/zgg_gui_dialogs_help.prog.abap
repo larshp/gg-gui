@@ -60,9 +60,9 @@ MODULE user_command_0100 INPUT.
         fieldtext = 'Example value' value = gv_choice ) ).
       CALL FUNCTION 'POPUP_GET_VALUES'
         EXPORTING
-          popup_title = 'Enter a value'
+          popup_title     = 'Enter a value'
         TABLES
-          fields      = lt_fields
+          fields          = lt_fields
         EXCEPTIONS
           error_in_fields = 1
           OTHERS          = 2.

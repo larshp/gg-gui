@@ -9,31 +9,27 @@ TYPES:
 
 TYPES:
   BEGIN OF ty_row,
-    id            TYPE c LENGTH 8,
-    name          TYPE c LENGTH 30,
-    category      TYPE c LENGTH 20,
-    quantity      TYPE i,
-    unit          TYPE c LENGTH 3,
-    price         TYPE p LENGTH 8 DECIMALS 2,
-    currency      TYPE c LENGTH 3,
-    active        TYPE abap_bool,
-    status        TYPE c LENGTH 1,
-    description   TYPE string,
-    exception     TYPE i,
-    technical     TYPE c LENGTH 12,
-    cell_colors   TYPE lvc_t_scol,
-    cell_types    TYPE ty_int4_columns,
-    link_handles  TYPE ty_int4_columns,
+    id           TYPE c LENGTH 8,
+    name         TYPE c LENGTH 30,
+    category     TYPE c LENGTH 20,
+    quantity     TYPE i,
+    unit         TYPE c LENGTH 3,
+    price        TYPE p LENGTH 8 DECIMALS 2,
+    currency     TYPE c LENGTH 3,
+    active       TYPE abap_bool,
+    status       TYPE c LENGTH 1,
+    description  TYPE string,
+    exception    TYPE i,
+    technical    TYPE c LENGTH 12,
+    cell_colors  TYPE lvc_t_scol,
+    cell_types   TYPE ty_int4_columns,
+    link_handles TYPE ty_int4_columns,
   END OF ty_row,
   ty_rows TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY,
   ty_text_line TYPE c LENGTH 255,
   ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
 
-TYPES:
-  BEGIN OF ty_layout_key,
-    report TYPE syrepid,
-    handle TYPE c LENGTH 4,
-  END OF ty_layout_key.
+TYPES ty_layout_key TYPE salv_s_layout_key.
 
 CLASS lcl_events DEFINITION FINAL.
   PUBLIC SECTION.
@@ -132,9 +128,10 @@ FORM create_controls.
   PERFORM build_rows.
   TRY.
       cl_salv_table=>factory(
-        EXPORTING r_container = go_host container_name = 'CC_MAIN'
-        IMPORTING r_salv_table = go_salv
-        CHANGING t_table = gt_rows ).
+        EXPORTING r_container    = go_host
+                  container_name = 'CC_MAIN'
+        IMPORTING r_salv_table   = go_salv
+        CHANGING t_table         = gt_rows ).
       PERFORM configure_salv USING go_salv.
       CREATE OBJECT go_events.
       DATA(lo_event_source) = go_salv->get_event( ).
@@ -180,19 +177,23 @@ FORM build_rows.
   ENDLOOP.
 ENDFORM.
 
-FORM configure_salv USING io_salv TYPE REF TO cl_salv_table.
+FORM configure_salv USING io_salv TYPE REF TO cl_salv_table
+    RAISING cx_salv_error.
   DATA lo_columns TYPE REF TO cl_salv_columns_table.
   DATA lo_column TYPE REF TO cl_salv_column.
   DATA lo_functions TYPE REF TO cl_salv_functions_list.
   DATA lo_settings TYPE REF TO cl_salv_display_settings.
+  DATA lo_selections TYPE REF TO cl_salv_selections.
   DATA lo_layout TYPE REF TO cl_salv_layout.
+  DATA lt_selected_rows TYPE salv_t_row.
   DATA ls_color TYPE lvc_s_colo.
   DATA ls_key TYPE ty_layout_key.
 
   lo_columns = io_salv->get_columns( ).
   lo_columns->set_optimize( abap_true ).
   lo_columns->set_key_fixation( abap_true ).
-  lo_columns->set_column_position( columnname = 'ID' position = 1 ).
+  lo_columns->set_column_position( columnname = 'ID'
+                                   position   = 1 ).
   CALL METHOD lo_columns->('SET_COLOR_COLUMN') EXPORTING value = 'CELL_COLORS'.
   CALL METHOD lo_columns->('SET_CELL_TYPE_COLUMN') EXPORTING value = 'CELL_TYPES'.
   CALL METHOD lo_columns->('SET_EXCEPTION_COLUMN') EXPORTING value = 'EXCEPTION'.
@@ -241,35 +242,54 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table.
   lo_functions = io_salv->get_functions( ).
   lo_functions->set_all( abap_true ).
   lo_functions->add_function(
-    name = 'ZRESET' icon = '@42@' text = 'Reset'
-    tooltip = 'Restore deterministic demo rows'
+    name     = 'ZRESET'
+    icon     = '@42@'
+    text     = 'Reset'
+    tooltip  = 'Restore deterministic demo rows'
     position = if_salv_c_function_position=>right_of_salv_functions ).
   lo_functions->add_function(
-    name = 'ZSELECT' icon = '@0V@' text = 'Selection'
-    tooltip = 'Read the selected SALV rows'
+    name     = 'ZSELECT'
+    icon     = '@0V@'
+    text     = 'Selection'
+    tooltip  = 'Read the selected SALV rows'
     position = if_salv_c_function_position=>right_of_salv_functions ).
   lo_functions->add_function(
-    name = 'ZREMOVE' text = 'Temporary' tooltip = 'Function removed before display'
+    name     = 'ZREMOVE'
+    text     = 'Temporary'
+    tooltip  = 'Function removed before display'
     position = if_salv_c_function_position=>right_of_salv_functions ).
   lo_functions->remove_function( 'ZREMOVE' ).
 
   io_salv->get_sorts( )->add_sort(
-    columnname = 'CATEGORY' sequence = 1 position = 1 subtotal = abap_false ).
+    columnname = 'CATEGORY'
+    sequence   = 1
+    position   = 1
+    subtotal   = abap_false ).
   io_salv->get_sorts( )->add_sort(
-    columnname = 'NAME' sequence = 1 position = 2 subtotal = abap_false ).
+    columnname = 'NAME'
+    sequence   = 1
+    position   = 2
+    subtotal   = abap_false ).
   io_salv->get_filters( )->add_filter(
-    columnname = 'CATEGORY' sign = 'I' option = 'CP' low = '*' ).
+    columnname = 'CATEGORY'
+    sign       = 'I'
+    option     = 'CP'
+    low        = '*' ).
   io_salv->get_aggregations( )->add_aggregation(
-    columnname = 'QUANTITY' aggregation = if_salv_c_aggregation=>total ).
+    columnname  = 'QUANTITY'
+    aggregation = if_salv_c_aggregation=>total ).
   io_salv->get_aggregations( )->add_aggregation(
-    columnname = 'PRICE' aggregation = if_salv_c_aggregation=>average ).
+    columnname  = 'PRICE'
+    aggregation = if_salv_c_aggregation=>average ).
 
   lo_settings = io_salv->get_display_settings( ).
   lo_settings->set_list_header( 'Read-only SALV product gallery' ).
   lo_settings->set_striped_pattern( abap_true ).
   lo_settings->set_fit_column_to_table_size( abap_true ).
-  io_salv->set_selection_mode( if_salv_c_selection_mode=>multiple ).
-  io_salv->set_selected_rows( VALUE cl_salv_table=>ty_rows( ( 1 ) ( 3 ) ) ).
+  lo_selections = io_salv->get_selections( ).
+  lo_selections->set_selection_mode( if_salv_c_selection_mode=>multiple ).
+  lt_selected_rows = VALUE #( ( 1 ) ( 3 ) ).
+  lo_selections->set_selected_rows( lt_selected_rows ).
 
   ls_key-report = sy-repid.
   ls_key-handle = 'MAIN'.
@@ -283,7 +303,8 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table.
   PERFORM configure_forms USING io_salv.
 ENDFORM.
 
-FORM configure_hyperlinks USING io_salv TYPE REF TO cl_salv_table.
+FORM configure_hyperlinks USING io_salv TYPE REF TO cl_salv_table
+    RAISING cx_salv_error.
   DATA lo_settings TYPE REF TO cl_salv_functional_settings.
   DATA lo_hyperlinks TYPE REF TO cl_salv_hyperlinks.
 
@@ -291,7 +312,8 @@ FORM configure_hyperlinks USING io_salv TYPE REF TO cl_salv_table.
   lo_hyperlinks = lo_settings->get_hyperlinks( ).
   DO lines( gt_rows ) TIMES.
     lo_hyperlinks->add_hyperlink(
-      handle = sy-index hyperlink = |https://example.invalid/products/{ sy-index }| ).
+      handle    = sy-index
+      hyperlink = |https://example.invalid/products/{ sy-index }| ).
   ENDDO.
 ENDFORM.
 
@@ -302,14 +324,20 @@ FORM configure_forms USING io_salv TYPE REF TO cl_salv_table.
 
   CREATE OBJECT lo_top TYPE (lv_grid_class).
   CALL METHOD lo_top->('CREATE_HEADER_INFORMATION')
-    EXPORTING row = 1 column = 1 text = 'SALV table sample'
+    EXPORTING row = 1
+              column = 1
+              text = 'SALV table sample'
       tooltip = 'Top-of-list form element'.
   CALL METHOD lo_top->('CREATE_LABEL')
-    EXPORTING row = 2 column = 1 text = 'Five deterministic products'.
+    EXPORTING row = 2
+              column = 1
+              text = 'Five deterministic products'.
 
   CREATE OBJECT lo_end TYPE (lv_grid_class).
   CALL METHOD lo_end->('CREATE_LABEL')
-    EXPORTING row = 1 column = 1 text = 'End of SALV output'.
+    EXPORTING row = 1
+              column = 1
+              text = 'End of SALV output'.
 
   CALL METHOD io_salv->('SET_TOP_OF_LIST') EXPORTING value = lo_top.
   CALL METHOD io_salv->('SET_TOP_OF_LIST_PRINT') EXPORTING value = lo_top.
@@ -322,7 +350,7 @@ FORM read_selection.
     RETURN.
   ENDIF.
   TRY.
-      DATA(lt_rows) = go_salv->get_selected_rows( ).
+      DATA(lt_rows) = go_salv->get_selections( )->get_selected_rows( ).
       gv_status = |Selected SALV row count: { lines( lt_rows ) }|.
       gv_detail = COND #( WHEN lt_rows IS INITIAL
         THEN 'Choose rows using the row selector and retry'
@@ -338,10 +366,12 @@ FORM inspect_layouts.
   ls_key-report = sy-repid.
   ls_key-handle = 'MAIN'.
   TRY.
-      DATA(ls_default) = cl_salv_layout_service=>get_default_layout( s_key = ls_key ).
-      DATA(lt_layouts) = cl_salv_layout_service=>get_layouts( s_key = ls_key ).
+      DATA(ls_default) = cl_salv_layout_service=>get_default_layout( ls_key ).
+      DATA(lt_layouts) = cl_salv_layout_service=>get_layouts( ls_key ).
       DATA(ls_chosen) = cl_salv_layout_service=>f4_layouts(
-        s_key = ls_key layout = ls_default-layout restrict = cl_salv_layout=>restrict_none ).
+        s_key    = ls_key
+        layout   = ls_default-layout
+        restrict = cl_salv_layout=>restrict_none ).
       gv_status = |Available layouts: { lines( lt_layouts ) }; F4 returned { ls_chosen-layout }|.
       gv_detail = |Default layout: { ls_default-layout }|.
     CATCH cx_root INTO DATA(lx_error).
@@ -355,7 +385,7 @@ FORM export_xml.
     RETURN.
   ENDIF.
   TRY.
-      DATA(lv_xml) = go_salv->to_xml( xml_type = 1 ).
+      DATA(lv_xml) = go_salv->to_xml( 1 ).
       gv_status = |TO_XML returned { xstrlen( lv_xml ) } bytes|.
       gv_detail = 'The sample measures the generated representation without writing to a frontend path'.
     CATCH cx_root INTO DATA(lx_error).
@@ -374,7 +404,7 @@ FORM refresh_data.
     <row>-quantity = 12 + gv_refresh_count.
   ENDIF.
   TRY.
-      go_salv->refresh( s_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
+      go_salv->refresh( VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
       gv_status = |Row P100 refreshed in place; quantity is now { <row>-quantity }|.
       gv_detail = 'Stable row and column positions were requested'.
     CATCH cx_root INTO DATA(lx_error).
@@ -387,7 +417,7 @@ FORM reset_data.
   PERFORM build_rows.
   IF go_salv IS BOUND.
     TRY.
-        go_salv->refresh( s_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
+        go_salv->refresh( VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
         gv_status = 'Deterministic rows restored and the current SALV refreshed'.
       CATCH cx_root INTO DATA(lx_error).
         gv_status = |SALV reset failed: { lx_error->get_text( ) }|.
@@ -406,9 +436,12 @@ FORM show_popup.
       cl_salv_table=>factory(
         EXPORTING list_display = abap_true
         IMPORTING r_salv_table = lo_popup
-        CHANGING t_table = lt_popup ).
+        CHANGING t_table       = lt_popup ).
       lo_popup->set_screen_popup(
-        start_column = 10 end_column = 100 start_line = 3 end_line = 25 ).
+        start_column = 10
+        end_column   = 100
+        start_line   = 3
+        end_line     = 25 ).
       lo_popup->get_functions( )->set_all( abap_true ).
       lo_popup->display( ).
       gv_status = 'Popup SALV closed and control returned to screen 0100'.
@@ -426,9 +459,10 @@ FORM show_fullscreen.
       cl_salv_table=>factory(
         EXPORTING list_display = abap_false
         IMPORTING r_salv_table = lo_full
-        CHANGING t_table = lt_full ).
+        CHANGING t_table       = lt_full ).
       lo_full->set_screen_status(
-        report = sy-repid pfstatus = 'STANDARD'
+        report        = sy-repid
+        pfstatus      = 'STANDARD'
         set_functions = cl_salv_table=>c_functions_all ).
       lo_full->display( ).
       gv_status = 'Fullscreen SALV closed and control returned to screen 0100'.
@@ -457,8 +491,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'CL_SALV_TABLE is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP sample remains syntax checked and guarded by a capability check.' )
     ( 'The pinned open-abap-gui SALV factory currently terminates with an assertion.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'SALV unavailable; a non-terminating text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

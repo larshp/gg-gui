@@ -102,9 +102,14 @@ FORM create_controls.
   ENDIF.
   TRY.
       CREATE OBJECT go_ili
-        EXPORTING parent = go_host atomwidth = 1 atomheight = 1
-          atomoffsetx = 0 atomoffsety = 0 manual_scaling = abap_true
-          register_as_systemevents = abap_false use_internal_contextmenu = abap_true.
+        EXPORTING parent                   = go_host
+                  atomwidth                = 1
+                  atomheight               = 1
+          atomoffsetx                      = 0
+                  atomoffsety              = 0
+                  manual_scaling           = abap_true
+          register_as_systemevents         = abap_false
+                  use_internal_contextmenu = abap_true.
       CREATE OBJECT go_events.
       SET HANDLER go_events->on_dropped FOR go_ili.
       SET HANDLER go_events->on_resized FOR go_ili.
@@ -128,8 +133,12 @@ FORM start_mode USING iv_mode TYPE i.
   ENDIF.
   TRY.
       go_ili->start_dragging(
-        left = gv_left top = gv_top width = gv_width height = gv_height
-        mode = iv_mode flush = abap_true ).
+        left   = gv_left
+        top    = gv_top
+        width  = gv_width
+        height = gv_height
+        mode   = iv_mode
+        flush  = abap_true ).
       gv_status = |Interactive region started with mode { iv_mode } and current geometry|.
       gv_detail = 'Modes cover move, horizontal resize, vertical resize, and combined move/resize'.
     CATCH cx_root INTO DATA(lx_error).
@@ -161,13 +170,13 @@ FORM rebuild_menu.
   TRY.
       go_ili->clear_contextmenu( ).
       go_ili->add_contextmenuitem( str = 'Move region'
-        menumode = cl_gui_ilidragndrop_control=>co_mf_enabled ).
+        menumode                       = cl_gui_ilidragndrop_control=>co_mf_enabled ).
       go_ili->add_contextmenuitem( str = 'Resize both axes'
-        menumode = cl_gui_ilidragndrop_control=>co_mf_enabled ).
+        menumode                       = cl_gui_ilidragndrop_control=>co_mf_enabled ).
       go_ili->add_contextmenuitem( str = ''
-        menumode = cl_gui_ilidragndrop_control=>co_mf_separator ).
+        menumode                       = cl_gui_ilidragndrop_control=>co_mf_separator ).
       go_ili->add_contextmenuitem( str = 'Show or hide'
-        menumode = cl_gui_ilidragndrop_control=>co_mf_checked ).
+        menumode                       = cl_gui_ilidragndrop_control=>co_mf_checked ).
       go_ili->show_contextmenu( ).
       gv_menu_count = 4.
       gv_status = 'Internal context menu rebuilt with move, resize, separator, and visibility items'.
@@ -212,8 +221,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'CL_GUI_ILIDRAGNDROP_CONTROL is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP report retains move/resize modes, geometry, visibility, events, and internal menu calls.' )
     ( 'The pinned open-abap constructor currently terminates with an assertion.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Interactive drag/resize unavailable; a text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

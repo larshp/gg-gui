@@ -18,18 +18,20 @@ DATA go_host TYPE REF TO cl_gui_custom_container.
 DATA go_calendar TYPE REF TO object.
 DATA go_control TYPE REF TO cl_gui_control.
 DATA gv_ok_code TYPE sy-ucomm.
-DATA gv_focus TYPE d VALUE sy-datum.
+DATA gv_focus TYPE d.
 DATA gv_selection_style TYPE i VALUE c_select_day.
 DATA gv_style_text TYPE c LENGTH 24.
 DATA gv_locale TYPE c LENGTH 60.
 DATA gv_status TYPE c LENGTH 104.
-DATA gv_native_event_program TYPE c LENGTH 8.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_calendar_event TYPE c LENGTH 24.
 DATA gv_event_begin TYPE d.
 DATA gv_event_end TYPE d.
 
+INCLUDE zgg_native_calendar.
+
 START-OF-SELECTION.
+  gv_focus = sy-datum.
   CALL SCREEN 100.
 
 MODULE status_0100 OUTPUT.
@@ -124,22 +126,22 @@ FORM create_calendar.
   TRY.
       CREATE OBJECT go_calendar TYPE (lv_class_name)
         EXPORTING
-          parent = go_host
-          view_style = c_style_vertical
+          parent          = go_host
+          view_style      = c_style_vertical
           selection_style = gv_selection_style
-          focus_date = gv_focus
-          display_months = 3
-          stand_alone = abap_false
-          week_begin_day = '1'
-          week_end = '67'
-          year_begin = gv_focus(4) - 2
-          year_end = gv_focus(4) + 2.
+          focus_date      = gv_focus
+          display_months  = 3
+          stand_alone     = abap_false
+          week_begin_day  = '1'
+          week_end        = '67'
+          year_begin      = gv_focus(4) - 2
+          year_end        = gv_focus(4) + 2.
       go_control ?= go_calendar.
-      PERFORM register_native_calendar_events.
+      PERFORM register_calendar_events.
       IF gv_native_events_registered = abap_true.
         gv_status = 'Calendar DATE_SELECTED and INFO_REQUEST events registered'.
       ELSE.
-        gv_status = 'Calendar created; native event adapter is unavailable'.
+        gv_status = 'Calendar created; native event handler is unavailable'.
       ENDIF.
     CATCH cx_root INTO DATA(lx_error).
       FREE: go_calendar, go_control.
@@ -147,92 +149,6 @@ FORM create_calendar.
   ENDTRY.
 ENDFORM.
 
-FORM register_native_calendar_events.
-  DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
-  DATA lv_message TYPE string.
-
-  IF gv_native_event_program IS INITIAL.
-    lt_source = VALUE #(
-      ( `PROGRAM SUBPOOL.` )
-      ( `CLASS lcl_events DEFINITION DEFERRED.` )
-      ( `DATA go_events TYPE REF TO lcl_events.` )
-      ( `DATA go_calendar TYPE REF TO cl_gui_calendar.` )
-      ( `CLASS lcl_events DEFINITION.` )
-      ( `  PUBLIC SECTION.` )
-      ( `    METHODS on_date FOR EVENT date_selected OF cl_gui_calendar` )
-      ( `      IMPORTING date_begin date_end.` )
-      ( `    METHODS on_info FOR EVENT info_request OF cl_gui_calendar` )
-      ( `      IMPORTING date_begin date_end.` )
-      ( `ENDCLASS.` )
-      ( `CLASS lcl_events IMPLEMENTATION.` )
-      ( `  METHOD on_date.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'DATE_SELECTED'.` )
-      ( `    EXPORT event = lv_event date_begin = date_begin date_end = date_end` )
-      ( `      TO MEMORY ID 'ZGG_GUI_CALENDAR_EVENT'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'CAL_EVENT' ).` )
-      ( `  ENDMETHOD.` )
-      ( `  METHOD on_info.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'INFO_REQUEST'.` )
-      ( `    EXPORT event = lv_event date_begin = date_begin date_end = date_end` )
-      ( `      TO MEMORY ID 'ZGG_GUI_CALENDAR_EVENT'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'CAL_EVENT' ).` )
-      ( `  ENDMETHOD.` )
-      ( `ENDCLASS.` )
-      ( `FORM register USING io_calendar TYPE REF TO object` )
-      ( `    CHANGING cv_registered TYPE abap_bool.` )
-      ( `  DATA lt_events TYPE cntl_simple_events.` )
-      ( `  CLEAR cv_registered.` )
-      ( `  go_calendar ?= io_calendar.` )
-      ( `  CREATE OBJECT go_events.` )
-      ( `  lt_events = VALUE #(` )
-      ( `    ( eventid = cl_gui_calendar=>m_id_date_selected appl_event = abap_true )` )
-      ( `    ( eventid = cl_gui_calendar=>m_id_info_request appl_event = abap_true ) ).` )
-      ( `  CALL METHOD go_calendar->set_registered_events` )
-      ( `    EXPORTING events = lt_events` )
-      ( `    EXCEPTIONS cntl_error = 1 cntl_system_error = 2` )
-      ( `      illegal_event_combination = 3 OTHERS = 4.` )
-      ( `  IF sy-subrc <> 0. RETURN. ENDIF.` )
-      ( `  SET HANDLER go_events->on_date FOR go_calendar.` )
-      ( `  SET HANDLER go_events->on_info FOR go_calendar.` )
-      ( `  cv_registered = abap_true.` )
-      ( `ENDFORM.` )
-      ( `FORM unregister.` )
-      ( `  IF go_events IS BOUND AND go_calendar IS BOUND.` )
-      ( `    SET HANDLER go_events->on_date FOR go_calendar ACTIVATION space.` )
-      ( `    SET HANDLER go_events->on_info FOR go_calendar ACTIVATION space.` )
-      ( `  ENDIF.` )
-      ( `  FREE: go_events, go_calendar.` )
-      ( `ENDFORM.` ) ).
-
-    GENERATE SUBROUTINE POOL lt_source
-      NAME gv_native_event_program MESSAGE lv_message.
-    IF sy-subrc <> 0 OR gv_native_event_program IS INITIAL.
-      CLEAR: gv_native_event_program, gv_native_events_registered.
-      gv_status = |Native calendar event adapter did not compile: { lv_message }|.
-      RETURN.
-    ENDIF.
-  ENDIF.
-
-  TRY.
-      PERFORM register IN PROGRAM (gv_native_event_program)
-        USING go_calendar CHANGING gv_native_events_registered.
-    CATCH cx_root INTO DATA(lx_event_error).
-      CLEAR gv_native_events_registered.
-      gv_status = |Native calendar event registration failed: { lx_event_error->get_text( ) }|.
-  ENDTRY.
-ENDFORM.
-
-FORM unregister_native_calendar_events.
-  IF gv_native_event_program IS NOT INITIAL AND
-      gv_native_events_registered = abap_true.
-    TRY.
-        PERFORM unregister IN PROGRAM (gv_native_event_program) IF FOUND.
-      CATCH cx_root.
-    ENDTRY.
-  ENDIF.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_CALENDAR_EVENT'.
-ENDFORM.
 
 FORM go_to_focus.
   TRY.
@@ -251,7 +167,9 @@ FORM set_selection.
     THEN gv_focus ELSE gv_focus + 7 ).
   TRY.
       CALL METHOD go_calendar->('SET_SELECTION')
-        EXPORTING date_begin = gv_focus date_end = lv_end no_scroll = abap_false.
+        EXPORTING date_begin = gv_focus
+                  date_end = lv_end
+                  no_scroll = abap_false.
       gv_status = |Selection set from { gv_focus DATE = USER } to { lv_end DATE = USER }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SET_SELECTION failed: { lx_error->get_text( ) }|.
@@ -308,13 +226,12 @@ FORM describe_state.
 ENDFORM.
 
 FORM free_calendar.
-  PERFORM unregister_native_calendar_events.
+  PERFORM unregister_calendar_events.
   IF go_control IS BOUND. go_control->free( ). FREE go_control. ENDIF.
   FREE go_calendar.
 ENDFORM.
 
 FORM free_controls.
   PERFORM free_calendar.
-  CLEAR gv_native_event_program.
   IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
 ENDFORM.

@@ -150,9 +150,13 @@ FORM show_graphics_proxy.
   ENDIF.
   TRY.
       CREATE OBJECT go_control TYPE (lv_class)
-        EXPORTING parent = go_host prod_id = 1.
+        EXPORTING parent  = go_host
+                  prod_id = 1.
       CALL METHOD go_control->('SET_DC_NAMES')
-        EXPORTING objid = 'OBJID' grpid = 'GRPID' x_val = 'X_VAL' y_val = 'Y_VAL'
+        EXPORTING objid = 'OBJID'
+                  grpid = 'GRPID'
+                  x_val = 'X_VAL'
+                  y_val = 'Y_VAL'
         IMPORTING retval = lv_retval.
       CALL METHOD go_control->('IF_GRAPHIC_PROXY~ACTIVATE') IMPORTING retval = lv_retval.
       gv_active_class = lv_class.
@@ -199,8 +203,8 @@ FORM show_audit.
     ( |CL_GUI_GP_PRES: { gv_graphics_proxy } - Graphical Framework business-graphics proxy| )
     ( |CL_GUI_SELECTOR: { gv_selector } - installed color selector| )
     ( 'Choose a variant to create it; missing classes and construction failures remain nonfatal.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
 ENDFORM.
 
 FORM show_missing USING iv_class TYPE string iv_reason TYPE string.
@@ -212,8 +216,8 @@ FORM show_missing USING iv_class TYPE string iv_reason TYPE string.
     ( |{ iv_class } is unavailable or could not be initialized.| )
     ( |Reason: { iv_reason }| )
     ( 'Use the availability audit to compare installed controls; no optional class is assumed.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = |{ iv_class } unavailable; diagnostic fallback shown|.
   gv_detail = iv_reason.
 ENDFORM.

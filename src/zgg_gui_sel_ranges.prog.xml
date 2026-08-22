@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_PROG" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
@@ -10,12 +10,41 @@
     <UCCHECK>X</UCCHECK>
    </PROGDIR>
    <TPOOL>
-    <item><ID>R</ID><ENTRY>Select-Options and Ranges</ENTRY><LENGTH>25</LENGTH></item>
-    <item><ID>S</ID><KEY>S_NUMBER</KEY><ENTRY>Restricted numbers</ENTRY><LENGTH>18</LENGTH></item>
-    <item><ID>S</ID><KEY>S_SINGLE</KEY><ENTRY>Single value</ENTRY><LENGTH>12</LENGTH></item>
-    <item><ID>S</ID><KEY>S_FIXED</KEY><ENTRY>Fixed ranges</ENTRY><LENGTH>12</LENGTH></item>
-    <item><ID>S</ID><KEY>S_REQ</KEY><ENTRY>Required values</ENTRY><LENGTH>15</LENGTH></item>
-    <item><ID>S</ID><KEY>S_TEXT</KEY><ENTRY>Text patterns</ENTRY><LENGTH>13</LENGTH></item>
+    <item>
+     <ID>R</ID>
+     <ENTRY>Select-Options and Ranges</ENTRY>
+     <LENGTH>25</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>S_NUMBER</KEY>
+     <ENTRY>Restricted numbers</ENTRY>
+     <LENGTH>26</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>S_SINGLE</KEY>
+     <ENTRY>Single value</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>S_FIXED</KEY>
+     <ENTRY>Fixed ranges</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>S_REQ</KEY>
+     <ENTRY>Required values</ENTRY>
+     <LENGTH>23</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>S_TEXT</KEY>
+     <ENTRY>Text patterns</ENTRY>
+     <LENGTH>21</LENGTH>
+    </item>
    </TPOOL>
   </asx:values>
  </asx:abap>

@@ -43,12 +43,13 @@ DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_status TYPE c LENGTH 108.
 DATA gv_detail TYPE c LENGTH 108.
 DATA gv_filtered TYPE abap_bool.
-DATA gv_native_event_program TYPE c LENGTH 8.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_hierseq_event TYPE c LENGTH 24.
 DATA gv_event_level TYPE i.
 DATA gv_event_row TYPE i.
 DATA gv_event_column TYPE c LENGTH 40.
+
+INCLUDE zgg_native_salv_hseq.
 
 START-OF-SELECTION.
   CALL SCREEN 100.
@@ -111,7 +112,7 @@ FORM create_controls.
         IF gv_native_events_registered = abap_true.
           gv_status = 'Hierarchical-sequential SALV displayed with link-click and double-click events'.
         ELSE.
-          gv_status = 'Hierarchical-sequential SALV displayed; native event adapter unavailable'.
+          gv_status = 'Hierarchical-sequential SALV displayed; native event handler unavailable'.
         ENDIF.
         gv_detail = 'GROUP_ID is the explicit master/slave binding; header and item structures remain separate'.
       ENDIF.
@@ -166,86 +167,23 @@ FORM configure_levels.
   CALL METHOD go_hierseq->('GET_FILTERS') EXPORTING level = 2 RECEIVING value = go_item_filters.
   CALL METHOD go_hierseq->('GET_AGGREGATIONS') EXPORTING level = 2 RECEIVING value = go_item_aggregations.
   CALL METHOD go_item_sorts->('ADD_SORT')
-    EXPORTING columnname = 'NAME' sequence = 1 position = 1 subtotal = abap_false.
+    EXPORTING columnname = 'NAME'
+              sequence = 1
+              position = 1
+              subtotal = abap_false.
   CALL METHOD go_item_filters->('ADD_FILTER')
-    EXPORTING columnname = 'QUANTITY' sign = 'I' option = 'GE' low = 0.
+    EXPORTING columnname = 'QUANTITY'
+              sign = 'I'
+              option = 'GE'
+              low = 0.
   CALL METHOD go_item_aggregations->('ADD_AGGREGATION')
-    EXPORTING columnname = 'QUANTITY' aggregation = if_salv_c_aggregation=>total.
+    EXPORTING columnname = 'QUANTITY'
+              aggregation = if_salv_c_aggregation=>total.
   CALL METHOD go_item_aggregations->('ADD_AGGREGATION')
-    EXPORTING columnname = 'PRICE' aggregation = if_salv_c_aggregation=>average.
+    EXPORTING columnname = 'PRICE'
+              aggregation = if_salv_c_aggregation=>average.
 ENDFORM.
 
-FORM register_native_hierseq_events.
-  DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
-  DATA lv_message TYPE string.
-
-  IF gv_native_event_program IS INITIAL.
-    lt_source = VALUE #(
-      ( `PROGRAM SUBPOOL.` )
-      ( `CLASS lcl_events DEFINITION DEFERRED.` )
-      ( `DATA go_events TYPE REF TO lcl_events.` )
-      ( `DATA go_hierseq TYPE REF TO cl_salv_hierseq_table.` )
-      ( `DATA go_salv_events TYPE REF TO cl_salv_events_hierseq.` )
-      ( `CLASS lcl_events DEFINITION.` )
-      ( `  PUBLIC SECTION.` )
-      ( `    METHODS on_link FOR EVENT link_click OF cl_salv_events_hierseq` )
-      ( `      IMPORTING level row column.` )
-      ( `    METHODS on_double FOR EVENT double_click OF cl_salv_events_hierseq` )
-      ( `      IMPORTING level row column.` )
-      ( `ENDCLASS.` )
-      ( `CLASS lcl_events IMPLEMENTATION.` )
-      ( `  METHOD on_link.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'LINK_CLICK'.` )
-      ( `    DATA lv_text TYPE c LENGTH 80.` )
-      ( `    EXPORT event = lv_event level = level row = row column = column` )
-      ( `      TO MEMORY ID 'ZGG_GUI_SALV_HIERSEQ_EVENT'.` )
-      ( `    lv_text = |LINK_CLICK level { level }, row { row }, column { column }|.` )
-      ( `    MESSAGE lv_text TYPE 'S'.` )
-      ( `  ENDMETHOD.` )
-      ( `  METHOD on_double.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'DOUBLE_CLICK'.` )
-      ( `    DATA lv_text TYPE c LENGTH 80.` )
-      ( `    EXPORT event = lv_event level = level row = row column = column` )
-      ( `      TO MEMORY ID 'ZGG_GUI_SALV_HIERSEQ_EVENT'.` )
-      ( `    lv_text = |DOUBLE_CLICK level { level }, row { row }, column { column }|.` )
-      ( `    MESSAGE lv_text TYPE 'S'.` )
-      ( `  ENDMETHOD.` )
-      ( `ENDCLASS.` )
-      ( `FORM register USING io_hierseq TYPE REF TO object` )
-      ( `    CHANGING cv_registered TYPE abap_bool.` )
-      ( `  CLEAR cv_registered.` )
-      ( `  go_hierseq ?= io_hierseq.` )
-      ( `  go_salv_events = go_hierseq->get_event( ).` )
-      ( `  CREATE OBJECT go_events.` )
-      ( `  SET HANDLER go_events->on_link FOR go_salv_events.` )
-      ( `  SET HANDLER go_events->on_double FOR go_salv_events.` )
-      ( `  cv_registered = abap_true.` )
-      ( `ENDFORM.` )
-      ( `FORM unregister.` )
-      ( `  IF go_events IS BOUND AND go_salv_events IS BOUND.` )
-      ( `    SET HANDLER go_events->on_link FOR go_salv_events ACTIVATION space.` )
-      ( `    SET HANDLER go_events->on_double FOR go_salv_events ACTIVATION space.` )
-      ( `  ENDIF.` )
-      ( `  FREE: go_events, go_salv_events, go_hierseq.` )
-      ( `ENDFORM.` ) ).
-
-    GENERATE SUBROUTINE POOL lt_source
-      NAME gv_native_event_program MESSAGE lv_message.
-    IF sy-subrc <> 0 OR gv_native_event_program IS INITIAL.
-      CLEAR: gv_native_event_program, gv_native_events_registered.
-      gv_detail = |Native hierseq event adapter did not compile: { lv_message }|.
-      RETURN.
-    ENDIF.
-  ENDIF.
-
-  TRY.
-      PERFORM register IN PROGRAM (gv_native_event_program)
-        USING go_hierseq CHANGING gv_native_events_registered.
-    CATCH cx_root INTO DATA(lx_event_error).
-      CLEAR gv_native_events_registered.
-      gv_detail = |Native hierseq event registration failed: { lx_event_error->get_text( ) }|.
-  ENDTRY.
-ENDFORM.
 
 FORM consume_native_hierseq_event.
   CLEAR: gv_hierseq_event, gv_event_level, gv_event_row, gv_event_column.
@@ -258,17 +196,6 @@ FORM consume_native_hierseq_event.
   ENDIF.
 ENDFORM.
 
-FORM unregister_native_hierseq_events.
-  IF gv_native_event_program IS NOT INITIAL AND
-      gv_native_events_registered = abap_true.
-    TRY.
-        PERFORM unregister IN PROGRAM (gv_native_event_program) IF FOUND.
-      CATCH cx_root.
-    ENDTRY.
-  ENDIF.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_SALV_HIERSEQ_EVENT'.
-ENDFORM.
 
 FORM toggle_filter.
   IF go_item_filters IS NOT BOUND.
@@ -280,10 +207,16 @@ FORM toggle_filter.
       CALL METHOD go_item_filters->('CLEAR').
       IF gv_filtered = abap_true.
         CALL METHOD go_item_filters->('ADD_FILTER')
-          EXPORTING columnname = 'QUANTITY' sign = 'I' option = 'GE' low = 8.
+          EXPORTING columnname = 'QUANTITY'
+                    sign = 'I'
+                    option = 'GE'
+                    low = 8.
       ELSE.
         CALL METHOD go_item_filters->('ADD_FILTER')
-          EXPORTING columnname = 'QUANTITY' sign = 'I' option = 'GE' low = 0.
+          EXPORTING columnname = 'QUANTITY'
+                    sign = 'I'
+                    option = 'GE'
+                    low = 0.
       ENDIF.
       CALL METHOD go_hierseq->('REFRESH').
       gv_status = |Item-level quantity filter toggled; threshold-eight mode { gv_filtered }|.
@@ -301,9 +234,13 @@ FORM configure_totals.
   TRY.
       CALL METHOD go_item_sorts->('CLEAR').
       CALL METHOD go_item_sorts->('ADD_SORT')
-        EXPORTING columnname = 'NAME' sequence = 1 position = 1 subtotal = abap_false.
+        EXPORTING columnname = 'NAME'
+                  sequence = 1
+                  position = 1
+                  subtotal = abap_false.
       CALL METHOD go_item_aggregations->('ADD_AGGREGATION')
-        EXPORTING columnname = 'QUANTITY' aggregation = if_salv_c_aggregation=>maximum.
+        EXPORTING columnname = 'QUANTITY'
+                  aggregation = if_salv_c_aggregation=>maximum.
       CALL METHOD go_hierseq->('REFRESH').
       gv_status = 'Item sorting restored; total quantity, average price, and maximum quantity aggregations requested'.
     CATCH cx_root INTO DATA(lx_error).
@@ -332,7 +269,10 @@ FORM reset_data.
     TRY.
         CALL METHOD go_item_filters->('CLEAR').
         CALL METHOD go_item_filters->('ADD_FILTER')
-          EXPORTING columnname = 'QUANTITY' sign = 'I' option = 'GE' low = 0.
+          EXPORTING columnname = 'QUANTITY'
+                    sign = 'I'
+                    option = 'GE'
+                    low = 0.
         CALL METHOD go_hierseq->('REFRESH').
         gv_status = 'Header rows, item rows, binding assumptions, filter, and displayed hierarchy reset'.
       CATCH cx_root INTO DATA(lx_error).
@@ -352,15 +292,14 @@ FORM show_fallback USING iv_error TYPE string.
     ( 'CL_SALV_HIERSEQ_TABLE and its helper classes are unavailable in this runtime.' )
     ( 'The native SAP sample retains factory bindings and separate level configuration behind capability checks.' )
     ( 'Static event handlers require the missing hierarchical-sequential SALV event class.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Hierarchical-sequential SALV unavailable; a text fallback is displayed'.
   gv_detail = iv_error.
 ENDFORM.
 
 FORM free_controls.
-  PERFORM unregister_native_hierseq_events.
-  CLEAR gv_native_event_program.
+  PERFORM unregister_hierseq_events.
   FREE: go_header_columns, go_item_columns, go_item_sorts,
     go_item_filters, go_item_aggregations, go_hierseq.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.

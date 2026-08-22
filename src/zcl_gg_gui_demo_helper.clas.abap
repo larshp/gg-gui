@@ -8,10 +8,10 @@ CLASS zcl_gg_gui_demo_helper DEFINITION
 
     CLASS-METHODS add_log
       IMPORTING
-        event TYPE string
+        event     TYPE string
         max_lines TYPE i DEFAULT 12
       CHANGING
-        log   TYPE ty_log_lines.
+        log       TYPE ty_log_lines.
 
     CLASS-METHODS reset_log
       IMPORTING

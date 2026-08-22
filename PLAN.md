@@ -136,8 +136,11 @@ gracefully when unavailable.
 - [x] Comments, horizontal lines, blank lines, and explicit positions.
 - [x] Multiple elements on one line.
 - [x] Selection-screen pushbuttons with user commands.
-- [x] Application-toolbar function keys through `SSCRFIELDS`.
-- [x] Icons and quick-info text where selection screens support them.
+- [ ] Application-toolbar function keys. Not covered: labelling a
+      `SELECTION-SCREEN FUNCTION KEY` requires `SSCRFIELDS-FUNCTXT_nn`, and
+      `SSCRFIELDS` is deliberately unused in this repository. An icon
+      pushbutton carries the same action instead.
+- [x] Icons on selection-screen elements.
 
 #### `ZGG_GUI_SEL_DYNAMIC` - Dynamic selection screens
 
@@ -163,7 +166,8 @@ gracefully when unavailable.
 
 - [x] Static text fields and input/output fields.
 - [x] Output-only, required, invisible, and intensified fields.
-- [x] Date, time, numeric, quantity, currency, and masked templates.
+- [x] Date, time, numeric, quantity, currency, and masked templates, including
+  explicit `QUAN`/`UNIT` and `CURR`/`CUKY` reference-field pairs.
 - [x] Dropdown list boxes.
 - [x] Checkboxes and radio-button groups with and without function codes.
 - [x] Text and icon pushbuttons.
@@ -237,7 +241,9 @@ gracefully when unavailable.
 - [x] Embed a control in a Screen Painter custom-control area.
 - [x] Compare a custom container with `CL_GUI_CONTAINER=>SCREEN0` and
   `DEFAULT_SCREEN`.
-- [x] Link a container by program, screen, custom-control name, or parent.
+- [x] Link a container by program, screen, and custom-control name.
+      `CL_GUI_CONTAINER->LINK` takes no parent; a parent container is supplied
+      when the hosted control is constructed.
 - [x] Compare container lifetime modes.
 - [x] Resize the screen and child control.
 - [x] Replace or recreate the hosted child safely.
@@ -284,9 +290,9 @@ gracefully when unavailable.
 - [x] Display supported bitmap formats.
 - [x] Stretch, fit, center, and keep-aspect display modes.
 - [x] Toggle the 3D border.
-- [x] Compile and register native `PICTURE_CLICK` and `PICTURE_DBLCLICK`
-  handlers through a capability-checked runtime adapter, including original
-  image coordinates and explicit deregistration.
+- [x] Declare and register native `PICTURE_CLICK` and `PICTURE_DBLCLICK`
+  handlers in static include `ZGG_NATIVE_PICTURE`, including original image
+  coordinates and explicit deregistration.
 - [ ] Exercise both picture events on the declared native SAP baseline.
 - [x] Clear and reload the image.
 - [x] Handle unavailable or invalid image sources.
@@ -341,9 +347,9 @@ gracefully when unavailable.
   multi-date selection is not part of this control's ABAP interface.
 - [x] Navigate between months and years.
 - [x] Mark dates and display day information.
-- [x] Compile and register native `DATE_SELECTED` and `INFO_REQUEST` handlers
-  through a capability-checked runtime adapter and return the selected or
-  requested date range to the report.
+- [x] Declare and register native `DATE_SELECTED` and `INFO_REQUEST` handlers
+  in static include `ZGG_NATIVE_CALENDAR` and return the selected or requested
+  date range to the report.
 - [ ] Exercise both calendar events on the declared native SAP baseline.
 - [x] Locale-dependent first day, names, and date formatting.
 
@@ -377,9 +383,10 @@ gracefully when unavailable.
 - [x] Background pictures, document merging, and vertical splitting.
 - [x] Table row and column styles.
 - [x] Print a generated document.
-- [x] Runtime-compile and register native handlers for link/button `CLICKED`,
-  input `ENTERED`/`HELP_F1`, and select `SELECTED`, including sender values and
-  deregistration before reset or exit.
+- [x] Declare and register native handlers in static include
+  `ZGG_NATIVE_DOCUMENT` for link/button `CLICKED`, input `ENTERED`/`HELP_F1`,
+  and select `SELECTED`, including sender values and deregistration before reset
+  or exit.
 - [ ] Exercise all five Dynamic Document element events on the declared native
   SAP baseline.
 - [x] Refresh parts of a document without rebuilding unrelated state.
@@ -474,8 +481,9 @@ gracefully when unavailable.
   text events.
 - [x] Add custom toolbar functions.
 - [x] Modify the context menu.
-- [x] Runtime-compile and register a native `DELAYED_CHANGED_SEL_CALLBACK`
-  handler, preserve it across event-mode recreation, and deregister on exit.
+- [x] Declare and register a native `DELAYED_CHANGED_SEL_CALLBACK` handler in
+  static include `ZGG_NATIVE_ALV_EVENTS`, preserve it across event-mode
+  recreation, and deregister on exit.
 - [ ] Exercise delayed selection changes on the declared native SAP baseline.
 - [x] Drag-and-drop between rows and controls.
 - [x] Print and top-of-page events where applicable.
@@ -488,8 +496,9 @@ gracefully when unavailable.
 - [x] Node and item events.
 - [x] Dynamic node loading.
 - [x] Toolbar extension and context-menu selection events.
-- [x] Runtime-compile and register a native `NODE_CONTEXT_MENU_REQUEST`
-  handler that preserves existing frontend registrations and adds two commands.
+- [x] Declare and register a native `NODE_CONTEXT_MENU_REQUEST` handler in
+  static include `ZGG_NATIVE_ALV_TREE` that preserves existing frontend
+  registrations and adds two commands.
 - [ ] Exercise the context-menu request and both injected commands on the
   declared native SAP baseline.
 - [x] Hierarchy headers, help fields, optimized columns, and calculated values.
@@ -503,8 +512,9 @@ gracefully when unavailable.
 - [x] Create and populate a `CL_SALV_TREE` hierarchy.
 - [x] Configure hierarchy and data columns.
 - [x] Standard functions and selections.
-- [x] Runtime-compile and register native SALV Tree link-click and double-click
-  handlers, including node/column payloads and deregistration on exit.
+- [x] Declare and register native SALV Tree link-click and double-click handlers
+  in static include `ZGG_NATIVE_SALV_TREE`, including node/column payloads and
+  deregistration on exit.
 - [ ] Exercise SALV Tree link-click and double-click on the declared native SAP
   baseline.
 - [x] Compare capabilities and restrictions with the ALV tree control.
@@ -514,8 +524,9 @@ gracefully when unavailable.
 - [x] Header and item tables with key relationships.
 - [x] Separate header and item column configuration.
 - [x] Sorting, filtering, and aggregation.
-- [x] Runtime-compile and register native hierarchical-sequential link-click and
-  double-click handlers, including level/row/column payloads and deregistration.
+- [x] Declare and register native hierarchical-sequential link-click and
+  double-click handlers in static include `ZGG_NATIVE_SALV_HSEQ`, including
+  level/row/column payloads and deregistration.
 - [ ] Exercise both hierarchical-sequential SALV events on the declared native
   SAP baseline.
 - [x] Use cases and limitations compared with trees and ordinary tables.
@@ -620,18 +631,18 @@ capability-guarded samples and recorded in `ANORMALIES.md`.
 The following feature boxes remain unchecked because their native event type is
 absent from the pinned dependency surface or their target interaction has not
 yet been exercised. The reports keep the surrounding native behavior and CFW
-dispatch path. Where a runtime-compiled adapter is used, its generated handler
-still has to compile and run on the declared native baseline.
+dispatch path. Native-only event declarations are isolated in static include
+programs, which still have to activate and run on the declared native baseline.
 
 | Feature | Implemented repository behavior | Native evidence still required |
 | --- | --- | --- |
-| Picture click/double-click | Typed runtime adapter, coordinate payload, and cleanup | Click and double-click the rendered fixture on native SAP GUI |
-| Calendar selection/view events | Typed runtime adapter, date-range payload, and cleanup | Select a date/range and request date information on native SAP GUI |
-| Dynamic Document element events | Typed runtime adapter for five element events, sender/value payload, and cleanup | Trigger link, button, Enter, F1, and select events on native SAP GUI |
-| Delayed ALV selection | Typed runtime adapter, delayed event registration, mode recreation, and cleanup | Change selection and observe the callback after the native delay |
-| ALV Tree context-menu request | Typed runtime adapter preserving prior event registrations and adding two commands | Open the node menu and execute both added commands on native SAP GUI |
-| SALV Tree link/double-click | Typed `GET_EVENT` adapter with node/column payload and cleanup | Activate a link item and double-click an item on native SAP GUI |
-| SALV hierseq events | Typed `GET_EVENT` adapter with level/row/column payload and cleanup | Activate the `ITEM_ID` hotspot and double-click both hierarchy levels |
+| Picture click/double-click | Static typed handler include, coordinate payload, and cleanup | Click and double-click the rendered fixture on native SAP GUI |
+| Calendar selection/view events | Static typed handler include, date-range payload, and cleanup | Select a date/range and request date information on native SAP GUI |
+| Dynamic Document element events | Static typed handler include for five element events, sender/value payload, and cleanup | Trigger link, button, Enter, F1, and select events on native SAP GUI |
+| Delayed ALV selection | Static typed handler include, delayed event registration, mode recreation, and cleanup | Change selection and observe the callback after the native delay |
+| ALV Tree context-menu request | Static typed handler include preserving prior event registrations and adding two commands | Open the node menu and execute both added commands on native SAP GUI |
+| SALV Tree link/double-click | Static typed `GET_EVENT` handler include with node/column payload and cleanup | Activate a link item and double-click an item on native SAP GUI |
+| SALV hierseq events | Static typed `GET_EVENT` handler include with level/row/column payload and cleanup | Activate the `ITEM_ID` hotspot and double-click both hierarchy levels |
 
 Do not check these items based only on dynamic RTTI calls or a generic dispatch
 return code. Check them after a real handler compiles against the declared
@@ -649,9 +660,9 @@ checking any remaining native-only box:
 2. Execute `ZGG_GUI_CATALOG`, launch every row, exercise all visible commands,
    Reset/Recreate paths, Back/Exit/Cancel, and return to the catalog. Do not add
    validation fields to the launcher; it remains category/program/title only.
-3. For each row in the event table above, confirm adapter generation and
-   registration did not produce a diagnostic, perform every listed gesture,
-   and verify the displayed event name plus payload.
+3. For each row in the event table above, activate the owner report and its
+   static native include, confirm handler registration, perform every listed
+   gesture, and verify the displayed event name plus payload.
 4. Repeat ordinary dynpro, selection-screen, list, and supported control
    samples on SAP GUI for Windows, Java, and HTML. Treat unavailable optional
    Windows controls as a pass only when the documented diagnostic fallback is
@@ -703,15 +714,30 @@ Every sample must:
   functionality in `ANORMALIES.md`, including a minimal reproduction and the
   native SAP behavior expected.
 - [x] Avoid color as the only indication of status or validation.
-- [x] Use icons with text or quick info where their meaning is not universal.
+- [x] Use icons with text or quick info where their meaning is not universal,
+  keeping quick-info values within native fixed-length parameter limits.
+- [x] Exclude Screen Painter icon aliases known to fail native object import;
+  repository verification rejects these values before delivery.
+- [x] Separate top-level Screen Painter elements that share rows by at least one
+  column; repository verification rejects touching or overlapping elements.
+- [x] Give top-level `QUAN` and `CURR` fields explicit unit and currency
+  references; repository verification checks matching visible reference types.
 - [ ] Work at common window sizes and DPI scaling levels.
 - [x] Document any frontend, operating-system, release, or software dependency.
+- [x] Use static source for all handlers and helper routines; generated
+  subroutine pools are prohibited. Native event types missing from open-abap are
+  isolated in the seven checked `ZGG_NATIVE_*` include programs.
 
 `npm run verify:repo` enforces the independently executable report shape,
 catalog parity and schema, screen/XML pairing, dynpro exit paths, event-receiver
-cleanup, PLAN coverage, anomaly record structure, and the direct-database-DML
-rule. Behavioral and visual requirements still require the native checks in
-Phase 6 and are not inferred from this gate.
+cleanup, Screen Painter icon aliases, top-level element spacing, quantity and
+currency references, PLAN coverage, anomaly record structure, the
+direct-database-DML rule, the generated-subroutine-pool ban, and exact static
+native-include ownership and metadata. Behavioral and visual requirements still
+require the native checks in Phase 6 and are not inferred from this gate.
+
+`npm run lint` enforces ABAP syntax and API parameter compatibility, including
+fixed-length toolbar quick-info arguments.
 
 ## Delivery Plan
 

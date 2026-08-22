@@ -88,10 +88,10 @@ MODULE user_command_0100 INPUT.
   CASE lv_ok_code.
     WHEN 'APPEND'.
       APPEND VALUE #(
-        id = |P{ lines( gt_rows ) + 500 }|
-        name = 'New product'
+        id       = |P{ lines( gt_rows ) + 500 }|
+        name     = 'New product'
         currency = 'EUR'
-        active = abap_true ) TO gt_rows.
+        active   = abap_true ) TO gt_rows.
       gv_status = 'A row was appended'.
     WHEN 'INSERT'.
       lv_index = tc_rows-top_line + gv_cursor_line - 1.
@@ -99,10 +99,10 @@ MODULE user_command_0100 INPUT.
         lv_index = 1.
       ENDIF.
       INSERT VALUE #(
-        id = |P{ lines( gt_rows ) + 500 }|
-        name = 'Inserted product'
+        id       = |P{ lines( gt_rows ) + 500 }|
+        name     = 'Inserted product'
         currency = 'EUR'
-        active = abap_true ) INTO gt_rows INDEX lv_index.
+        active   = abap_true ) INTO gt_rows INDEX lv_index.
       gv_status = |A row was inserted at position { lv_index }|.
     WHEN 'COPY'.
       READ TABLE gt_rows INTO ls_source WITH KEY mark = abap_true.

@@ -67,7 +67,8 @@ MODULE user_command_0100 INPUT.
       gv_extension = gv_extension + 40.
       PERFORM set_extension.
     WHEN 'EXTEND_DOWN'.
-      gv_extension = nmax( val1 = 80 val2 = gv_extension - 40 ).
+      gv_extension = nmax( val1 = 80
+                           val2 = gv_extension - 40 ).
       PERFORM set_extension.
     WHEN 'FLOAT'.
       PERFORM optional_docking_method USING 'DETACH'.
@@ -76,7 +77,8 @@ MODULE user_command_0100 INPUT.
       PERFORM dock_at_side.
     WHEN 'RELINK'.
       go_container->link(
-        EXPORTING repid = sy-repid dynnr = sy-dynnr
+        EXPORTING repid = sy-repid
+                  dynnr = sy-dynnr
         EXCEPTIONS cntl_error = 1 cntl_system_error = 2
           lifetime_dynpro_dynpro_link = 3 OTHERS = 4 ).
       gv_status = |Relinked to the current dynpro; rc { sy-subrc }|.
@@ -97,11 +99,11 @@ FORM create_controls.
   TRY.
       CREATE OBJECT go_docking TYPE (lv_class_name)
         EXPORTING
-          repid = sy-repid
-          dynnr = sy-dynnr
-          side = gv_side
-          extension = gv_extension
-          lifetime = c_lifetime_dynpro
+          repid                   = sy-repid
+          dynnr                   = sy-dynnr
+          side                    = gv_side
+          extension               = gv_extension
+          lifetime                = c_lifetime_dynpro
           no_autodef_progid_dynnr = abap_true.
       go_container ?= go_docking.
       CREATE OBJECT go_editor EXPORTING parent = go_container.
@@ -109,7 +111,7 @@ FORM create_controls.
         ( 'CL_GUI_DOCKING_CONTAINER' )
         ( 'Drag the docking grip to resize or float it where the frontend supports this.' )
         ( 'Use the dynpro buttons to change edge and extension.' ) ).
-      go_editor->set_text_as_r3table( table = lt_text ).
+      go_editor->set_text_as_r3table( lt_text ).
       gv_status = 'Docking container created and linked to the current dynpro'.
     CATCH cx_root INTO DATA(lx_error).
       FREE go_docking.

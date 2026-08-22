@@ -62,9 +62,10 @@ DATA gv_status TYPE c LENGTH 108.
 DATA gv_detail TYPE c LENGTH 108.
 DATA gv_event_count TYPE i.
 DATA gv_application_events TYPE abap_bool VALUE abap_true.
-DATA gv_native_event_program TYPE c LENGTH 8.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_delayed_requested TYPE abap_bool.
+
+INCLUDE zgg_native_alv_events.
 
 CLASS lcl_drag_payload IMPLEMENTATION.
   METHOD constructor.
@@ -125,8 +126,10 @@ CLASS lcl_events IMPLEMENTATION.
 
   METHOD on_menu_button.
     IF e_object IS BOUND.
-      e_object->add_function( fcode = 'ZMENU_A' text = 'Menu action A' ).
-      e_object->add_function( fcode = 'ZMENU_B' text = 'Menu action B' ).
+      e_object->add_function( fcode = 'ZMENU_A'
+                              text  = 'Menu action A' ).
+      e_object->add_function( fcode = 'ZMENU_B'
+                              text  = 'Menu action B' ).
     ENDIF.
     ADD 1 TO gv_event_count.
     gv_status = |MENU_BUTTON prepared for command { e_ucomm }|.
@@ -150,9 +153,11 @@ CLASS lcl_events IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD on_context_menu.
-    e_object->add_function( fcode = 'ZDETAIL' text = 'Show row details' ).
+    e_object->add_function( fcode = 'ZDETAIL'
+                            text  = 'Show row details' ).
     e_object->add_separator( ).
-    e_object->add_function( fcode = 'ZRESET' text = 'Reset event sample' ).
+    e_object->add_function( fcode = 'ZRESET'
+                            text  = 'Reset event sample' ).
     ADD 1 TO gv_event_count.
     gv_status = 'CONTEXT_MENU_REQUEST added sample functions and a separator'.
   ENDMETHOD.
@@ -194,7 +199,8 @@ CLASS lcl_events IMPLEMENTATION.
 
   METHOD on_drop_flavor.
     ADD 1 TO gv_event_count.
-    gv_status = |ONDROPGETFLAVOR row { e_row-index } / { es_row_no-row_id }, flavor { e_flavors }|.
+    gv_status = |ONDROPGETFLAVOR row { e_row-index } / { es_row_no-row_id }, flavor { concat_lines_of( table = e_flavors
+                                                                                                       sep   = ',' ) }|.
     gv_detail = |Column { e_column-fieldname }; drag object bound { xsdbool( e_dragdropobj IS BOUND ) }|.
   ENDMETHOD.
 
@@ -288,8 +294,11 @@ FORM configure_dragdrop.
   TRY.
       CREATE OBJECT go_dragdrop.
       go_dragdrop->add(
-        flavor = 'GG_ROWS' dragsrc = abap_true droptarget = abap_true
-        effect = cl_dragdrop=>move effect_in_ctrl = cl_dragdrop=>move ).
+        flavor         = 'GG_ROWS'
+        dragsrc        = abap_true
+        droptarget     = abap_true
+        effect         = cl_dragdrop=>move
+        effect_in_ctrl = cl_dragdrop=>move ).
       go_dragdrop->get_handle( IMPORTING handle = gv_dragdrop_handle ).
     CATCH cx_root INTO DATA(lx_error).
       CLEAR gv_dragdrop_handle.
@@ -303,7 +312,8 @@ FORM create_grid.
   lv_appl_events = COND #( WHEN gv_application_events = abap_true THEN abap_true ELSE space ).
   TRY.
       CREATE OBJECT go_grid
-        EXPORTING i_parent = go_host i_appl_events = lv_appl_events.
+        EXPORTING i_parent      = go_host
+                  i_appl_events = lv_appl_events.
       CREATE OBJECT go_events.
       SET HANDLER go_events->on_double_click FOR go_grid.
       SET HANDLER go_events->on_hotspot_click FOR go_grid.
@@ -322,7 +332,7 @@ FORM create_grid.
       SET HANDLER go_events->on_drop_complete FOR go_grid.
       SET HANDLER go_events->on_drop_flavor FOR go_grid.
       SET HANDLER go_events->on_top_of_page FOR go_grid.
-      go_grid->register_f4_for_fields( it_f4 = VALUE lvc_t_f4(
+      go_grid->register_f4_for_fields( VALUE lvc_t_f4(
         ( fieldname = 'NAME' register = abap_true getbefore = abap_true ) ) ).
       go_grid->set_table_for_first_display(
         EXPORTING is_layout = VALUE lvc_s_layo(
@@ -347,8 +357,9 @@ FORM raise_custom_command.
     RETURN.
   ENDIF.
   TRY.
-      go_grid->raise_event( i_ucomm = 'ZHELLO' i_user_command = abap_true ).
-      go_grid->set_user_command( i_ucomm = 'ZHELLO' ).
+      go_grid->raise_event( i_ucomm        = 'ZHELLO'
+                            i_user_command = abap_true ).
+      go_grid->set_user_command( 'ZHELLO' ).
       gv_status = 'Custom ZHELLO command raised through the ALV event and user-command paths'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Custom command failed: { lx_error->get_text( ) }|.
@@ -379,86 +390,14 @@ FORM register_delayed.
   ENDIF.
 ENDFORM.
 
-FORM register_native_delayed_event.
-  DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
-  DATA lv_message TYPE string.
-
-  IF gv_native_events_registered = abap_true.
-    RETURN.
-  ENDIF.
-  IF gv_native_event_program IS INITIAL.
-    lt_source = VALUE #(
-      ( `PROGRAM SUBPOOL.` )
-      ( `CLASS lcl_events DEFINITION DEFERRED.` )
-      ( `DATA go_events TYPE REF TO lcl_events.` )
-      ( `DATA go_grid TYPE REF TO cl_gui_alv_grid.` )
-      ( `CLASS lcl_events DEFINITION.` )
-      ( `  PUBLIC SECTION.` )
-      ( `    METHODS on_delayed FOR EVENT delayed_changed_sel_callback` )
-      ( `      OF cl_gui_alv_grid.` )
-      ( `ENDCLASS.` )
-      ( `CLASS lcl_events IMPLEMENTATION.` )
-      ( `  METHOD on_delayed.` )
-      ( `    DATA lv_event TYPE c LENGTH 24 VALUE 'DELAYED_SELECTION'.` )
-      ( `    EXPORT event = lv_event TO MEMORY ID 'ZGG_GUI_ALV_DELAYED'.` )
-      ( `    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'ALV_DELAYED' ).` )
-      ( `  ENDMETHOD.` )
-      ( `ENDCLASS.` )
-      ( `FORM register USING io_grid TYPE REF TO object` )
-      ( `    CHANGING cv_registered TYPE abap_bool.` )
-      ( `  CLEAR cv_registered.` )
-      ( `  go_grid ?= io_grid.` )
-      ( `  CREATE OBJECT go_events.` )
-      ( `  SET HANDLER go_events->on_delayed FOR go_grid.` )
-      ( `  CALL METHOD go_grid->register_delayed_event` )
-      ( `    EXPORTING i_event_id = cl_gui_alv_grid=>mc_evt_delayed_change_select.` )
-      ( `  cv_registered = abap_true.` )
-      ( `ENDFORM.` )
-      ( `FORM unregister.` )
-      ( `  IF go_events IS BOUND AND go_grid IS BOUND.` )
-      ( `    SET HANDLER go_events->on_delayed FOR go_grid ACTIVATION space.` )
-      ( `  ENDIF.` )
-      ( `  FREE: go_events, go_grid.` )
-      ( `ENDFORM.` ) ).
-
-    GENERATE SUBROUTINE POOL lt_source
-      NAME gv_native_event_program MESSAGE lv_message.
-    IF sy-subrc <> 0 OR gv_native_event_program IS INITIAL.
-      CLEAR: gv_native_event_program, gv_native_events_registered.
-      gv_status = |Native delayed-event adapter did not compile: { lv_message }|.
-      gv_detail = 'Other statically declared ALV event handlers remain active'.
-      RETURN.
-    ENDIF.
-  ENDIF.
-
-  TRY.
-      PERFORM register IN PROGRAM (gv_native_event_program)
-        USING go_grid CHANGING gv_native_events_registered.
-    CATCH cx_root INTO DATA(lx_event_error).
-      CLEAR gv_native_events_registered.
-      gv_status = |Native delayed-event registration failed: { lx_event_error->get_text( ) }|.
-  ENDTRY.
-ENDFORM.
-
-FORM unregister_native_delayed_event.
-  IF gv_native_event_program IS NOT INITIAL AND
-      gv_native_events_registered = abap_true.
-    TRY.
-        PERFORM unregister IN PROGRAM (gv_native_event_program) IF FOUND.
-      CATCH cx_root.
-    ENDTRY.
-  ENDIF.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_ALV_DELAYED'.
-ENDFORM.
-
 FORM request_print_events.
   IF go_grid IS NOT BOUND.
     RETURN.
   ENDIF.
   TRY.
-      go_grid->list_processing_events( i_event_name = 'TOP_OF_PAGE' i_table_index = 1 ).
-      go_grid->set_user_command( i_ucomm = '&PRINT' ).
+      go_grid->list_processing_events( i_event_name  = 'TOP_OF_PAGE'
+                                       i_table_index = 1 ).
+      go_grid->set_user_command( '&PRINT' ).
       gv_status = 'TOP_OF_PAGE list processing and the standard print command were requested'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Print event request failed or was canceled: { lx_error->get_text( ) }|.
@@ -467,7 +406,7 @@ ENDFORM.
 
 FORM toggle_event_mode.
   gv_application_events = xsdbool( gv_application_events = abap_false ).
-  PERFORM unregister_native_delayed_event.
+  PERFORM unregister_delayed_event.
   IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
   FREE go_events.
   PERFORM create_grid.
@@ -499,15 +438,14 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'CL_GUI_ALV_GRID event behavior is unavailable in this runtime.' )
     ( 'The native SAP report retains its handlers, toolbar/context extensions, drag/drop, and print hooks.' )
     ( 'The delayed-selection callback is missing from the pinned open-abap class definition.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'ALV events unavailable; a non-terminating text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.
 
 FORM free_controls.
-  PERFORM unregister_native_delayed_event.
-  CLEAR gv_native_event_program.
+  PERFORM unregister_delayed_event.
   FREE: go_events, go_dragdrop.
   IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.

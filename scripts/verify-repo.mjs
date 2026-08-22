@@ -9,10 +9,56 @@ const read = (path) => readFileSync(path, "utf8");
 const fail = (message) => {
   throw new Error(message);
 };
+const unsupportedScreenIcons = new Set([
+  "ICON_BACK",
+  "ICON_HIDE",
+  "ICON_MINUS",
+  "ICON_PICTURE",
+  "ICON_PLUS",
+  "ICON_SYSTEM_OKAY",
+]);
+const elementValue = (block, tag) =>
+  block.match(new RegExp(`<${tag}>([^<]*)</${tag}>`, "i"))?.[1].trim() ?? "";
+const topLevelScreenFields = (dynpro) =>
+  [...dynpro.matchAll(/<RPY_DYFATC>([\s\S]*?)<\/RPY_DYFATC>/gi)]
+    .map((match) => match[1])
+    .filter((field) => elementValue(field, "CONT_TYPE").toUpperCase() === "SCREEN")
+    .filter((field) => !["FRAME", "OKCODE"].includes(elementValue(field, "TYPE").toUpperCase()))
+    .map((field) => {
+      const line = Number.parseInt(elementValue(field, "LINE"), 10);
+      const column = Number.parseInt(elementValue(field, "COLUMN"), 10);
+      const width = Number.parseInt(
+        elementValue(field, "VISLENGTH") || elementValue(field, "LENGTH"),
+        10,
+      );
+      const height = Number.parseInt(elementValue(field, "HEIGHT") || "1", 10);
+      return {
+        name: elementValue(field, "NAME"),
+        format: elementValue(field, "FORMAT").toUpperCase(),
+        reference: elementValue(field, "REF_FIELD").toUpperCase(),
+        top: line,
+        bottom: line + height - 1,
+        left: column,
+        right: column + width - 1,
+      };
+    })
+    .filter((field) =>
+      field.name && [field.top, field.bottom, field.left, field.right].every(Number.isFinite),
+    );
 
 const reportFiles = files.filter((name) => /^zgg_gui_.+\.prog\.abap$/i.test(name));
 const sampleFiles = reportFiles.filter((name) => name !== "zgg_gui_catalog.prog.abap");
+const abapFiles = files.filter((name) => /\.abap$/i.test(name));
 const programFor = (name) => name.replace(/\.prog\.abap$/i, "").toUpperCase();
+const nativeIncludeOwners = new Map([
+  ["ZGG_NATIVE_ALV_EVENTS", "zgg_gui_alv_events.prog.abap"],
+  ["ZGG_NATIVE_ALV_TREE", "zgg_gui_alv_tree.prog.abap"],
+  ["ZGG_NATIVE_CALENDAR", "zgg_gui_calendar.prog.abap"],
+  ["ZGG_NATIVE_DOCUMENT", "zgg_gui_dynamic_document.prog.abap"],
+  ["ZGG_NATIVE_PICTURE", "zgg_gui_picture.prog.abap"],
+  ["ZGG_NATIVE_SALV_HSEQ", "zgg_gui_salv_hierseq.prog.abap"],
+  ["ZGG_NATIVE_SALV_TREE", "zgg_gui_salv_tree.prog.abap"],
+]);
 const plan = read(join(root, "PLAN.md"));
 const anomalies = read(join(root, "ANORMALIES.md"));
 const abaplintConfig = read(join(root, "abaplint.jsonc"));
@@ -20,6 +66,38 @@ const catalog = read(join(srcDir, "zgg_gui_catalog.prog.abap"));
 
 if (!/"version"\s*:\s*"v750"/.test(abaplintConfig)) {
   fail("abaplint syntax version must remain v750 to match the declared minimum release");
+}
+
+for (const file of abapFiles) {
+  const source = read(join(srcDir, file));
+  if (/\bGENERATE\s+SUBROUTINE\s+POOL\b/i.test(source)) {
+    fail(`${file}: generated subroutine pools are not allowed; use static code`);
+  }
+}
+
+const nativeIncludePrograms = files
+  .filter((name) => /^zgg_native_.+\.prog\.abap$/i.test(name))
+  .map(programFor)
+  .sort();
+const requiredNativeIncludes = [...nativeIncludeOwners.keys()].sort();
+if (JSON.stringify(nativeIncludePrograms) !== JSON.stringify(requiredNativeIncludes)) {
+  fail("Static native include programs do not exactly match the required event includes");
+}
+for (const [includeProgram, ownerFile] of nativeIncludeOwners) {
+  const includeFile = `${includeProgram.toLowerCase()}.prog.abap`;
+  const xmlName = includeFile.replace(/\.abap$/i, ".xml");
+  if (!files.includes(xmlName)) fail(`${includeProgram}: missing ${xmlName}`);
+
+  const xml = read(join(srcDir, xmlName));
+  if (!new RegExp(`<NAME>${includeProgram}</NAME>`, "i").test(xml) ||
+      !/<SUBC>I<\/SUBC>/i.test(xml)) {
+    fail(`${xmlName}: must describe include program ${includeProgram}`);
+  }
+
+  const ownerSource = read(join(srcDir, ownerFile));
+  if (!new RegExp(`^\\s*INCLUDE\\s+${includeProgram}\\s*\\.`, "im").test(ownerSource)) {
+    fail(`${ownerFile}: missing static include ${includeProgram}`);
+  }
 }
 
 for (const file of reportFiles) {
@@ -32,6 +110,46 @@ for (const file of reportFiles) {
   }
 
   const xml = read(join(srcDir, xmlName));
+  for (const match of xml.matchAll(/<ICON_NAME>([^<]+)<\/ICON_NAME>/gi)) {
+    const icon = match[1].trim().toUpperCase();
+    if (unsupportedScreenIcons.has(icon)) {
+      fail(`${xmlName}: unsupported Screen Painter icon ${icon}`);
+    }
+  }
+  const dynpros = xml.match(/<DYNPROS>([\s\S]*?)<\/DYNPROS>/i)?.[1] ?? "";
+  for (const match of dynpros.matchAll(/<item>([\s\S]*?)<\/item>/gi)) {
+    const dynpro = match[1];
+    const screen = elementValue(dynpro.match(/<HEADER>([\s\S]*?)<\/HEADER>/i)?.[1] ?? "", "SCREEN");
+    const screenFields = topLevelScreenFields(dynpro);
+    const fieldsByName = new Map(
+      screenFields.map((field) => [field.name.toUpperCase(), field]),
+    );
+    for (const field of screenFields) {
+      const referenceFormat = { CURR: "CUKY", QUAN: "UNIT" }[field.format];
+      if (!referenceFormat) continue;
+      if (!field.reference) {
+        fail(`${xmlName}: screen ${screen}, ${field.format} field ${field.name} has no reference field`);
+      }
+      const reference = fieldsByName.get(field.reference);
+      if (reference && reference.format !== referenceFormat) {
+        fail(
+          `${xmlName}: screen ${screen}, ${field.name} references ${reference.name} ` +
+          `with format ${reference.format} instead of ${referenceFormat}`,
+        );
+      }
+    }
+    for (let first = 0; first < screenFields.length; first += 1) {
+      for (let second = first + 1; second < screenFields.length; second += 1) {
+        const a = screenFields[first];
+        const b = screenFields[second];
+        const rowsOverlap = a.top <= b.bottom && b.top <= a.bottom;
+        const columnsTouch = a.left <= b.right + 1 && b.left <= a.right + 1;
+        if (rowsOverlap && columnsTouch) {
+          fail(`${xmlName}: screen ${screen}, element ${a.name} touches or overlaps ${b.name}`);
+        }
+      }
+    }
+  }
   if (!/<TPOOL>[\s\S]*?<ID>R<\/ID>/i.test(xml)) {
     fail(`${program}: missing report title in its text pool`);
   }
