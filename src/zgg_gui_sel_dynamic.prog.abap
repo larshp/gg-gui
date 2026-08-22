@@ -1,7 +1,5 @@
 REPORT zgg_gui_sel_dynamic.
 
-TABLES sscrfields.
-
 " USER-COMMAND cannot be combined with the LENGTH addition, so the list-box
 " parameter takes its length from a locally declared type instead.
 TYPES ty_view TYPE c LENGTH 10.
@@ -65,7 +63,7 @@ AT SELECTION-SCREEN OUTPUT.
   ENDLOOP.
 
 AT SELECTION-SCREEN.
-  CASE sscrfields-ucomm.
+  CASE sy-ucomm.
     WHEN 'ACTION'.
       p_note = |Applied { COND string( WHEN p_adv = abap_true THEN 'advanced' ELSE 'basic' ) } state|.
       MESSAGE 'Selection-screen pushbutton handled without leaving the screen' TYPE 'S'.

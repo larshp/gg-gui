@@ -136,8 +136,11 @@ gracefully when unavailable.
 - [x] Comments, horizontal lines, blank lines, and explicit positions.
 - [x] Multiple elements on one line.
 - [x] Selection-screen pushbuttons with user commands.
-- [x] Application-toolbar function keys through `SSCRFIELDS`.
-- [x] Icons and quick-info text where selection screens support them.
+- [ ] Application-toolbar function keys. Not covered: labelling a
+      `SELECTION-SCREEN FUNCTION KEY` requires `SSCRFIELDS-FUNCTXT_nn`, and
+      `SSCRFIELDS` is deliberately unused in this repository. An icon
+      pushbutton carries the same action instead.
+- [x] Icons on selection-screen elements.
 
 #### `ZGG_GUI_SEL_DYNAMIC` - Dynamic selection screens
 

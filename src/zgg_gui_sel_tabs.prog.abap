@@ -1,7 +1,5 @@
 REPORT zgg_gui_sel_tabs.
 
-TABLES sscrfields.
-
 SELECTION-SCREEN BEGIN OF SCREEN 100 AS SUBSCREEN.
   SELECTION-SCREEN BEGIN OF BLOCK b_identity WITH FRAME TITLE g_idtit.
     PARAMETERS:
@@ -47,7 +45,7 @@ INITIALIZATION.
   g_tabs-activetab = 'TAB1'.
 
 AT SELECTION-SCREEN.
-  CASE sscrfields-ucomm.
+  CASE sy-ucomm.
     WHEN 'TAB1'.
       g_tabs-dynnr = '0100'.
       g_tabs-activetab = 'TAB1'.
