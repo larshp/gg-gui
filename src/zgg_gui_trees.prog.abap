@@ -417,7 +417,7 @@ FORM change_header.
 
   gv_header_alt = xsdbool( gv_header_alt = abap_false ).
   go_tree->hierarchy_header_set_text(
-    text = COND string( WHEN gv_header_alt = abap_true
+    text = COND tv_heading( WHEN gv_header_alt = abap_true
       THEN 'Runtime hierarchy' ELSE 'Tree subject' ) ).
   go_tree->hierarchy_header_set_tooltip( tooltip = 'Header text and width changed at runtime' ).
   go_tree->hierarchy_header_set_width(

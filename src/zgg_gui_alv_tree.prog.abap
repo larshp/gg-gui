@@ -13,17 +13,6 @@ TYPES:
   ty_rows TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY.
 
 TYPES:
-  BEGIN OF ty_node_layout,
-    isfolder   TYPE abap_bool,
-    expander   TYPE abap_bool,
-    n_image    TYPE tv_image,
-    exp_image  TYPE tv_image,
-    style      TYPE i,
-    disabled   TYPE abap_bool,
-    dragdropid TYPE i,
-  END OF ty_node_layout.
-
-TYPES:
   BEGIN OF ty_item_layout,
     fieldname  TYPE lvc_fname,
     class      TYPE i,
@@ -244,7 +233,7 @@ FORM configure_dragdrop.
 ENDFORM.
 
 FORM add_initial_nodes.
-  DATA ls_folder TYPE ty_node_layout.
+  DATA ls_folder TYPE lvc_s_layn.
   DATA lt_item_layout TYPE ty_item_layouts.
 
   CLEAR: gt_outtab, gt_leaf_keys.

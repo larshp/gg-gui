@@ -241,7 +241,9 @@ gracefully when unavailable.
 - [x] Embed a control in a Screen Painter custom-control area.
 - [x] Compare a custom container with `CL_GUI_CONTAINER=>SCREEN0` and
   `DEFAULT_SCREEN`.
-- [x] Link a container by program, screen, custom-control name, or parent.
+- [x] Link a container by program, screen, and custom-control name.
+      `CL_GUI_CONTAINER->LINK` takes no parent; a parent container is supplied
+      when the hosted control is constructed.
 - [x] Compare container lifetime modes.
 - [x] Resize the screen and child control.
 - [x] Replace or recreate the hosted child safely.

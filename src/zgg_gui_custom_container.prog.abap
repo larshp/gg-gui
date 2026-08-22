@@ -51,20 +51,6 @@ MODULE user_command_0100 INPUT.
           lifetime_dynpro_dynpro_link = 3
           OTHERS                      = 4 ).
       gv_link_state = |Linked by program, screen, and custom-control name; rc { sy-subrc }|.
-    WHEN 'LINK_PARENT'.
-      IF cl_gui_container=>default_screen IS BOUND.
-        go_container->link(
-          EXPORTING
-            parent                      = cl_gui_container=>default_screen
-          EXCEPTIONS
-            cntl_error                  = 1
-            cntl_system_error           = 2
-            lifetime_dynpro_dynpro_link = 3
-            OTHERS                      = 4 ).
-        gv_link_state = |Linked to DEFAULT_SCREEN parent; rc { sy-subrc }|.
-      ELSE.
-        gv_link_state = 'DEFAULT_SCREEN is not bound in this frontend session'.
-      ENDIF.
     WHEN 'LIFETIME'.
       CASE gv_lifetime.
         WHEN c_lifetime_default.
