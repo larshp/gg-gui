@@ -97,7 +97,7 @@ MODULE user_command_0100 INPUT.
     WHEN 'INFO'.
       go_toolbar->set_button_info(
         fcode = 'NORMAL' icon = '@42@' text = 'Changed'
-        quickinfo = 'Text and quick info changed at runtime' ).
+        quickinfo = 'Text and quick info changed' ).
       gv_status = 'Normal button icon, text, and quick info changed'.
     WHEN 'GROUP'.
       PERFORM add_button_group.
