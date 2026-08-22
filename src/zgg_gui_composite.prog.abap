@@ -388,6 +388,8 @@ FORM populate_toolbar.
 ENDFORM.
 
 FORM select_navigation USING iv_node TYPE tv_nodekey.
+  DATA ls_product TYPE ty_row.
+
   IF iv_node = 'INPUT'.
     gv_filter = 'Input'.
   ELSEIF iv_node = 'DISPLAY'.
@@ -395,11 +397,12 @@ FORM select_navigation USING iv_node TYPE tv_nodekey.
   ELSEIF iv_node = 'ROOT'.
     CLEAR gv_filter.
   ELSE.
-    READ TABLE gt_all_rows WITH KEY id = iv_node INTO DATA(ls_product).
+    READ TABLE gt_all_rows WITH KEY id = iv_node INTO ls_product.
     IF sy-subrc = 0.
       gv_filter = ls_product-category.
       gt_rows = VALUE #( ( ls_product ) ).
-      PERFORM show_row_detail USING ls_product.
+      PERFORM show_row_detail USING ls_product-id ls_product-name
+        ls_product-category ls_product-quantity ls_product-price ls_product-currency.
       go_grid->refresh_table_display(
         is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
       gv_status = |Navigation leaf { iv_node } selected; one matching product shown|.
@@ -421,12 +424,18 @@ FORM select_navigation USING iv_node TYPE tv_nodekey.
 ENDFORM.
 
 FORM show_product USING iv_index TYPE i.
-  READ TABLE gt_rows INDEX iv_index INTO DATA(ls_row).
-  IF sy-subrc = 0. PERFORM show_row_detail USING ls_row. ENDIF.
+  DATA ls_row TYPE ty_row.
+
+  READ TABLE gt_rows INDEX iv_index INTO ls_row.
+  IF sy-subrc = 0.
+    PERFORM show_row_detail USING ls_row-id ls_row-name ls_row-category
+      ls_row-quantity ls_row-price ls_row-currency.
+  ENDIF.
 ENDFORM.
 
-FORM show_row_detail USING is_row TYPE ty_row.
-  gv_detail = |{ is_row-id } { is_row-name }; { is_row-category }; quantity { is_row-quantity }; { is_row-price } { is_row-currency }|.
+FORM show_row_detail USING iv_id TYPE c iv_name TYPE c iv_category TYPE c
+    iv_quantity TYPE i iv_price TYPE p iv_currency TYPE c.
+  gv_detail = |{ iv_id } { iv_name }; { iv_category }; quantity { iv_quantity }; { iv_price } { iv_currency }|.
   PERFORM refresh_details.
 ENDFORM.
 

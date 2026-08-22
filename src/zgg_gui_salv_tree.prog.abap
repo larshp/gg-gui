@@ -1,12 +1,18 @@
 REPORT zgg_gui_salv_tree.
 
+TYPES ty_price TYPE p LENGTH 8 DECIMALS 2.
+CONSTANTS c_price_129 TYPE ty_price VALUE '129.90'.
+CONSTANTS c_price_74 TYPE ty_price VALUE '74.50'.
+CONSTANTS c_price_389 TYPE ty_price VALUE '389.00'.
+CONSTANTS c_price_42 TYPE ty_price VALUE '42.00'.
+
 TYPES:
   BEGIN OF ty_row,
     id       TYPE c LENGTH 8,
     name     TYPE c LENGTH 30,
     category TYPE c LENGTH 20,
     quantity TYPE i,
-    price    TYPE p LENGTH 8 DECIMALS 2,
+    price    TYPE ty_price,
     currency TYPE c LENGTH 3,
   END OF ty_row,
   ty_rows TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY,
@@ -154,14 +160,15 @@ FORM populate_nodes.
     RECEIVING node = lo_node.
   CALL METHOD lo_node->('GET_KEY') RECEIVING value = gv_display_key.
 
-  PERFORM add_leaf USING gv_input_key 'P100' 'Mechanical Keyboard' 'Input' 12 '129.90' 'EUR'.
-  PERFORM add_leaf USING gv_input_key 'P110' 'Ergonomic Mouse' 'Input' 7 '74.50' 'EUR'.
-  PERFORM add_leaf USING gv_display_key 'P200' '27 Inch Display' 'Display' 4 '389.00' 'EUR'.
+  PERFORM add_leaf USING gv_input_key 'P100' 'Mechanical Keyboard' 'Input' 12 c_price_129 'EUR'.
+  PERFORM add_leaf USING gv_input_key 'P110' 'Ergonomic Mouse' 'Input' 7 c_price_74 'EUR'.
+  PERFORM add_leaf USING gv_display_key 'P200' '27 Inch Display' 'Display' 4 c_price_389 'EUR'.
   CALL METHOD go_nodes->('EXPAND_ALL').
 ENDFORM.
 
 FORM add_leaf USING iv_parent TYPE string iv_id TYPE c iv_name TYPE c
-    iv_category TYPE c iv_quantity TYPE i iv_price TYPE p iv_currency TYPE c.
+    iv_category TYPE c iv_quantity TYPE i iv_price TYPE ty_price
+    iv_currency TYPE c.
   DATA ls_row TYPE ty_row.
   DATA lo_node TYPE REF TO object.
   DATA lo_item TYPE REF TO object.
@@ -201,10 +208,12 @@ FORM add_runtime_leaf.
     RETURN.
   ENDIF.
   ADD 1 TO gv_sequence.
-  DATA(lv_id) = |P{ gv_sequence }|.
+  DATA lv_id TYPE c LENGTH 8.
+
+  lv_id = |P{ gv_sequence }|.
   TRY.
       PERFORM add_leaf USING gv_root_key lv_id 'Runtime SALV tree node'
-        'Runtime' gv_sequence '42.00' 'EUR'.
+        'Runtime' gv_sequence c_price_42 'EUR'.
       CALL METHOD go_tree->('REFRESH').
       gv_status = |SALV node { lv_id } added under the root and refreshed|.
     CATCH cx_root INTO DATA(lx_error).

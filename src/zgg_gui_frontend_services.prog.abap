@@ -449,7 +449,7 @@ FORM reset_log.
   gv_detail = gv_sample_dir.
 ENDFORM.
 
-FORM add_log USING iv_text TYPE string.
+FORM add_log USING iv_text TYPE c.
   zcl_gg_gui_demo_helper=>add_log( EXPORTING event = iv_text CHANGING log = gt_log ).
 ENDFORM.
 

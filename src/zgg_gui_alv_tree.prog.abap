@@ -1,12 +1,19 @@
 REPORT zgg_gui_alv_tree.
 
+TYPES ty_price TYPE p LENGTH 8 DECIMALS 2.
+CONSTANTS c_price_129 TYPE ty_price VALUE '129.90'.
+CONSTANTS c_price_74 TYPE ty_price VALUE '74.50'.
+CONSTANTS c_price_389 TYPE ty_price VALUE '389.00'.
+CONSTANTS c_price_219 TYPE ty_price VALUE '219.00'.
+CONSTANTS c_price_159 TYPE ty_price VALUE '159.00'.
+
 TYPES:
   BEGIN OF ty_row,
     id       TYPE c LENGTH 8,
     name     TYPE c LENGTH 30,
     category TYPE c LENGTH 20,
     quantity TYPE i,
-    price    TYPE p LENGTH 8 DECIMALS 2,
+    price    TYPE ty_price,
     currency TYPE c LENGTH 3,
     active   TYPE abap_bool,
   END OF ty_row,
@@ -263,16 +270,17 @@ FORM add_initial_nodes.
   lt_item_layout = VALUE #(
     ( fieldname = 'NAME' class = cl_gui_column_tree=>item_class_link style = 1 )
     ( fieldname = 'ACTIVE' class = cl_gui_column_tree=>item_class_checkbox editable = abap_true ) ).
-  PERFORM add_leaf USING gv_input_key 'P100' 'Mechanical Keyboard' 'Input' 12 '129.90' 'EUR' abap_true lt_item_layout.
-  PERFORM add_leaf USING gv_input_key 'P110' 'Ergonomic Mouse' 'Input' 7 '74.50' 'EUR' abap_true lt_item_layout.
-  PERFORM add_leaf USING gv_display_key 'P200' '27 Inch Display' 'Display' 4 '389.00' 'EUR' abap_true lt_item_layout.
+  PERFORM add_leaf USING gv_input_key 'P100' 'Mechanical Keyboard' 'Input' 12 c_price_129 'EUR' abap_true lt_item_layout.
+  PERFORM add_leaf USING gv_input_key 'P110' 'Ergonomic Mouse' 'Input' 7 c_price_74 'EUR' abap_true lt_item_layout.
+  PERFORM add_leaf USING gv_display_key 'P200' '27 Inch Display' 'Display' 4 c_price_389 'EUR' abap_true lt_item_layout.
   go_tree->expand_node( i_node_key = gv_root_key i_level_count = 2 ).
   go_tree->set_top_node( i_node_key = gv_root_key ).
 ENDFORM.
 
 FORM add_leaf USING iv_parent TYPE lvc_nkey iv_id TYPE c iv_name TYPE c
-    iv_category TYPE c iv_quantity TYPE i iv_price TYPE p iv_currency TYPE c
-    iv_active TYPE abap_bool it_item_layout TYPE ty_item_layouts.
+    iv_category TYPE c iv_quantity TYPE i iv_price TYPE ty_price
+    iv_currency TYPE c iv_active TYPE abap_bool
+    it_item_layout TYPE ty_item_layouts.
   DATA ls_row TYPE ty_row.
   DATA lv_key TYPE lvc_nkey.
 
@@ -315,8 +323,8 @@ FORM load_lazy_nodes.
   lt_item_layout = VALUE #(
     ( fieldname = 'NAME' class = cl_gui_column_tree=>item_class_link )
     ( fieldname = 'ACTIVE' class = cl_gui_column_tree=>item_class_checkbox editable = abap_true ) ).
-  PERFORM add_leaf USING gv_lazy_key 'P300' 'USB-C Dock' 'Connectivity' 0 '219.00' 'EUR' abap_false lt_item_layout.
-  PERFORM add_leaf USING gv_lazy_key 'P400' 'Conference Speaker' 'Audio' 9 '159.00' 'EUR' abap_true lt_item_layout.
+  PERFORM add_leaf USING gv_lazy_key 'P300' 'USB-C Dock' 'Connectivity' 0 c_price_219 'EUR' abap_false lt_item_layout.
+  PERFORM add_leaf USING gv_lazy_key 'P400' 'Conference Speaker' 'Audio' 9 c_price_159 'EUR' abap_true lt_item_layout.
   gv_lazy_loaded = abap_true.
   go_tree->expand_node( i_node_key = gv_lazy_key i_level_count = 1 ).
   go_tree->frontend_update( ).
