@@ -37,7 +37,9 @@ CLASS lcl_events IMPLEMENTATION.
   METHOD on_dropdown.
     gv_event = |DROPDOWN_CLICKED: { fcode } at { posx },{ posy }|.
     go_toolbar->track_context_menu(
-      EXPORTING context_menu = go_menu posx = posx posy = posy
+      EXPORTING context_menu = go_menu
+                posx = posx
+                posy = posy
       EXCEPTIONS ctmenu_error = 1 OTHERS = 2 ).
     cl_gui_cfw=>set_new_ok_code( 'TOOL_EVENT' ).
   ENDMETHOD.
@@ -70,8 +72,11 @@ MODULE user_command_0100 INPUT.
     WHEN 'ADD'.
       IF gv_dynamic_added = abap_false.
         go_toolbar->add_button(
-          fcode = 'DYNAMIC' icon = '@17@' butn_type = c_button
-          text = 'Dynamic' quickinfo = 'Added after initial creation' ).
+          fcode     = 'DYNAMIC'
+          icon      = '@17@'
+          butn_type = c_button
+          text      = 'Dynamic'
+          quickinfo = 'Added after initial creation' ).
         gv_dynamic_added = abap_true.
         gv_status = 'Dynamic button appended'.
       ENDIF.
@@ -85,18 +90,23 @@ MODULE user_command_0100 INPUT.
       gv_enabled = xsdbool( gv_enabled = abap_false ).
       gv_checked = xsdbool( gv_checked = abap_false ).
       go_toolbar->set_button_state(
-        EXPORTING fcode = 'TOGGLE' enabled = gv_enabled checked = gv_checked
+        EXPORTING fcode = 'TOGGLE'
+                  enabled = gv_enabled
+                  checked = gv_checked
         EXCEPTIONS cntl_error = 1 cntb_error_fcode = 2 OTHERS = 3 ).
       gv_status = |Toggle enabled={ gv_enabled }, checked={ gv_checked }; rc { sy-subrc }|.
     WHEN 'VISIBLE'.
       gv_visible = xsdbool( gv_visible = abap_false ).
       go_toolbar->set_button_visible(
-        EXPORTING fcode = 'NORMAL' visible = gv_visible
+        EXPORTING fcode = 'NORMAL'
+                  visible = gv_visible
         EXCEPTIONS cntl_error = 1 cntb_error_fcode = 2 OTHERS = 3 ).
       gv_status = |Normal button visible={ gv_visible }; rc { sy-subrc }|.
     WHEN 'INFO'.
       go_toolbar->set_button_info(
-        fcode = 'NORMAL' icon = '@42@' text = 'Changed'
+        fcode     = 'NORMAL'
+        icon      = '@42@'
+        text      = 'Changed'
         quickinfo = 'Text and quick info changed' ).
       gv_status = 'Normal button icon, text, and quick info changed'.
     WHEN 'GROUP'.
@@ -134,12 +144,18 @@ ENDFORM.
 FORM create_menus.
   CREATE OBJECT go_menu.
   CREATE OBJECT go_submenu.
-  go_menu->add_function( fcode = 'MENU_ONE' text = 'First action' icon = '@0V@' ).
+  go_menu->add_function( fcode = 'MENU_ONE'
+                         text  = 'First action'
+                         icon  = '@0V@' ).
   go_menu->add_separator( ).
-  go_submenu->add_function( fcode = 'SUB_ONE' text = 'Nested action' ).
+  go_submenu->add_function( fcode = 'SUB_ONE'
+                            text  = 'Nested action' ).
   go_submenu->add_function(
-    fcode = 'SUB_DISABLED' text = 'Disabled action' disabled = abap_true ).
-  go_menu->add_submenu( menu = go_submenu text = 'More actions' ).
+    fcode    = 'SUB_DISABLED'
+    text     = 'Disabled action'
+    disabled = abap_true ).
+  go_menu->add_submenu( menu = go_submenu
+                        text = 'More actions' ).
 ENDFORM.
 
 FORM create_toolbar.
@@ -161,21 +177,38 @@ FORM create_toolbar.
   go_toolbar->set_registered_events( lt_events ).
 
   go_toolbar->add_button(
-    fcode = 'NORMAL' icon = '@42@' butn_type = c_button
-    text = 'Normal' quickinfo = 'Normal toolbar button' ).
+    fcode     = 'NORMAL'
+    icon      = '@42@'
+    butn_type = c_button
+    text      = 'Normal'
+    quickinfo = 'Normal toolbar button' ).
   go_toolbar->add_button(
-    fcode = 'TOGGLE' icon = '@0V@' butn_type = c_check
-    text = 'Toggle' quickinfo = 'Check or toggle button' ).
-  go_toolbar->add_button( fcode = '' icon = '' butn_type = c_separator ).
+    fcode     = 'TOGGLE'
+    icon      = '@0V@'
+    butn_type = c_check
+    text      = 'Toggle'
+    quickinfo = 'Check or toggle button' ).
+  go_toolbar->add_button( fcode     = ''
+                          icon      = ''
+                          butn_type = c_separator ).
   go_toolbar->add_button(
-    fcode = 'DROPDOWN' icon = '@0S@' butn_type = c_dropdown
-    text = 'Dropdown' quickinfo = 'Raises DROPDOWN_CLICKED' ).
+    fcode     = 'DROPDOWN'
+    icon      = '@0S@'
+    butn_type = c_dropdown
+    text      = 'Dropdown'
+    quickinfo = 'Raises DROPDOWN_CLICKED' ).
   go_toolbar->add_button(
-    fcode = 'MENU' icon = '@3S@' butn_type = c_menu
-    text = 'Menu' quickinfo = 'Open static context menu' ).
+    fcode     = 'MENU'
+    icon      = '@3S@'
+    butn_type = c_menu
+    text      = 'Menu'
+    quickinfo = 'Open static context menu' ).
   go_toolbar->add_button(
-    fcode = 'DISABLED' icon = '@0W@' butn_type = c_button
-    text = 'Disabled' quickinfo = 'Initially disabled button'
+    fcode       = 'DISABLED'
+    icon        = '@0W@'
+    butn_type   = c_button
+    text        = 'Disabled'
+    quickinfo   = 'Initially disabled button'
     is_disabled = abap_true ).
 
   lt_static_menus = VALUE #( ( function = 'MENU' ctmenu = go_menu ) ).
@@ -188,12 +221,18 @@ FORM add_button_group.
   DATA lt_buttons TYPE ttb_button.
 
   cl_gui_toolbar=>fill_buttons_data_table(
-    EXPORTING fcode = 'GROUP_A' icon = '@0V@' butn_type = '0'
-      text = 'Group A' quickinfo = 'First grouped button'
+    EXPORTING fcode     = 'GROUP_A'
+              icon      = '@0V@'
+              butn_type = '0'
+      text              = 'Group A'
+              quickinfo = 'First grouped button'
     CHANGING data_table = lt_buttons ).
   cl_gui_toolbar=>fill_buttons_data_table(
-    EXPORTING fcode = 'GROUP_B' icon = '@0W@' butn_type = '0'
-      text = 'Group B' quickinfo = 'Second grouped button'
+    EXPORTING fcode     = 'GROUP_B'
+              icon      = '@0W@'
+              butn_type = '0'
+      text              = 'Group B'
+              quickinfo = 'Second grouped button'
     CHANGING data_table = lt_buttons ).
   go_toolbar->add_button_group( lt_buttons ).
   gv_status = 'Two buttons added with ADD_BUTTON_GROUP'.

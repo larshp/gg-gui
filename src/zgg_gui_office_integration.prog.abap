@@ -90,7 +90,9 @@ FORM create_office_host.
       ENDIF.
       CALL METHOD go_office->('INIT_CONTROL')
         EXPORTING r3_application_name = 'GG GUI Office sample'
-          parent = go_host inplace_enabled = abap_true no_flush = abap_false
+          parent = go_host
+                  inplace_enabled = abap_true
+                  no_flush = abap_false
         IMPORTING retcode = lv_retcode.
       IF lv_retcode <> 0.
         lv_reason = |Desktop Office initialization returned code { lv_retcode }|.
@@ -127,16 +129,20 @@ FORM get_document USING iv_type TYPE string iv_title TYPE string.
   ENDIF.
   TRY.
       CALL METHOD go_office->('GET_DOCUMENT_PROXY')
-        EXPORTING document_type = iv_type document_format = 'OLE'
-          register_container = abap_true no_flush = abap_false
+        EXPORTING document_type = iv_type
+                  document_format = 'OLE'
+          register_container = abap_true
+                  no_flush = abap_false
         IMPORTING document_proxy = go_document retcode = lv_retcode.
       IF go_document IS NOT BOUND OR lv_retcode <> 0.
         gv_status = |No { iv_type } document proxy; return code { lv_retcode }|.
         RETURN.
       ENDIF.
       CALL METHOD go_document->('CREATE_DOCUMENT')
-        EXPORTING document_title = iv_title open_inplace = abap_true
-          create_view_data = abap_false no_flush = abap_false
+        EXPORTING document_title = iv_title
+                  open_inplace = abap_true
+          create_view_data = abap_false
+                  no_flush = abap_false
         IMPORTING retcode = lv_retcode.
       IF lv_retcode <> 0.
         gv_status = |{ iv_type } could not create an embedded document; return code { lv_retcode }|.
@@ -179,8 +185,11 @@ FORM show_spreadsheet.
         RETURN.
       ENDIF.
       CALL METHOD go_sheet->('INSERT_ONE_TABLE')
-        EXPORTING data_table = lt_cells fields_table = lt_fields
-          rangename = 'GG_DATA' wholetable = abap_true no_flush = abap_false
+        EXPORTING data_table = lt_cells
+                  fields_table = lt_fields
+          rangename = 'GG_DATA'
+                  wholetable = abap_true
+                  no_flush = abap_false
         IMPORTING retcode = lv_retcode.
       gv_status = |Embedded spreadsheet created with three deterministic rows; return code { lv_retcode }|.
       gv_detail = 'Range GG_DATA demonstrates the standard Desktop Office spreadsheet table interface'.
@@ -208,7 +217,8 @@ FORM show_word_document.
         RETURN.
       ENDIF.
       CALL METHOD go_word->('INSERT_TEXT')
-        EXPORTING text = lv_text no_flush = abap_false
+        EXPORTING text = lv_text
+                  no_flush = abap_false
         IMPORTING retcode = lv_retcode.
       gv_status = |Embedded word-processing document populated with deterministic merge-style fields; return code { lv_retcode }|.
       gv_detail = 'The recipient and reference values form a small mail-merge-style scenario without persistent data'.
@@ -223,7 +233,8 @@ FORM close_document.
   IF go_document IS BOUND.
     TRY.
         CALL METHOD go_document->('CLOSE_DOCUMENT')
-          EXPORTING do_save = abap_false no_flush = abap_false
+          EXPORTING do_save = abap_false
+                    no_flush = abap_false
           IMPORTING retcode = lv_retcode.
         CALL METHOD go_document->('RELEASE_DOCUMENT') IMPORTING retcode = lv_retcode.
       CATCH cx_root INTO DATA(lx_error).

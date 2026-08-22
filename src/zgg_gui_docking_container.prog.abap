@@ -67,7 +67,8 @@ MODULE user_command_0100 INPUT.
       gv_extension = gv_extension + 40.
       PERFORM set_extension.
     WHEN 'EXTEND_DOWN'.
-      gv_extension = nmax( val1 = 80 val2 = gv_extension - 40 ).
+      gv_extension = nmax( val1 = 80
+                           val2 = gv_extension - 40 ).
       PERFORM set_extension.
     WHEN 'FLOAT'.
       PERFORM optional_docking_method USING 'DETACH'.
@@ -76,7 +77,8 @@ MODULE user_command_0100 INPUT.
       PERFORM dock_at_side.
     WHEN 'RELINK'.
       go_container->link(
-        EXPORTING repid = sy-repid dynnr = sy-dynnr
+        EXPORTING repid = sy-repid
+                  dynnr = sy-dynnr
         EXCEPTIONS cntl_error = 1 cntl_system_error = 2
           lifetime_dynpro_dynpro_link = 3 OTHERS = 4 ).
       gv_status = |Relinked to the current dynpro; rc { sy-subrc }|.

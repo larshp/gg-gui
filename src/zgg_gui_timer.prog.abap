@@ -64,7 +64,8 @@ MODULE user_command_0100 INPUT.
       go_timer->cancel( ).
       gv_status = 'Timer stopped'.
     WHEN 'FASTER'.
-      gv_interval = nmax( val1 = 1 val2 = gv_interval - 1 ).
+      gv_interval = nmax( val1 = 1
+                          val2 = gv_interval - 1 ).
       go_timer->interval = gv_interval.
       gv_status = |Interval changed to { gv_interval } seconds|.
     WHEN 'SLOWER'.

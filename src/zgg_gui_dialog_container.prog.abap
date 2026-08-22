@@ -127,7 +127,10 @@ FORM apply_geometry.
     RETURN.
   ENDIF.
   go_container->set_position(
-    EXPORTING left = gv_left top = gv_top width = gv_width height = gv_height
+    EXPORTING left = gv_left
+              top = gv_top
+              width = gv_width
+              height = gv_height
     EXCEPTIONS cntl_error = 1 cntl_system_error = 2 OTHERS = 3 ).
   gv_status = |Position and size sent to the frontend; rc { sy-subrc }|.
   PERFORM read_geometry.

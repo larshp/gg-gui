@@ -153,7 +153,8 @@ FORM run_dialogs.
   TRY.
       cl_gui_frontend_services=>file_open_dialog(
         EXPORTING window_title = 'Select a file for read-only inspection'
-          multiselection = abap_false initial_directory = gv_temp_dir
+          multiselection = abap_false
+                  initial_directory = gv_temp_dir
           file_filter = 'Text files (*.txt)|*.txt|All files (*.*)|*.*|'
         CHANGING file_table = lt_files rc = lv_rc user_action = lv_action ).
       zcl_gg_gui_demo_helper=>add_log(
@@ -166,8 +167,10 @@ FORM run_dialogs.
 
       cl_gui_frontend_services=>file_save_dialog(
         EXPORTING window_title = 'Choose a sample export path'
-          default_extension = 'txt' default_file_name = 'zgg-gui-sample.txt'
-          initial_directory = gv_temp_dir prompt_on_overwrite = abap_true
+          default_extension = 'txt'
+                  default_file_name = 'zgg-gui-sample.txt'
+          initial_directory = gv_temp_dir
+                  prompt_on_overwrite = abap_true
         CHANGING filename = lv_filename path = lv_path fullpath = lv_fullpath
           user_action = lv_action ).
       zcl_gg_gui_demo_helper=>add_log(
@@ -209,13 +212,17 @@ FORM create_sample_files.
         EXPORTING event = |Create directory rc { lv_rc }: { gv_sample_dir }|
         CHANGING log    = gt_log ).
       cl_gui_frontend_services=>gui_download(
-        EXPORTING filename = gv_text_file filetype = 'ASC'
-          write_lf = abap_true confirm_overwrite = abap_true
-        CHANGING data_tab = lt_text ).
+        EXPORTING filename          = gv_text_file
+                  filetype          = 'ASC'
+          write_lf                  = abap_true
+                  confirm_overwrite = abap_true
+        CHANGING data_tab           = lt_text ).
       cl_gui_frontend_services=>gui_download(
-        EXPORTING filename = gv_binary_file filetype = 'BIN' bin_filesize = 16
-          confirm_overwrite = abap_true
-        CHANGING data_tab = lt_binary ).
+        EXPORTING filename     = gv_binary_file
+                  filetype     = 'BIN'
+                  bin_filesize = 16
+          confirm_overwrite    = abap_true
+        CHANGING data_tab      = lt_binary ).
       gv_status = 'Sample-owned text and binary files written after explicit action'.
       gv_detail = gv_sample_dir.
       zcl_gg_gui_demo_helper=>add_log(
@@ -245,17 +252,24 @@ FORM inspect_sample_files.
       cl_gui_frontend_services=>file_get_size(
         EXPORTING file_name = gv_text_file IMPORTING file_size = lv_size ).
       cl_gui_frontend_services=>gui_upload(
-        EXPORTING filename = gv_text_file filetype = 'ASC' read_by_line = abap_true
+        EXPORTING filename = gv_text_file
+                  filetype = 'ASC'
+                  read_by_line = abap_true
         IMPORTING filelength = lv_text_length header = lv_header
         CHANGING data_tab = lt_text ).
       cl_gui_frontend_services=>gui_upload(
-        EXPORTING filename = gv_binary_file filetype = 'BIN'
+        EXPORTING filename = gv_binary_file
+                  filetype = 'BIN'
         IMPORTING filelength = lv_binary_length header = lv_header
         CHANGING data_tab = lt_binary ).
       cl_gui_frontend_services=>file_copy(
-        source = gv_text_file destination = gv_copy_file overwrite = abap_true ).
+        source      = gv_text_file
+        destination = gv_copy_file
+        overwrite   = abap_true ).
       cl_gui_frontend_services=>directory_list_files(
-        EXPORTING directory = gv_sample_dir files_only = abap_true filter = '*.*'
+        EXPORTING directory = gv_sample_dir
+                  files_only = abap_true
+                  filter = '*.*'
         CHANGING file_table = lt_files count = lv_count ).
       gv_status = |Directory exists { lv_dir_exists }; text exists { lv_exists }; size { lv_size }; listed files { lv_count }|.
       gv_detail = |Uploaded text bytes { lv_text_length }; binary bytes { lv_binary_length }; copied to sample-copy.txt|.
@@ -365,8 +379,9 @@ FORM read_registry.
 
   TRY.
       cl_gui_frontend_services=>registry_get_value(
-        EXPORTING root = cl_gui_frontend_services=>hkey_current_user
-          key = 'Software\SAP\General' value = 'Theme'
+        EXPORTING root      = cl_gui_frontend_services=>hkey_current_user
+          key               = 'Software\SAP\General'
+                  value     = 'Theme'
         IMPORTING reg_value = lv_value ).
       gv_status = |Read-only registry lookup completed; value length { strlen( lv_value ) }|.
       gv_detail = 'HKCU\Software\SAP\General\Theme was read; no registry write API is used'.
@@ -397,7 +412,8 @@ FORM open_target.
     RETURN.
   ENDIF.
   TRY.
-      cl_gui_frontend_services=>execute( document = lv_target operation = 'OPEN' ).
+      cl_gui_frontend_services=>execute( document  = lv_target
+                                         operation = 'OPEN' ).
       gv_status = |Frontend open requested for { lv_target }|.
       gv_detail = 'The SAP GUI security policy and local application association control execution'.
       PERFORM add_log USING gv_status.

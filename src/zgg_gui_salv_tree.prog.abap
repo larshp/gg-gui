@@ -105,7 +105,8 @@ FORM create_controls.
 
   TRY.
       CALL METHOD (lv_class)=>(lv_factory)
-        EXPORTING r_container = go_host container_name = 'CC_MAIN'
+        EXPORTING r_container = go_host
+                  container_name = 'CC_MAIN'
         IMPORTING r_salv_tree = go_tree
         CHANGING t_table = gt_rows.
       CALL METHOD go_tree->('GET_NODES') RECEIVING value = go_nodes.
@@ -142,21 +143,34 @@ FORM populate_nodes.
 
   CLEAR: gt_rows, gt_leaf_keys.
   CALL METHOD go_nodes->('ADD_NODE')
-    EXPORTING related_node = space relationship = 2 data_row = ls_empty
-      text = 'Product catalog' folder = abap_true expander = abap_true
-      collapsed_icon = '@3Y@' expanded_icon = '@3W@'
+    EXPORTING related_node = space
+              relationship = 2
+              data_row = ls_empty
+      text = 'Product catalog'
+              folder = abap_true
+              expander = abap_true
+      collapsed_icon = '@3Y@'
+              expanded_icon = '@3W@'
     RECEIVING node = lo_node.
   CALL METHOD lo_node->('GET_KEY') RECEIVING value = gv_root_key.
 
   CALL METHOD go_nodes->('ADD_NODE')
-    EXPORTING related_node = gv_root_key relationship = 2 data_row = ls_empty
-      text = 'Input devices' folder = abap_true expander = abap_true
+    EXPORTING related_node = gv_root_key
+              relationship = 2
+              data_row = ls_empty
+      text = 'Input devices'
+              folder = abap_true
+              expander = abap_true
     RECEIVING node = lo_node.
   CALL METHOD lo_node->('GET_KEY') RECEIVING value = gv_input_key.
 
   CALL METHOD go_nodes->('ADD_NODE')
-    EXPORTING related_node = gv_root_key relationship = 2 data_row = ls_empty
-      text = 'Displays' folder = abap_true expander = abap_true
+    EXPORTING related_node = gv_root_key
+              relationship = 2
+              data_row = ls_empty
+      text = 'Displays'
+              folder = abap_true
+              expander = abap_true
     RECEIVING node = lo_node.
   CALL METHOD lo_node->('GET_KEY') RECEIVING value = gv_display_key.
 
@@ -178,8 +192,11 @@ FORM add_leaf USING iv_parent TYPE string iv_id TYPE c iv_name TYPE c
     id = iv_id name = iv_name category = iv_category quantity = iv_quantity
     price = iv_price currency = iv_currency ).
   CALL METHOD go_nodes->('ADD_NODE')
-    EXPORTING related_node = iv_parent relationship = 2 data_row = ls_row
-      text = iv_name folder = abap_false
+    EXPORTING related_node = iv_parent
+              relationship = 2
+              data_row = ls_row
+      text = iv_name
+              folder = abap_false
     RECEIVING node = lo_node.
   CALL METHOD lo_node->('GET_KEY') RECEIVING value = lv_key.
   APPEND lv_key TO gt_leaf_keys.

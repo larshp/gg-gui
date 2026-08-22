@@ -85,10 +85,14 @@ FORM create_controls.
   PERFORM build_manual_catalog.
   PERFORM build_configuration.
   TRY.
-      CREATE OBJECT go_grid EXPORTING i_parent = go_host i_appl_events = abap_true.
+      CREATE OBJECT go_grid EXPORTING i_parent      = go_host
+                                      i_appl_events = abap_true.
       go_grid->set_table_for_first_display(
-        EXPORTING is_variant = gs_variant i_save = 'A' i_default = abap_true
-          is_layout = gs_layout is_print = gs_print
+        EXPORTING is_variant = gs_variant
+                  i_save = 'A'
+                  i_default = abap_true
+          is_layout = gs_layout
+                  is_print = gs_print
           it_toolbar_excluding = VALUE ui_functions(
             ( cl_gui_alv_grid=>mc_fc_graph )
             ( cl_gui_alv_grid=>mc_fc_word_processor ) )
@@ -241,7 +245,9 @@ FORM scroll_roundtrip.
       go_grid->get_scroll_info_via_id(
         IMPORTING es_row_no = ls_row_number es_row_info = ls_row es_col_info = ls_column ).
       go_grid->set_scroll_info_via_id(
-        is_row_info = ls_row is_col_info = ls_column is_row_no = ls_row_number ).
+        is_row_info = ls_row
+        is_col_info = ls_column
+        is_row_no   = ls_row_number ).
       gv_status = |Scroll position read and restored: row { ls_row-index }, column { ls_column-fieldname }|.
       gv_detail = 'The control keeps its top row and left column across refresh-oriented operations'.
     CATCH cx_root INTO DATA(lx_error).
@@ -316,7 +322,8 @@ FORM variant_roundtrip.
       go_grid->get_variant( IMPORTING es_variant = ls_current e_save = lv_save ).
       go_grid->save_variant( EXPORTING i_dialog = abap_true IMPORTING e_exit = lv_exit ).
       IF lv_exit = abap_false AND ls_current-variant IS NOT INITIAL.
-        go_grid->set_variant( is_variant = ls_current i_save = lv_save ).
+        go_grid->set_variant( is_variant = ls_current
+                              i_save     = lv_save ).
       ENDIF.
       gv_status = |Variant dialog exit flag { lv_exit }; current variant { ls_current-variant }|.
       gv_detail = 'Only the current report and BSC1 handle are used by this sample'.
@@ -411,7 +418,8 @@ FORM reset_grid.
         go_grid->set_frontend_layout( gs_layout ).
         go_grid->set_sort_criteria( gt_sort ).
         go_grid->set_filter_criteria( gt_filter ).
-        go_grid->set_variant( is_variant = gs_variant i_save = 'A' ).
+        go_grid->set_variant( is_variant = gs_variant
+                              i_save     = 'A' ).
         go_grid->set_gridtitle( 'Basic ALV Grid Control - deterministic products' ).
         go_grid->set_ready_for_input( 0 ).
         go_grid->set_3d_border( 1 ).

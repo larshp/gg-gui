@@ -67,11 +67,17 @@ MODULE user_command_0100 INPUT.
       gv_large = xsdbool( gv_large = abap_false ).
       IF gv_large = abap_true.
         go_editor->set_position(
-          EXPORTING left = 4 top = 4 width = 560 height = 300
+          EXPORTING left = 4
+                    top = 4
+                    width = 560
+                    height = 300
           EXCEPTIONS cntl_error = 1 cntl_system_error = 2 OTHERS = 3 ).
       ELSE.
         go_editor->set_position(
-          EXPORTING left = 16 top = 12 width = 380 height = 180
+          EXPORTING left = 16
+                    top = 12
+                    width = 380
+                    height = 180
           EXCEPTIONS cntl_error = 1 cntl_system_error = 2 OTHERS = 3 ).
       ENDIF.
       gv_link_state = |Child geometry changed; rc { sy-subrc }|.

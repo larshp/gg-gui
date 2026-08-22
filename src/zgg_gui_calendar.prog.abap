@@ -167,7 +167,9 @@ FORM set_selection.
     THEN gv_focus ELSE gv_focus + 7 ).
   TRY.
       CALL METHOD go_calendar->('SET_SELECTION')
-        EXPORTING date_begin = gv_focus date_end = lv_end no_scroll = abap_false.
+        EXPORTING date_begin = gv_focus
+                  date_end = lv_end
+                  no_scroll = abap_false.
       gv_status = |Selection set from { gv_focus DATE = USER } to { lv_end DATE = USER }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SET_SELECTION failed: { lx_error->get_text( ) }|.

@@ -110,11 +110,15 @@ MODULE user_command_0100 INPUT.
     WHEN 'RESIZE'.
       go_editor->set_alignment(
         cl_gui_control=>align_at_left + cl_gui_control=>align_at_top ).
-      go_editor->set_position( left = 8 top = 8 width = 420 height = 220 ).
+      go_editor->set_position( left   = 8
+                               top    = 8
+                               width  = 420
+                               height = 220 ).
       go_editor->get_width( IMPORTING width = lv_width ).
       go_editor->get_height( IMPORTING height = lv_height ).
       lv_pixels = cl_gui_cfw=>compute_pixel_from_metric(
-        x_or_y = 'X' in = 100 ).
+        x_or_y = 'X'
+        in     = 100 ).
       lcl_log=>add( |Size { lv_width }x{ lv_height }; metric { lv_pixels }| ).
     WHEN 'TIMER'.
       lcl_log=>add( 'Timer PAI round trip completed' ).

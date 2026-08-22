@@ -167,13 +167,21 @@ FORM configure_levels.
   CALL METHOD go_hierseq->('GET_FILTERS') EXPORTING level = 2 RECEIVING value = go_item_filters.
   CALL METHOD go_hierseq->('GET_AGGREGATIONS') EXPORTING level = 2 RECEIVING value = go_item_aggregations.
   CALL METHOD go_item_sorts->('ADD_SORT')
-    EXPORTING columnname = 'NAME' sequence = 1 position = 1 subtotal = abap_false.
+    EXPORTING columnname = 'NAME'
+              sequence = 1
+              position = 1
+              subtotal = abap_false.
   CALL METHOD go_item_filters->('ADD_FILTER')
-    EXPORTING columnname = 'QUANTITY' sign = 'I' option = 'GE' low = 0.
+    EXPORTING columnname = 'QUANTITY'
+              sign = 'I'
+              option = 'GE'
+              low = 0.
   CALL METHOD go_item_aggregations->('ADD_AGGREGATION')
-    EXPORTING columnname = 'QUANTITY' aggregation = if_salv_c_aggregation=>total.
+    EXPORTING columnname = 'QUANTITY'
+              aggregation = if_salv_c_aggregation=>total.
   CALL METHOD go_item_aggregations->('ADD_AGGREGATION')
-    EXPORTING columnname = 'PRICE' aggregation = if_salv_c_aggregation=>average.
+    EXPORTING columnname = 'PRICE'
+              aggregation = if_salv_c_aggregation=>average.
 ENDFORM.
 
 
@@ -199,10 +207,16 @@ FORM toggle_filter.
       CALL METHOD go_item_filters->('CLEAR').
       IF gv_filtered = abap_true.
         CALL METHOD go_item_filters->('ADD_FILTER')
-          EXPORTING columnname = 'QUANTITY' sign = 'I' option = 'GE' low = 8.
+          EXPORTING columnname = 'QUANTITY'
+                    sign = 'I'
+                    option = 'GE'
+                    low = 8.
       ELSE.
         CALL METHOD go_item_filters->('ADD_FILTER')
-          EXPORTING columnname = 'QUANTITY' sign = 'I' option = 'GE' low = 0.
+          EXPORTING columnname = 'QUANTITY'
+                    sign = 'I'
+                    option = 'GE'
+                    low = 0.
       ENDIF.
       CALL METHOD go_hierseq->('REFRESH').
       gv_status = |Item-level quantity filter toggled; threshold-eight mode { gv_filtered }|.
@@ -220,9 +234,13 @@ FORM configure_totals.
   TRY.
       CALL METHOD go_item_sorts->('CLEAR').
       CALL METHOD go_item_sorts->('ADD_SORT')
-        EXPORTING columnname = 'NAME' sequence = 1 position = 1 subtotal = abap_false.
+        EXPORTING columnname = 'NAME'
+                  sequence = 1
+                  position = 1
+                  subtotal = abap_false.
       CALL METHOD go_item_aggregations->('ADD_AGGREGATION')
-        EXPORTING columnname = 'QUANTITY' aggregation = if_salv_c_aggregation=>maximum.
+        EXPORTING columnname = 'QUANTITY'
+                  aggregation = if_salv_c_aggregation=>maximum.
       CALL METHOD go_hierseq->('REFRESH').
       gv_status = 'Item sorting restored; total quantity, average price, and maximum quantity aggregations requested'.
     CATCH cx_root INTO DATA(lx_error).
@@ -251,7 +269,10 @@ FORM reset_data.
     TRY.
         CALL METHOD go_item_filters->('CLEAR').
         CALL METHOD go_item_filters->('ADD_FILTER')
-          EXPORTING columnname = 'QUANTITY' sign = 'I' option = 'GE' low = 0.
+          EXPORTING columnname = 'QUANTITY'
+                    sign = 'I'
+                    option = 'GE'
+                    low = 0.
         CALL METHOD go_hierseq->('REFRESH').
         gv_status = 'Header rows, item rows, binding assumptions, filter, and displayed hierarchy reset'.
       CATCH cx_root INTO DATA(lx_error).

@@ -61,32 +61,45 @@ CLASS lcl_events IMPLEMENTATION.
     LOOP AT er_data_changed->mt_mod_cells INTO DATA(ls_cell).
       IF ls_cell-fieldname = 'QUANTITY' AND ls_cell-value < 0.
         er_data_changed->add_protocol_entry(
-          i_msgid = '00' i_msgty = 'E' i_msgno = '398'
-          i_msgv1 = 'Quantity must be zero or greater'
-          i_fieldname = ls_cell-fieldname i_row_id = ls_cell-row_id ).
+          i_msgid     = '00'
+          i_msgty     = 'E'
+          i_msgno     = '398'
+          i_msgv1     = 'Quantity must be zero or greater'
+          i_fieldname = ls_cell-fieldname
+          i_row_id    = ls_cell-row_id ).
         er_data_changed->modify_cell(
-          i_row_id = ls_cell-row_id i_fieldname = ls_cell-fieldname i_value = 0 ).
+          i_row_id    = ls_cell-row_id
+          i_fieldname = ls_cell-fieldname
+          i_value     = 0 ).
         er_data_changed->modify_style(
-          i_row_id = ls_cell-row_id i_fieldname = ls_cell-fieldname
-          i_style = cl_gui_alv_grid=>mc_style_disabled ).
+          i_row_id    = ls_cell-row_id
+          i_fieldname = ls_cell-fieldname
+          i_style     = cl_gui_alv_grid=>mc_style_disabled ).
       ELSEIF ls_cell-fieldname = 'NAME' AND ls_cell-value IS INITIAL.
         er_data_changed->add_protocol_entry(
-          i_msgid = '00' i_msgty = 'E' i_msgno = '398'
-          i_msgv1 = 'Product name is required'
-          i_fieldname = ls_cell-fieldname i_row_id = ls_cell-row_id ).
+          i_msgid     = '00'
+          i_msgty     = 'E'
+          i_msgno     = '398'
+          i_msgv1     = 'Product name is required'
+          i_fieldname = ls_cell-fieldname
+          i_row_id    = ls_cell-row_id ).
       ELSEIF ls_cell-fieldname = 'PRICE' AND ls_cell-value < 0.
         er_data_changed->add_protocol_entry(
-          i_msgid = '00' i_msgty = 'E' i_msgno = '398'
-          i_msgv1 = 'Price must be zero or greater'
-          i_fieldname = ls_cell-fieldname i_row_id = ls_cell-row_id ).
+          i_msgid     = '00'
+          i_msgty     = 'E'
+          i_msgno     = '398'
+          i_msgv1     = 'Price must be zero or greater'
+          i_fieldname = ls_cell-fieldname
+          i_row_id    = ls_cell-row_id ).
       ENDIF.
     ENDLOOP.
     DATA lv_id TYPE c LENGTH 8.
     IF er_data_changed->mt_mod_cells IS NOT INITIAL.
       READ TABLE er_data_changed->mt_mod_cells INDEX 1 INTO DATA(ls_first).
       er_data_changed->get_cell_value(
-        EXPORTING i_row_id = ls_first-row_id i_fieldname = 'ID'
-        IMPORTING e_value = lv_id ).
+        EXPORTING i_row_id    = ls_first-row_id
+                  i_fieldname = 'ID'
+        IMPORTING e_value     = lv_id ).
       er_data_changed->refresh_protocol( ).
       gv_detail = |Protocol refreshed for row { ls_first-row_id }, product { lv_id }, command { e_ucomm }|.
     ENDIF.
@@ -126,7 +139,9 @@ CLASS lcl_events IMPLEMENTATION.
     IF sy-subrc = 0 AND lt_return IS NOT INITIAL AND go_protocol IS BOUND.
       READ TABLE lt_return INDEX 1 INTO DATA(ls_return).
       go_protocol->modify_cell(
-        i_row_id = es_row_no-row_id i_fieldname = e_fieldname i_value = ls_return-fieldval ).
+        i_row_id    = es_row_no-row_id
+        i_fieldname = e_fieldname
+        i_value     = ls_return-fieldval ).
     ENDIF.
     er_event_data->m_event_handled = abap_true.
     gv_status = |Custom F4 handled row { es_row_no-row_id }; previous value { e_fieldvalue }, display flag { e_display }|.
@@ -183,7 +198,8 @@ FORM create_controls.
   PERFORM build_rows.
   PERFORM build_field_catalog.
   TRY.
-      CREATE OBJECT go_grid EXPORTING i_parent = go_host i_appl_events = abap_true.
+      CREATE OBJECT go_grid EXPORTING i_parent      = go_host
+                                      i_appl_events = abap_true.
       CREATE OBJECT go_events.
       SET HANDLER go_events->on_data_changed FOR go_grid.
       SET HANDLER go_events->on_data_changed_finished FOR go_grid.
@@ -272,7 +288,8 @@ FORM display_protocol.
   TRY.
       go_protocol->refresh_protocol( ).
       go_protocol->display_protocol(
-        i_display_toolbar = abap_true i_optimize_columns = abap_true ).
+        i_display_toolbar  = abap_true
+        i_optimize_columns = abap_true ).
       gv_status = |Protocol displayed with { lines( go_protocol->mt_protocol ) } entries|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Protocol display failed: { lx_error->get_text( ) }|.

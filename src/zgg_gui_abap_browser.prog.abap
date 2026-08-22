@@ -71,8 +71,10 @@ FORM show_xml_string.
   lv_xml = '<?xml version="1.0"?><catalog><sample id="1">String XML</sample></catalog>'.
   TRY.
       cl_abap_browser=>show_xml(
-        xml_string = lv_xml title = 'XML from STRING'
-        container = go_host printing = abap_true ).
+        xml_string = lv_xml
+        title      = 'XML from STRING'
+        container  = go_host
+        printing   = abap_true ).
       gv_status = 'Well-formed XML STRING displayed in the supplied container'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SHOW_XML with STRING failed: { lx_error->get_text( ) }|.
@@ -87,8 +89,11 @@ FORM show_xml_xstring.
   lv_xxml = cl_abap_codepage=>convert_to( lv_xml ).
   TRY.
       cl_abap_browser=>show_xml(
-        xml_string = '' xml_xstring = lv_xxml title = 'XML from XSTRING'
-        container = go_host printing = abap_true ).
+        xml_string  = ''
+        xml_xstring = lv_xxml
+        title       = 'XML from XSTRING'
+        container   = go_host
+        printing    = abap_true ).
       gv_status = |XML XSTRING displayed; byte length { xstrlen( lv_xxml ) }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SHOW_XML with XSTRING failed: { lx_error->get_text( ) }|.
@@ -98,8 +103,10 @@ ENDFORM.
 FORM show_malformed.
   TRY.
       cl_abap_browser=>show_xml(
-        xml_string = '<catalog><unclosed>' title = 'Malformed XML'
-        container = go_host dialog = abap_false ).
+        xml_string = '<catalog><unclosed>'
+        title      = 'Malformed XML'
+        container  = go_host
+        dialog     = abap_false ).
       gv_status = 'Malformed XML was passed without terminating the caller'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Malformed XML was rejected safely: { lx_error->get_text( ) }|.
@@ -109,8 +116,10 @@ ENDFORM.
 FORM show_empty.
   TRY.
       cl_abap_browser=>show_html(
-        html_string = '' title = 'Empty HTML'
-        container = go_host dialog = abap_false ).
+        html_string = ''
+        title       = 'Empty HTML'
+        container   = go_host
+        dialog      = abap_false ).
       gv_status = 'Empty HTML was passed without terminating the caller'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Empty HTML was rejected safely: { lx_error->get_text( ) }|.

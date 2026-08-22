@@ -43,6 +43,7 @@
     "uncaught_exception": true,
     "cds_check_syntax": true,
     "cds_comment_style": true,
+    "line_break_multiple_parameters": true,
     "cloud_types": true,
     "colon_missing_space": true,
     "commented_code": true,

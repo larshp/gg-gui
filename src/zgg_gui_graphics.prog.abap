@@ -150,9 +150,13 @@ FORM show_graphics_proxy.
   ENDIF.
   TRY.
       CREATE OBJECT go_control TYPE (lv_class)
-        EXPORTING parent = go_host prod_id = 1.
+        EXPORTING parent  = go_host
+                  prod_id = 1.
       CALL METHOD go_control->('SET_DC_NAMES')
-        EXPORTING objid = 'OBJID' grpid = 'GRPID' x_val = 'X_VAL' y_val = 'Y_VAL'
+        EXPORTING objid = 'OBJID'
+                  grpid = 'GRPID'
+                  x_val = 'X_VAL'
+                  y_val = 'Y_VAL'
         IMPORTING retval = lv_retval.
       CALL METHOD go_control->('IF_GRAPHIC_PROXY~ACTIVATE') IMPORTING retval = lv_retval.
       gv_active_class = lv_class.

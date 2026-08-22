@@ -180,9 +180,11 @@ FORM create_controls.
   PERFORM build_field_catalog.
   TRY.
       CREATE OBJECT go_tree
-        EXPORTING parent = go_host
-          node_selection_mode = cl_gui_column_tree=>node_sel_mode_multiple
-          item_selection = abap_true no_toolbar = abap_false no_html_header = abap_false.
+        EXPORTING parent         = go_host
+          node_selection_mode    = cl_gui_column_tree=>node_sel_mode_multiple
+          item_selection         = abap_true
+                  no_toolbar     = abap_false
+                  no_html_header = abap_false.
       CREATE OBJECT go_events.
       SET HANDLER go_events->on_link FOR go_tree.
       SET HANDLER go_events->on_item_double FOR go_tree.
@@ -200,8 +202,10 @@ FORM create_controls.
         CHANGING it_outtab = gt_outtab it_fieldcatalog = gt_fieldcat ).
       PERFORM register_native_context_event.
       go_tree->set_hierarchy_help_fields(
-        i_ref_table = 'MARA' i_ref_field = 'MATNR'
-        i_doktitle = 'Hierarchy' i_rollname = 'MATNR' ).
+        i_ref_table = 'MARA'
+        i_ref_field = 'MATNR'
+        i_doktitle  = 'Hierarchy'
+        i_rollname  = 'MATNR' ).
       PERFORM add_initial_nodes.
       PERFORM extend_toolbar.
       go_tree->column_optimize( i_include_heading = abap_true ).
@@ -234,8 +238,11 @@ ENDFORM.
 FORM configure_dragdrop.
   CREATE OBJECT go_dragdrop.
   go_dragdrop->add(
-    flavor = 'GG_TREE_ROWS' dragsrc = abap_true droptarget = abap_true
-    effect = cl_dragdrop=>move effect_in_ctrl = cl_dragdrop=>move ).
+    flavor         = 'GG_TREE_ROWS'
+    dragsrc        = abap_true
+    droptarget     = abap_true
+    effect         = cl_dragdrop=>move
+    effect_in_ctrl = cl_dragdrop=>move ).
   go_tree->set_default_drop( go_dragdrop ).
 ENDFORM.
 
@@ -248,24 +255,28 @@ FORM add_initial_nodes.
     n_image = '@3Y@' exp_image = '@3W@' ).
   go_tree->add_node(
     EXPORTING i_relat_node_key = space
-      i_relationship = cl_gui_column_tree=>relat_last_child
-      is_node_layout = ls_folder i_node_text = 'Product catalog'
-    IMPORTING e_new_node_key = gv_root_key ).
+      i_relationship           = cl_gui_column_tree=>relat_last_child
+      is_node_layout           = ls_folder
+              i_node_text      = 'Product catalog'
+    IMPORTING e_new_node_key   = gv_root_key ).
   go_tree->add_node(
     EXPORTING i_relat_node_key = gv_root_key
-      i_relationship = cl_gui_column_tree=>relat_last_child
-      is_node_layout = ls_folder i_node_text = 'Input devices'
-    IMPORTING e_new_node_key = gv_input_key ).
+      i_relationship           = cl_gui_column_tree=>relat_last_child
+      is_node_layout           = ls_folder
+              i_node_text      = 'Input devices'
+    IMPORTING e_new_node_key   = gv_input_key ).
   go_tree->add_node(
     EXPORTING i_relat_node_key = gv_root_key
-      i_relationship = cl_gui_column_tree=>relat_last_child
-      is_node_layout = ls_folder i_node_text = 'Displays'
-    IMPORTING e_new_node_key = gv_display_key ).
+      i_relationship           = cl_gui_column_tree=>relat_last_child
+      is_node_layout           = ls_folder
+              i_node_text      = 'Displays'
+    IMPORTING e_new_node_key   = gv_display_key ).
   go_tree->add_node(
     EXPORTING i_relat_node_key = gv_root_key
-      i_relationship = cl_gui_column_tree=>relat_last_child
-      is_node_layout = ls_folder i_node_text = 'Lazy-loaded products'
-    IMPORTING e_new_node_key = gv_lazy_key ).
+      i_relationship           = cl_gui_column_tree=>relat_last_child
+      is_node_layout           = ls_folder
+              i_node_text      = 'Lazy-loaded products'
+    IMPORTING e_new_node_key   = gv_lazy_key ).
 
   lt_item_layout = VALUE #(
     ( fieldname = 'NAME' class = cl_gui_column_tree=>item_class_link style = 1 )
@@ -273,7 +284,8 @@ FORM add_initial_nodes.
   PERFORM add_leaf USING gv_input_key 'P100' 'Mechanical Keyboard' 'Input' 12 c_price_129 'EUR' abap_true lt_item_layout.
   PERFORM add_leaf USING gv_input_key 'P110' 'Ergonomic Mouse' 'Input' 7 c_price_74 'EUR' abap_true lt_item_layout.
   PERFORM add_leaf USING gv_display_key 'P200' '27 Inch Display' 'Display' 4 c_price_389 'EUR' abap_true lt_item_layout.
-  go_tree->expand_node( i_node_key = gv_root_key i_level_count = 2 ).
+  go_tree->expand_node( i_node_key    = gv_root_key
+                        i_level_count = 2 ).
   go_tree->set_top_node( gv_root_key ).
 ENDFORM.
 
@@ -290,9 +302,11 @@ FORM add_leaf USING iv_parent TYPE lvc_nkey iv_id TYPE c iv_name TYPE c
   APPEND ls_row TO gt_outtab.
   go_tree->add_node(
     EXPORTING i_relat_node_key = iv_parent
-      i_relationship = cl_gui_column_tree=>relat_last_child
-      is_outtab_line = ls_row it_item_layout = it_item_layout i_node_text = iv_name
-    IMPORTING e_new_node_key = lv_key ).
+      i_relationship           = cl_gui_column_tree=>relat_last_child
+      is_outtab_line           = ls_row
+              it_item_layout   = it_item_layout
+              i_node_text      = iv_name
+    IMPORTING e_new_node_key   = lv_key ).
   APPEND lv_key TO gt_leaf_keys.
 ENDFORM.
 
@@ -302,11 +316,17 @@ FORM extend_toolbar.
   go_tree->get_toolbar_object( IMPORTING er_toolbar = lo_toolbar ).
   IF lo_toolbar IS BOUND.
     lo_toolbar->add_button(
-      fcode = 'ZLOAD' icon = '@17@' butn_type = 0
-      text = 'Load lazy' quickinfo = 'Load lazy-folder children' ).
+      fcode     = 'ZLOAD'
+      icon      = '@17@'
+      butn_type = 0
+      text      = 'Load lazy'
+      quickinfo = 'Load lazy-folder children' ).
     lo_toolbar->add_button(
-      fcode = 'ZCALC' icon = '@15@' butn_type = 0
-      text = 'Calculate' quickinfo = 'Update calculated columns' ).
+      fcode     = 'ZCALC'
+      icon      = '@15@'
+      butn_type = 0
+      text      = 'Calculate'
+      quickinfo = 'Update calculated columns' ).
   ENDIF.
 ENDFORM.
 
@@ -326,7 +346,8 @@ FORM load_lazy_nodes.
   PERFORM add_leaf USING gv_lazy_key 'P300' 'USB-C Dock' 'Connectivity' 0 c_price_219 'EUR' abap_false lt_item_layout.
   PERFORM add_leaf USING gv_lazy_key 'P400' 'Conference Speaker' 'Audio' 9 c_price_159 'EUR' abap_true lt_item_layout.
   gv_lazy_loaded = abap_true.
-  go_tree->expand_node( i_node_key = gv_lazy_key i_level_count = 1 ).
+  go_tree->expand_node( i_node_key    = gv_lazy_key
+                        i_level_count = 1 ).
   go_tree->frontend_update( ).
   gv_status = 'Two product leaves loaded under the lazy folder and expanded'.
 ENDFORM.
@@ -346,9 +367,13 @@ FORM change_nodes_and_items.
   lt_item_layout = VALUE #(
     ( fieldname = 'NAME' class = cl_gui_column_tree=>item_class_link chosen = gv_changed ) ).
   go_tree->change_node(
-    i_node_key = lv_key i_outtab_line = ls_row it_item_layout = lt_item_layout ).
+    i_node_key     = lv_key
+    i_outtab_line  = ls_row
+    it_item_layout = lt_item_layout ).
   go_tree->change_item(
-    i_node_key = lv_key i_fieldname = 'NAME' i_data = ls_row-name
+    i_node_key     = lv_key
+    i_fieldname    = 'NAME'
+    i_data         = ls_row-name
     is_item_layout = VALUE ty_item_layout( fieldname = 'NAME'
       class = cl_gui_column_tree=>item_class_link chosen = gv_changed ) ).
   go_tree->frontend_update( ).

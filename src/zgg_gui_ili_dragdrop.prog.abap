@@ -102,9 +102,14 @@ FORM create_controls.
   ENDIF.
   TRY.
       CREATE OBJECT go_ili
-        EXPORTING parent = go_host atomwidth = 1 atomheight = 1
-          atomoffsetx = 0 atomoffsety = 0 manual_scaling = abap_true
-          register_as_systemevents = abap_false use_internal_contextmenu = abap_true.
+        EXPORTING parent                   = go_host
+                  atomwidth                = 1
+                  atomheight               = 1
+          atomoffsetx                      = 0
+                  atomoffsety              = 0
+                  manual_scaling           = abap_true
+          register_as_systemevents         = abap_false
+                  use_internal_contextmenu = abap_true.
       CREATE OBJECT go_events.
       SET HANDLER go_events->on_dropped FOR go_ili.
       SET HANDLER go_events->on_resized FOR go_ili.
@@ -128,8 +133,12 @@ FORM start_mode USING iv_mode TYPE i.
   ENDIF.
   TRY.
       go_ili->start_dragging(
-        left = gv_left top = gv_top width = gv_width height = gv_height
-        mode = iv_mode flush = abap_true ).
+        left   = gv_left
+        top    = gv_top
+        width  = gv_width
+        height = gv_height
+        mode   = iv_mode
+        flush  = abap_true ).
       gv_status = |Interactive region started with mode { iv_mode } and current geometry|.
       gv_detail = 'Modes cover move, horizontal resize, vertical resize, and combined move/resize'.
     CATCH cx_root INTO DATA(lx_error).

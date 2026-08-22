@@ -161,7 +161,9 @@ ENDFORM.
 FORM protect_first_line.
   TRY.
       CALL METHOD go_editor->('PROTECT_LINES')
-        EXPORTING from_line = 1 to_line = 1 protect_mode = 1.
+        EXPORTING from_line = 1
+                  to_line = 1
+                  protect_mode = 1.
       gv_status = 'The first line is protected from editing'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Protected-line API unavailable: { lx_error->get_text( ) }|.
@@ -178,14 +180,16 @@ FORM load_file.
 
   cl_gui_frontend_services=>file_open_dialog(
     EXPORTING window_title = 'Load text into the editor'
-      default_extension = 'txt' file_filter = 'Text files (*.txt)|*.txt|'
+      default_extension = 'txt'
+              file_filter = 'Text files (*.txt)|*.txt|'
     CHANGING file_table = lt_files rc = lv_count user_action = lv_action ).
   IF lv_count <= 0 OR lt_files IS INITIAL.
     gv_status = 'Open dialog cancelled'.
     RETURN.
   ENDIF.
   cl_gui_frontend_services=>gui_upload(
-    EXPORTING filename = CONV #( lt_files[ 1 ]-filename ) filetype = 'ASC'
+    EXPORTING filename = CONV #( lt_files[ 1 ]-filename )
+              filetype = 'ASC'
     IMPORTING filelength = lv_length header = lv_header
     CHANGING data_tab = lt_text ).
   go_editor->set_text_as_r3table( lt_text ).
@@ -201,9 +205,11 @@ FORM save_file.
   DATA lt_text TYPE ty_text_lines.
 
   cl_gui_frontend_services=>file_save_dialog(
-    EXPORTING window_title = 'Save editor text' default_extension = 'txt'
+    EXPORTING window_title = 'Save editor text'
+              default_extension = 'txt'
       default_file_name = 'sap-gui-textedit.txt'
-      file_filter = 'Text files (*.txt)|*.txt|' prompt_on_overwrite = abap_true
+      file_filter = 'Text files (*.txt)|*.txt|'
+              prompt_on_overwrite = abap_true
     CHANGING filename = lv_filename path = lv_path fullpath = lv_fullpath
       user_action = lv_action ).
   IF lv_fullpath IS INITIAL.
@@ -214,8 +220,10 @@ FORM save_file.
     EXPORTING only_when_modified = cl_gui_textedit=>false
     IMPORTING table = lt_text is_modified = lv_modified ).
   cl_gui_frontend_services=>gui_download(
-    EXPORTING filename = lv_fullpath filetype = 'ASC' confirm_overwrite = abap_true
-    CHANGING data_tab = lt_text ).
+    EXPORTING filename          = lv_fullpath
+              filetype          = 'ASC'
+              confirm_overwrite = abap_true
+    CHANGING data_tab           = lt_text ).
   gv_status = |Saved { lines( lt_text ) } lines to { lv_fullpath }|.
 ENDFORM.
 

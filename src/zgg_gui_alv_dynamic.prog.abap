@@ -67,7 +67,8 @@ FORM create_controls.
   PERFORM build_field_catalog.
   TRY.
       cl_alv_table_create=>create_dynamic_table(
-        EXPORTING it_fieldcatalog = gt_fieldcat i_style_table = abap_true
+        EXPORTING it_fieldcatalog = gt_fieldcat
+                  i_style_table = abap_true
           i_length_in_byte = abap_true
         IMPORTING ep_table = gr_table e_style_fname = gv_style_field ).
       IF gr_table IS NOT BOUND.

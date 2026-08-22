@@ -132,9 +132,10 @@ FORM create_controls.
   PERFORM build_rows.
   TRY.
       cl_salv_table=>factory(
-        EXPORTING r_container = go_host container_name = 'CC_MAIN'
-        IMPORTING r_salv_table = go_salv
-        CHANGING t_table = gt_rows ).
+        EXPORTING r_container    = go_host
+                  container_name = 'CC_MAIN'
+        IMPORTING r_salv_table   = go_salv
+        CHANGING t_table         = gt_rows ).
       PERFORM configure_salv USING go_salv.
       CREATE OBJECT go_events.
       DATA(lo_event_source) = go_salv->get_event( ).
@@ -195,7 +196,8 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table
   lo_columns = io_salv->get_columns( ).
   lo_columns->set_optimize( abap_true ).
   lo_columns->set_key_fixation( abap_true ).
-  lo_columns->set_column_position( columnname = 'ID' position = 1 ).
+  lo_columns->set_column_position( columnname = 'ID'
+                                   position   = 1 ).
   CALL METHOD lo_columns->('SET_COLOR_COLUMN') EXPORTING value = 'CELL_COLORS'.
   CALL METHOD lo_columns->('SET_CELL_TYPE_COLUMN') EXPORTING value = 'CELL_TYPES'.
   CALL METHOD lo_columns->('SET_EXCEPTION_COLUMN') EXPORTING value = 'EXCEPTION'.
@@ -244,28 +246,45 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table
   lo_functions = io_salv->get_functions( ).
   lo_functions->set_all( abap_true ).
   lo_functions->add_function(
-    name = 'ZRESET' icon = '@42@' text = 'Reset'
-    tooltip = 'Restore deterministic demo rows'
+    name     = 'ZRESET'
+    icon     = '@42@'
+    text     = 'Reset'
+    tooltip  = 'Restore deterministic demo rows'
     position = if_salv_c_function_position=>right_of_salv_functions ).
   lo_functions->add_function(
-    name = 'ZSELECT' icon = '@0V@' text = 'Selection'
-    tooltip = 'Read the selected SALV rows'
+    name     = 'ZSELECT'
+    icon     = '@0V@'
+    text     = 'Selection'
+    tooltip  = 'Read the selected SALV rows'
     position = if_salv_c_function_position=>right_of_salv_functions ).
   lo_functions->add_function(
-    name = 'ZREMOVE' text = 'Temporary' tooltip = 'Function removed before display'
+    name     = 'ZREMOVE'
+    text     = 'Temporary'
+    tooltip  = 'Function removed before display'
     position = if_salv_c_function_position=>right_of_salv_functions ).
   lo_functions->remove_function( 'ZREMOVE' ).
 
   io_salv->get_sorts( )->add_sort(
-    columnname = 'CATEGORY' sequence = 1 position = 1 subtotal = abap_false ).
+    columnname = 'CATEGORY'
+    sequence   = 1
+    position   = 1
+    subtotal   = abap_false ).
   io_salv->get_sorts( )->add_sort(
-    columnname = 'NAME' sequence = 1 position = 2 subtotal = abap_false ).
+    columnname = 'NAME'
+    sequence   = 1
+    position   = 2
+    subtotal   = abap_false ).
   io_salv->get_filters( )->add_filter(
-    columnname = 'CATEGORY' sign = 'I' option = 'CP' low = '*' ).
+    columnname = 'CATEGORY'
+    sign       = 'I'
+    option     = 'CP'
+    low        = '*' ).
   io_salv->get_aggregations( )->add_aggregation(
-    columnname = 'QUANTITY' aggregation = if_salv_c_aggregation=>total ).
+    columnname  = 'QUANTITY'
+    aggregation = if_salv_c_aggregation=>total ).
   io_salv->get_aggregations( )->add_aggregation(
-    columnname = 'PRICE' aggregation = if_salv_c_aggregation=>average ).
+    columnname  = 'PRICE'
+    aggregation = if_salv_c_aggregation=>average ).
 
   lo_settings = io_salv->get_display_settings( ).
   lo_settings->set_list_header( 'Read-only SALV product gallery' ).
@@ -297,7 +316,8 @@ FORM configure_hyperlinks USING io_salv TYPE REF TO cl_salv_table
   lo_hyperlinks = lo_settings->get_hyperlinks( ).
   DO lines( gt_rows ) TIMES.
     lo_hyperlinks->add_hyperlink(
-      handle = sy-index hyperlink = |https://example.invalid/products/{ sy-index }| ).
+      handle    = sy-index
+      hyperlink = |https://example.invalid/products/{ sy-index }| ).
   ENDDO.
 ENDFORM.
 
@@ -308,14 +328,20 @@ FORM configure_forms USING io_salv TYPE REF TO cl_salv_table.
 
   CREATE OBJECT lo_top TYPE (lv_grid_class).
   CALL METHOD lo_top->('CREATE_HEADER_INFORMATION')
-    EXPORTING row = 1 column = 1 text = 'SALV table sample'
+    EXPORTING row = 1
+              column = 1
+              text = 'SALV table sample'
       tooltip = 'Top-of-list form element'.
   CALL METHOD lo_top->('CREATE_LABEL')
-    EXPORTING row = 2 column = 1 text = 'Five deterministic products'.
+    EXPORTING row = 2
+              column = 1
+              text = 'Five deterministic products'.
 
   CREATE OBJECT lo_end TYPE (lv_grid_class).
   CALL METHOD lo_end->('CREATE_LABEL')
-    EXPORTING row = 1 column = 1 text = 'End of SALV output'.
+    EXPORTING row = 1
+              column = 1
+              text = 'End of SALV output'.
 
   CALL METHOD io_salv->('SET_TOP_OF_LIST') EXPORTING value = lo_top.
   CALL METHOD io_salv->('SET_TOP_OF_LIST_PRINT') EXPORTING value = lo_top.
@@ -347,7 +373,9 @@ FORM inspect_layouts.
       DATA(ls_default) = cl_salv_layout_service=>get_default_layout( ls_key ).
       DATA(lt_layouts) = cl_salv_layout_service=>get_layouts( ls_key ).
       DATA(ls_chosen) = cl_salv_layout_service=>f4_layouts(
-        s_key = ls_key layout = ls_default-layout restrict = cl_salv_layout=>restrict_none ).
+        s_key    = ls_key
+        layout   = ls_default-layout
+        restrict = cl_salv_layout=>restrict_none ).
       gv_status = |Available layouts: { lines( lt_layouts ) }; F4 returned { ls_chosen-layout }|.
       gv_detail = |Default layout: { ls_default-layout }|.
     CATCH cx_root INTO DATA(lx_error).
@@ -414,7 +442,10 @@ FORM show_popup.
         IMPORTING r_salv_table = lo_popup
         CHANGING t_table       = lt_popup ).
       lo_popup->set_screen_popup(
-        start_column = 10 end_column = 100 start_line = 3 end_line = 25 ).
+        start_column = 10
+        end_column   = 100
+        start_line   = 3
+        end_line     = 25 ).
       lo_popup->get_functions( )->set_all( abap_true ).
       lo_popup->display( ).
       gv_status = 'Popup SALV closed and control returned to screen 0100'.
@@ -434,7 +465,8 @@ FORM show_fullscreen.
         IMPORTING r_salv_table = lo_full
         CHANGING t_table       = lt_full ).
       lo_full->set_screen_status(
-        report = sy-repid pfstatus = 'STANDARD'
+        report        = sy-repid
+        pfstatus      = 'STANDARD'
         set_functions = cl_salv_table=>c_functions_all ).
       lo_full->display( ).
       gv_status = 'Fullscreen SALV closed and control returned to screen 0100'.

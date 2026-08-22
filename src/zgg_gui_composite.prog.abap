@@ -152,8 +152,10 @@ CLASS lcl_events IMPLEMENTATION.
       RETURN.
     ENDIF.
     CREATE OBJECT drag_drop_object->object TYPE lcl_payload
-      EXPORTING iv_source = 'TREE' iv_node_key = node_key
-        iv_id = CONV char8( node_key ) iv_name = |Navigation item { node_key }|.
+      EXPORTING iv_source   = 'TREE'
+                iv_node_key = node_key
+        iv_id               = CONV char8( node_key )
+                iv_name     = |Navigation item { node_key }|.
     drag_drop_object->effect = cl_dragdrop=>copy.
     gv_status = |Tree drag { node_key }/{ item_name } started|.
     PERFORM add_log USING gv_status.
@@ -188,8 +190,10 @@ CLASS lcl_events IMPLEMENTATION.
       RETURN.
     ENDIF.
     CREATE OBJECT e_dragdropobj->object TYPE lcl_payload
-      EXPORTING iv_source = 'GRID' iv_row_index = es_row_no-row_id
-        iv_id = ls_row-id iv_name = ls_row-name.
+      EXPORTING iv_source    = 'GRID'
+                iv_row_index = es_row_no-row_id
+        iv_id                = ls_row-id
+                iv_name      = ls_row-name.
     e_dragdropobj->effect = cl_dragdrop=>move.
     gv_status = |Grid drag { ls_row-id }, row { e_row-index }, column { e_column-fieldname }|.
     PERFORM add_log USING gv_status.
@@ -273,24 +277,40 @@ FORM create_controls.
   ENDIF.
   PERFORM build_data.
   TRY.
-      CREATE OBJECT go_root_splitter EXPORTING parent = go_host rows = 1 columns = 2.
-      go_root_splitter->get_container( EXPORTING row = 1 column = 1 RECEIVING container = go_nav_host ).
-      go_root_splitter->get_container( EXPORTING row = 1 column = 2 RECEIVING container = go_right_host ).
-      go_root_splitter->set_column_width( id = 1 width = 28 ).
-      CREATE OBJECT go_right_splitter EXPORTING parent = go_right_host rows = 3 columns = 1.
-      go_right_splitter->get_container( EXPORTING row = 1 column = 1 RECEIVING container = go_toolbar_host ).
-      go_right_splitter->get_container( EXPORTING row = 2 column = 1 RECEIVING container = go_grid_host ).
-      go_right_splitter->get_container( EXPORTING row = 3 column = 1 RECEIVING container = go_detail_host ).
-      go_right_splitter->set_row_height( id = 1 height = 8 ).
-      go_right_splitter->set_row_height( id = 2 height = 58 ).
-      go_right_splitter->set_row_height( id = 3 height = 34 ).
+      CREATE OBJECT go_root_splitter EXPORTING parent  = go_host
+                                               rows    = 1
+                                               columns = 2.
+      go_root_splitter->get_container( EXPORTING row = 1
+                                                 column = 1 RECEIVING container = go_nav_host ).
+      go_root_splitter->get_container( EXPORTING row = 1
+                                                 column = 2 RECEIVING container = go_right_host ).
+      go_root_splitter->set_column_width( id    = 1
+                                          width = 28 ).
+      CREATE OBJECT go_right_splitter EXPORTING parent  = go_right_host
+                                                rows    = 3
+                                                columns = 1.
+      go_right_splitter->get_container( EXPORTING row = 1
+                                                  column = 1 RECEIVING container = go_toolbar_host ).
+      go_right_splitter->get_container( EXPORTING row = 2
+                                                  column = 1 RECEIVING container = go_grid_host ).
+      go_right_splitter->get_container( EXPORTING row = 3
+                                                  column = 1 RECEIVING container = go_detail_host ).
+      go_right_splitter->set_row_height( id     = 1
+                                         height = 8 ).
+      go_right_splitter->set_row_height( id     = 2
+                                         height = 58 ).
+      go_right_splitter->set_row_height( id     = 3
+                                         height = 34 ).
       PERFORM configure_dragdrop.
       ls_header = VALUE #( heading = 'Navigation' width = 28 tooltip = 'Select a category or drag products' ).
-      CREATE OBJECT go_tree EXPORTING parent = go_nav_host
-        node_selection_mode = cl_gui_column_tree=>node_sel_mode_single
-        item_selection = abap_true hierarchy_column_name = 'NODE'
-        hierarchy_header = ls_header.
-      go_tree->add_column( name = 'NAME' width = 20 header_text = 'Scope' ).
+      CREATE OBJECT go_tree EXPORTING parent                = go_nav_host
+        node_selection_mode                                 = cl_gui_column_tree=>node_sel_mode_single
+        item_selection                                      = abap_true
+                                      hierarchy_column_name = 'NODE'
+        hierarchy_header                                    = ls_header.
+      go_tree->add_column( name        = 'NAME'
+                           width       = 20
+                           header_text = 'Scope' ).
       CREATE OBJECT go_toolbar EXPORTING parent = go_toolbar_host
         display_mode                            = cl_gui_toolbar=>m_mode_horizontal.
       CREATE OBJECT go_grid EXPORTING i_parent = go_grid_host.
@@ -324,8 +344,11 @@ ENDFORM.
 
 FORM configure_dragdrop.
   CREATE OBJECT go_dragdrop.
-  go_dragdrop->add( flavor = 'GG_COMPOSITE' dragsrc = abap_true droptarget = abap_true
-    effect = cl_dragdrop=>move effect_in_ctrl = cl_dragdrop=>move ).
+  go_dragdrop->add( flavor         = 'GG_COMPOSITE'
+                    dragsrc        = abap_true
+                    droptarget     = abap_true
+    effect                         = cl_dragdrop=>move
+                    effect_in_ctrl = cl_dragdrop=>move ).
   go_dragdrop->get_handle( IMPORTING handle = gv_drag_handle ).
 ENDFORM.
 
@@ -367,24 +390,45 @@ FORM populate_tree.
     ( node_key = 'P110' item_name = 'NAME' class = cl_gui_column_tree=>item_class_text text = 'Mouse' )
     ( node_key = 'P200' item_name = 'NODE' class = cl_gui_column_tree=>item_class_text text = 'P200' )
     ( node_key = 'P200' item_name = 'NAME' class = cl_gui_column_tree=>item_class_text text = 'Display' ) ).
-  go_tree->add_nodes_and_items( node_table = gt_nodes item_table = gt_items
-    item_table_structure_name = 'MTREEITM' ).
+  go_tree->add_nodes_and_items( node_table = gt_nodes
+                                item_table = gt_items
+    item_table_structure_name              = 'MTREEITM' ).
 ENDFORM.
 
 FORM populate_toolbar.
-  go_toolbar->add_button( fcode = 'TREE' icon = '@3P@' butn_type = c_button
-    text = 'Tree' quickinfo = 'Activate navigation tree' ).
-  go_toolbar->add_button( fcode = 'GRID' icon = '@3Y@' butn_type = c_button
-    text = 'Grid' quickinfo = 'Make the ALV grid active' ).
-  go_toolbar->add_button( fcode = 'DETAIL' icon = '@0S@' butn_type = c_button
-    text = 'Details' quickinfo = 'Make the detail editor active' ).
-  go_toolbar->add_button( fcode = '' icon = '' butn_type = c_separator ).
-  go_toolbar->add_button( fcode = 'REFRESH' icon = '@42@' butn_type = c_button
-    text = 'Refresh' quickinfo = 'Refresh active child control' ).
-  go_toolbar->add_button( fcode = 'TOGGLE' icon = '@3Z@' butn_type = c_button
-    text = 'Details pane' quickinfo = 'Show or hide detail pane' ).
-  go_toolbar->add_button( fcode = 'RESET' icon = '@18@' butn_type = c_button
-    text = 'Reset' quickinfo = 'Reset data, filters, and panes' ).
+  go_toolbar->add_button( fcode     = 'TREE'
+                          icon      = '@3P@'
+                          butn_type = c_button
+    text                            = 'Tree'
+                          quickinfo = 'Activate navigation tree' ).
+  go_toolbar->add_button( fcode     = 'GRID'
+                          icon      = '@3Y@'
+                          butn_type = c_button
+    text                            = 'Grid'
+                          quickinfo = 'Make the ALV grid active' ).
+  go_toolbar->add_button( fcode     = 'DETAIL'
+                          icon      = '@0S@'
+                          butn_type = c_button
+    text                            = 'Details'
+                          quickinfo = 'Make the detail editor active' ).
+  go_toolbar->add_button( fcode     = ''
+                          icon      = ''
+                          butn_type = c_separator ).
+  go_toolbar->add_button( fcode     = 'REFRESH'
+                          icon      = '@42@'
+                          butn_type = c_button
+    text                            = 'Refresh'
+                          quickinfo = 'Refresh active child control' ).
+  go_toolbar->add_button( fcode     = 'TOGGLE'
+                          icon      = '@3Z@'
+                          butn_type = c_button
+    text                            = 'Details pane'
+                          quickinfo = 'Show or hide detail pane' ).
+  go_toolbar->add_button( fcode     = 'RESET'
+                          icon      = '@18@'
+                          butn_type = c_button
+    text                            = 'Reset'
+                          quickinfo = 'Reset data, filters, and panes' ).
 ENDFORM.
 
 FORM select_navigation USING iv_node TYPE tv_nodekey.
@@ -503,9 +547,12 @@ FORM restore_layout.
   IF gv_layout_saved = abap_false.
     gv_status = 'No session layout has been saved'.
   ELSE.
-    go_root_splitter->set_column_width( id = 1 width = gv_saved_nav_width ).
-    go_right_splitter->set_row_height( id = 2 height = gv_saved_grid_height ).
-    go_right_splitter->set_row_height( id = 3 height = gv_saved_detail_height ).
+    go_root_splitter->set_column_width( id    = 1
+                                        width = gv_saved_nav_width ).
+    go_right_splitter->set_row_height( id     = 2
+                                       height = gv_saved_grid_height ).
+    go_right_splitter->set_row_height( id     = 3
+                                       height = gv_saved_detail_height ).
     gv_details_visible = xsdbool( gv_saved_detail_height > 0 ).
     gv_status = 'Saved splitter proportions restored for the current report session'.
   ENDIF.
@@ -518,10 +565,14 @@ FORM reset_workbench.
   CLEAR: gv_filter, gv_detail, gt_log.
   gv_active = 'TREE'.
   gv_details_visible = abap_true.
-  go_root_splitter->set_column_width( id = 1 width = 28 ).
-  go_right_splitter->set_row_height( id = 1 height = 8 ).
-  go_right_splitter->set_row_height( id = 2 height = 58 ).
-  go_right_splitter->set_row_height( id = 3 height = 34 ).
+  go_root_splitter->set_column_width( id    = 1
+                                      width = 28 ).
+  go_right_splitter->set_row_height( id     = 1
+                                     height = 8 ).
+  go_right_splitter->set_row_height( id     = 2
+                                     height = 58 ).
+  go_right_splitter->set_row_height( id     = 3
+                                     height = 34 ).
   go_grid->refresh_table_display(
     is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
   gv_status = 'Workbench data, active child, filter, event log, and default splitter proportions reset'.

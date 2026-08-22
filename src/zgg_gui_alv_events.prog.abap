@@ -126,8 +126,10 @@ CLASS lcl_events IMPLEMENTATION.
 
   METHOD on_menu_button.
     IF e_object IS BOUND.
-      e_object->add_function( fcode = 'ZMENU_A' text = 'Menu action A' ).
-      e_object->add_function( fcode = 'ZMENU_B' text = 'Menu action B' ).
+      e_object->add_function( fcode = 'ZMENU_A'
+                              text  = 'Menu action A' ).
+      e_object->add_function( fcode = 'ZMENU_B'
+                              text  = 'Menu action B' ).
     ENDIF.
     ADD 1 TO gv_event_count.
     gv_status = |MENU_BUTTON prepared for command { e_ucomm }|.
@@ -151,9 +153,11 @@ CLASS lcl_events IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD on_context_menu.
-    e_object->add_function( fcode = 'ZDETAIL' text = 'Show row details' ).
+    e_object->add_function( fcode = 'ZDETAIL'
+                            text  = 'Show row details' ).
     e_object->add_separator( ).
-    e_object->add_function( fcode = 'ZRESET' text = 'Reset event sample' ).
+    e_object->add_function( fcode = 'ZRESET'
+                            text  = 'Reset event sample' ).
     ADD 1 TO gv_event_count.
     gv_status = 'CONTEXT_MENU_REQUEST added sample functions and a separator'.
   ENDMETHOD.
@@ -195,7 +199,8 @@ CLASS lcl_events IMPLEMENTATION.
 
   METHOD on_drop_flavor.
     ADD 1 TO gv_event_count.
-    gv_status = |ONDROPGETFLAVOR row { e_row-index } / { es_row_no-row_id }, flavor { concat_lines_of( table = e_flavors sep = ',' ) }|.
+    gv_status = |ONDROPGETFLAVOR row { e_row-index } / { es_row_no-row_id }, flavor { concat_lines_of( table = e_flavors
+                                                                                                       sep   = ',' ) }|.
     gv_detail = |Column { e_column-fieldname }; drag object bound { xsdbool( e_dragdropobj IS BOUND ) }|.
   ENDMETHOD.
 
@@ -289,8 +294,11 @@ FORM configure_dragdrop.
   TRY.
       CREATE OBJECT go_dragdrop.
       go_dragdrop->add(
-        flavor = 'GG_ROWS' dragsrc = abap_true droptarget = abap_true
-        effect = cl_dragdrop=>move effect_in_ctrl = cl_dragdrop=>move ).
+        flavor         = 'GG_ROWS'
+        dragsrc        = abap_true
+        droptarget     = abap_true
+        effect         = cl_dragdrop=>move
+        effect_in_ctrl = cl_dragdrop=>move ).
       go_dragdrop->get_handle( IMPORTING handle = gv_dragdrop_handle ).
     CATCH cx_root INTO DATA(lx_error).
       CLEAR gv_dragdrop_handle.
@@ -304,7 +312,8 @@ FORM create_grid.
   lv_appl_events = COND #( WHEN gv_application_events = abap_true THEN abap_true ELSE space ).
   TRY.
       CREATE OBJECT go_grid
-        EXPORTING i_parent = go_host i_appl_events = lv_appl_events.
+        EXPORTING i_parent      = go_host
+                  i_appl_events = lv_appl_events.
       CREATE OBJECT go_events.
       SET HANDLER go_events->on_double_click FOR go_grid.
       SET HANDLER go_events->on_hotspot_click FOR go_grid.
@@ -348,7 +357,8 @@ FORM raise_custom_command.
     RETURN.
   ENDIF.
   TRY.
-      go_grid->raise_event( i_ucomm = 'ZHELLO' i_user_command = abap_true ).
+      go_grid->raise_event( i_ucomm        = 'ZHELLO'
+                            i_user_command = abap_true ).
       go_grid->set_user_command( 'ZHELLO' ).
       gv_status = 'Custom ZHELLO command raised through the ALV event and user-command paths'.
     CATCH cx_root INTO DATA(lx_error).
@@ -385,7 +395,8 @@ FORM request_print_events.
     RETURN.
   ENDIF.
   TRY.
-      go_grid->list_processing_events( i_event_name = 'TOP_OF_PAGE' i_table_index = 1 ).
+      go_grid->list_processing_events( i_event_name  = 'TOP_OF_PAGE'
+                                       i_table_index = 1 ).
       go_grid->set_user_command( '&PRINT' ).
       gv_status = 'TOP_OF_PAGE list processing and the standard print command were requested'.
     CATCH cx_root INTO DATA(lx_error).
