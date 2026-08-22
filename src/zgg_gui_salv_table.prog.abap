@@ -180,7 +180,8 @@ FORM build_rows.
   ENDLOOP.
 ENDFORM.
 
-FORM configure_salv USING io_salv TYPE REF TO cl_salv_table.
+FORM configure_salv USING io_salv TYPE REF TO cl_salv_table
+    RAISING cx_salv_error.
   DATA lo_columns TYPE REF TO cl_salv_columns_table.
   DATA lo_column TYPE REF TO cl_salv_column.
   DATA lo_functions TYPE REF TO cl_salv_functions_list.
@@ -287,7 +288,8 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table.
   PERFORM configure_forms USING io_salv.
 ENDFORM.
 
-FORM configure_hyperlinks USING io_salv TYPE REF TO cl_salv_table.
+FORM configure_hyperlinks USING io_salv TYPE REF TO cl_salv_table
+    RAISING cx_salv_error.
   DATA lo_settings TYPE REF TO cl_salv_functional_settings.
   DATA lo_hyperlinks TYPE REF TO cl_salv_hyperlinks.
 

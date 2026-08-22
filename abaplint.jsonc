@@ -38,6 +38,7 @@
     "call_transaction_authority_check": true,
     "catch_and_raise": true,
     "cds_association_name": true,
+    "uncaught_exception": true,
     "cds_check_syntax": true,
     "cds_comment_style": true,
     "cloud_types": true,
