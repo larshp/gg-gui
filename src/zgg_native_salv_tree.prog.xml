@@ -1,8 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_PROG" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
-   <PROGDIR><NAME>ZGG_NATIVE_SALV_TREE</NAME><SUBC>I</SUBC><RLOAD>E</RLOAD><FIXPT>X</FIXPT><UCCHECK>X</UCCHECK></PROGDIR>
+   <PROGDIR>
+    <NAME>ZGG_NATIVE_SALV_TREE</NAME>
+    <SUBC>I</SUBC>
+    <RLOAD>E</RLOAD>
+    <FIXPT>X</FIXPT>
+    <UCCHECK>X</UCCHECK>
+   </PROGDIR>
   </asx:values>
  </asx:abap>
 </abapGit>

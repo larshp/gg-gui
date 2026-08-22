@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_PROG" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
@@ -10,13 +10,47 @@
     <UCCHECK>X</UCCHECK>
    </PROGDIR>
    <TPOOL>
-    <item><ID>R</ID><ENTRY>Selection-Screen Tabs</ENTRY><LENGTH>21</LENGTH></item>
-    <item><ID>S</ID><KEY>P_NAME</KEY><ENTRY>Name</ENTRY><LENGTH>4</LENGTH></item>
-    <item><ID>S</ID><KEY>P_ROLE</KEY><ENTRY>Role</ENTRY><LENGTH>4</LENGTH></item>
-    <item><ID>S</ID><KEY>P_EMAIL</KEY><ENTRY>Email</ENTRY><LENGTH>5</LENGTH></item>
-    <item><ID>S</ID><KEY>P_PHONE</KEY><ENTRY>Phone</ENTRY><LENGTH>5</LENGTH></item>
-    <item><ID>S</ID><KEY>P_LIMIT</KEY><ENTRY>Limit</ENTRY><LENGTH>5</LENGTH></item>
-    <item><ID>S</ID><KEY>P_ACTIVE</KEY><ENTRY>Active</ENTRY><LENGTH>6</LENGTH></item>
+    <item>
+     <ID>R</ID>
+     <ENTRY>Selection-Screen Tabs</ENTRY>
+     <LENGTH>21</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_NAME</KEY>
+     <ENTRY>Name</ENTRY>
+     <LENGTH>12</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_ROLE</KEY>
+     <ENTRY>Role</ENTRY>
+     <LENGTH>12</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_EMAIL</KEY>
+     <ENTRY>Email</ENTRY>
+     <LENGTH>13</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_PHONE</KEY>
+     <ENTRY>Phone</ENTRY>
+     <LENGTH>13</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_LIMIT</KEY>
+     <ENTRY>Limit</ENTRY>
+     <LENGTH>13</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_ACTIVE</KEY>
+     <ENTRY>Active</ENTRY>
+     <LENGTH>14</LENGTH>
+    </item>
    </TPOOL>
   </asx:values>
  </asx:abap>
