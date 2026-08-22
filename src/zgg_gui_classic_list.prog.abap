@@ -75,13 +75,16 @@ AT USER-COMMAND.
   ENDCASE.
 
 FORM write_main_list.
+  DATA lv_color TYPE i.
+
   WRITE: / icon_information AS ICON,
     'Legacy UI: use ALV or SALV for new tabular applications unless classic list processing is required.'.
   SKIP.
   LOOP AT gt_products INTO DATA(ls_product).
     gv_product_id = ls_product-id.
     gv_line_number = sy-linno.
-    FORMAT COLOR = COND #( WHEN ls_product-active = abap_true THEN COL_NORMAL ELSE COL_NEGATIVE ).
+    lv_color = COND #( WHEN ls_product-active = abap_true THEN col_normal ELSE col_negative ).
+    FORMAT COLOR = lv_color.
     WRITE: / ls_product-id HOTSPOT COLOR COL_KEY,
              14 ls_product-name,
              47 ls_product-category,

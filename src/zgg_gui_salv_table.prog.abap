@@ -326,7 +326,7 @@ FORM read_selection.
     RETURN.
   ENDIF.
   TRY.
-      DATA(lt_rows) = go_salv->get_selected_rows( ).
+      DATA(lt_rows) = go_salv->get_selections( )->get_selected_rows( ).
       gv_status = |Selected SALV row count: { lines( lt_rows ) }|.
       gv_detail = COND #( WHEN lt_rows IS INITIAL
         THEN 'Choose rows using the row selector and retry'

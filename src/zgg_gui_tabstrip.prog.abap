@@ -9,7 +9,7 @@ DATA gv_show_advanced TYPE abap_bool VALUE abap_true.
 DATA gv_name TYPE c LENGTH 30 VALUE 'Ada Lovelace'.
 DATA gv_role TYPE c LENGTH 20 VALUE 'Developer'.
 DATA gv_notify TYPE abap_bool VALUE abap_true.
-DATA gv_start_date TYPE d VALUE sy-datum.
+DATA gv_start_date TYPE d.
 DATA gv_note TYPE c LENGTH 50 VALUE 'Values remain while switching pages'.
 DATA gv_status TYPE c LENGTH 60.
 
@@ -18,6 +18,7 @@ CONTROLS ts_client TYPE TABSTRIP.
 
 START-OF-SELECTION.
   ts_main-activetab = 'TAB1'.
+  gv_start_date = sy-datum.
   CALL SCREEN 100.
 
 MODULE status_0100 OUTPUT.

@@ -18,7 +18,7 @@ DATA go_host TYPE REF TO cl_gui_custom_container.
 DATA go_calendar TYPE REF TO object.
 DATA go_control TYPE REF TO cl_gui_control.
 DATA gv_ok_code TYPE sy-ucomm.
-DATA gv_focus TYPE d VALUE sy-datum.
+DATA gv_focus TYPE d.
 DATA gv_selection_style TYPE i VALUE c_select_day.
 DATA gv_style_text TYPE c LENGTH 24.
 DATA gv_locale TYPE c LENGTH 60.
@@ -31,6 +31,7 @@ DATA gv_event_end TYPE d.
 INCLUDE zgg_native_calendar.
 
 START-OF-SELECTION.
+  gv_focus = sy-datum.
   CALL SCREEN 100.
 
 MODULE status_0100 OUTPUT.
