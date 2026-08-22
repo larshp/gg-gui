@@ -9,6 +9,6 @@
     "test": "npm run verify:repo && npm run lint"
   },
   "devDependencies": {
-    "@abaplint/cli": "2.120.27"
+    "@abaplint/cli": "2.120.30"
   }
 }
