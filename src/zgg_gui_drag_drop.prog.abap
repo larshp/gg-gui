@@ -201,7 +201,7 @@ CLASS lcl_events IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD on_grid_flavor.
-    lcl_log=>add( |GRID flavor query { e_flavors } at row { e_row-index }/{ es_row_no-row_id }, { e_column-fieldname }| ).
+    lcl_log=>add( |GRID flavor query { concat_lines_of( table = e_flavors sep = ',' ) } at row { e_row-index }/{ es_row_no-row_id }, { e_column-fieldname }| ).
     gv_detail = |Payload bound { xsdbool( e_dragdropobj IS BOUND ) }|.
   ENDMETHOD.
 

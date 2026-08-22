@@ -195,7 +195,7 @@ CLASS lcl_events IMPLEMENTATION.
 
   METHOD on_drop_flavor.
     ADD 1 TO gv_event_count.
-    gv_status = |ONDROPGETFLAVOR row { e_row-index } / { es_row_no-row_id }, flavor { e_flavors }|.
+    gv_status = |ONDROPGETFLAVOR row { e_row-index } / { es_row_no-row_id }, flavor { concat_lines_of( table = e_flavors sep = ',' ) }|.
     gv_detail = |Column { e_column-fieldname }; drag object bound { xsdbool( e_dragdropobj IS BOUND ) }|.
   ENDMETHOD.
 
