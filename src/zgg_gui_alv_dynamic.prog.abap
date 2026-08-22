@@ -247,8 +247,8 @@ FORM show_fallback USING iv_error TYPE string.
     ( 'CL_ALV_TABLE_CREATE is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP sample keeps the static factory and generic population code syntax checked.' )
     ( 'The pinned open-abap-gui implementation currently terminates with an assertion.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Dynamic ALV table unavailable; a non-terminating text fallback is displayed'.
   gv_detail = iv_error.
 ENDFORM.

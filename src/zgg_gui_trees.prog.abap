@@ -173,7 +173,7 @@ MODULE user_command_0100 INPUT.
       go_tree->expand_node( node_key = 'ROOT' level_count = 3 expand_subtree = abap_true ).
       gv_status = 'Root expanded through the column-tree API'.
     WHEN 'COLLAPSE'.
-      go_tree->collapse_subtree( node_key = 'ROOT' ).
+      go_tree->collapse_subtree( 'ROOT' ).
       gv_status = 'Root subtree collapsed'.
     WHEN 'SELECT'.
       PERFORM select_nodes.
@@ -259,8 +259,8 @@ FORM register_events.
     ( eventid = cl_gui_column_tree=>eventid_node_context_menu_req appl_event = abap_true )
     ( eventid = cl_gui_column_tree=>eventid_item_context_menu_req appl_event = abap_true )
     ( eventid = cl_gui_column_tree=>eventid_item_keypress appl_event = abap_true ) ).
-  go_tree->set_registered_events( events = lt_events ).
-  go_tree->set_ctx_menu_select_event_appl( appl_event = abap_true ).
+  go_tree->set_registered_events( lt_events ).
+  go_tree->set_ctx_menu_select_event_appl( abap_true ).
 ENDFORM.
 
 FORM build_initial_data.
@@ -332,7 +332,7 @@ FORM add_node.
   APPEND LINES OF lt_nodes TO gt_nodes.
   APPEND LINES OF lt_items TO gt_items.
   APPEND lv_key TO gt_added_keys.
-  go_tree->ensure_visible( node_key = lv_key ).
+  go_tree->ensure_visible( lv_key ).
   gv_status = |Node { lv_key } added under ROOT and scrolled into view|.
 ENDFORM.
 
@@ -379,7 +379,7 @@ FORM delete_node.
   ENDIF.
   READ TABLE gt_added_keys INDEX lines( gt_added_keys ) INTO lv_key.
   APPEND lv_key TO lt_keys.
-  go_tree->delete_nodes( node_key_table = lt_keys ).
+  go_tree->delete_nodes( lt_keys ).
   DELETE gt_nodes WHERE node_key = lv_key.
   DELETE gt_items WHERE node_key = lv_key.
   DELETE gt_added_keys INDEX lines( gt_added_keys ).
@@ -390,9 +390,9 @@ FORM select_nodes.
   DATA lt_keys TYPE treev_nks.
 
   lt_keys = VALUE #( ( 'CORE' ) ( 'EVENTS' ) ).
-  go_tree->select_nodes( node_key_table = lt_keys ).
-  go_tree->ensure_visible( node_key = 'EVENTS' ).
-  go_tree->set_top_node( node_key = 'ROOT' ).
+  go_tree->select_nodes( lt_keys ).
+  go_tree->ensure_visible( 'EVENTS' ).
+  go_tree->set_top_node( 'ROOT' ).
   gv_status = 'CORE and EVENTS selected; EVENTS made visible and ROOT retained as top node'.
 ENDFORM.
 
@@ -417,11 +417,11 @@ FORM change_header.
 
   gv_header_alt = xsdbool( gv_header_alt = abap_false ).
   go_tree->hierarchy_header_set_text(
-    text = COND tv_heading( WHEN gv_header_alt = abap_true
+    COND tv_heading( WHEN gv_header_alt = abap_true
       THEN 'Runtime hierarchy' ELSE 'Tree subject' ) ).
-  go_tree->hierarchy_header_set_tooltip( tooltip = 'Header text and width changed at runtime' ).
+  go_tree->hierarchy_header_set_tooltip( 'Header text and width changed at runtime' ).
   go_tree->hierarchy_header_set_width(
-    width = COND #( WHEN gv_header_alt = abap_true THEN 40 ELSE 30 ) ).
+    COND #( WHEN gv_header_alt = abap_true THEN 40 ELSE 30 ) ).
   go_tree->hierarchy_header_get_width( IMPORTING width = lv_width ).
   gv_status = |Hierarchy heading changed; reported width { lv_width }|.
 ENDFORM.
@@ -484,8 +484,8 @@ FORM reset_tree.
   PERFORM build_initial_data.
   PERFORM transfer_all_data.
   go_tree->column_set_hidden( column_name = 'STATE' hidden = abap_false ).
-  go_tree->hierarchy_header_set_text( text = 'Tree subject' ).
-  go_tree->hierarchy_header_set_width( width = 30 ).
+  go_tree->hierarchy_header_set_text( 'Tree subject' ).
+  go_tree->hierarchy_header_set_width( 30 ).
   go_tree->expand_root_nodes( level_count = 2 ).
   gv_status = 'Tree nodes, items, columns, header, selection assumptions, and lazy state reset'.
 ENDFORM.
@@ -498,7 +498,7 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'CL_GUI_COLUMN_TREE is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP sample remains syntax checked and guarded by a capability check.' )
     ( 'Use Audit classes to inspect the tree control and tree model family.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
+  go_fallback->set_text_as_r3table( lt_text ).
   gv_status = 'Column tree unavailable; a non-terminating text fallback is displayed'.
   gv_event = io_error->get_text( ).
 ENDFORM.

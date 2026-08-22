@@ -212,8 +212,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'CL_GUI_ILIDRAGNDROP_CONTROL is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP report retains move/resize modes, geometry, visibility, events, and internal menu calls.' )
     ( 'The pinned open-abap constructor currently terminates with an assertion.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Interactive drag/resize unavailable; a text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

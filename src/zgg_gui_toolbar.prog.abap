@@ -31,7 +31,7 @@ DATA gv_event TYPE c LENGTH 108.
 CLASS lcl_events IMPLEMENTATION.
   METHOD on_function.
     gv_event = |FUNCTION_SELECTED: { fcode }|.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'TOOL_EVENT' ).
+    cl_gui_cfw=>set_new_ok_code( 'TOOL_EVENT' ).
   ENDMETHOD.
 
   METHOD on_dropdown.
@@ -39,7 +39,7 @@ CLASS lcl_events IMPLEMENTATION.
     go_toolbar->track_context_menu(
       EXPORTING context_menu = go_menu posx = posx posy = posy
       EXCEPTIONS ctmenu_error = 1 OTHERS = 2 ).
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'TOOL_EVENT' ).
+    cl_gui_cfw=>set_new_ok_code( 'TOOL_EVENT' ).
   ENDMETHOD.
 ENDCLASS.
 
@@ -158,7 +158,7 @@ FORM create_toolbar.
   lt_events = VALUE #(
     ( eventid = cl_gui_toolbar=>m_id_function_selected appl_event = abap_true )
     ( eventid = cl_gui_toolbar=>m_id_dropdown_clicked appl_event = abap_true ) ).
-  go_toolbar->set_registered_events( events = lt_events ).
+  go_toolbar->set_registered_events( lt_events ).
 
   go_toolbar->add_button(
     fcode = 'NORMAL' icon = '@42@' butn_type = c_button
@@ -179,7 +179,7 @@ FORM create_toolbar.
     is_disabled = abap_true ).
 
   lt_static_menus = VALUE #( ( function = 'MENU' ctmenu = go_menu ) ).
-  go_toolbar->assign_static_ctxmenu_table( table_ctxmenu = lt_static_menus ).
+  go_toolbar->assign_static_ctxmenu_table( lt_static_menus ).
   gv_dynamic_added = abap_false.
   gv_status = 'Toolbar buttons, events, and static/dynamic context menus created'.
 ENDFORM.
@@ -195,7 +195,7 @@ FORM add_button_group.
     EXPORTING fcode = 'GROUP_B' icon = '@0W@' butn_type = '0'
       text = 'Group B' quickinfo = 'Second grouped button'
     CHANGING data_table = lt_buttons ).
-  go_toolbar->add_button_group( data_table = lt_buttons ).
+  go_toolbar->add_button_group( lt_buttons ).
   gv_status = 'Two buttons added with ADD_BUTTON_GROUP'.
 ENDFORM.
 

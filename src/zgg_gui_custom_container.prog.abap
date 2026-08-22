@@ -116,7 +116,7 @@ FORM create_child.
     ( |Child generation: { gv_generation }| )
     ( 'Resize this SAP GUI window to exercise the custom-control area.' )
     ( 'Use the buttons below to relink, resize, or replace the child.' ) ).
-  go_editor->set_text_as_r3table( table = lt_text ).
+  go_editor->set_text_as_r3table( lt_text ).
 ENDFORM.
 
 FORM describe_hosts.

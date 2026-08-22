@@ -304,15 +304,15 @@ FORM create_controls.
       SET HANDLER go_events->on_grid_drag FOR go_grid.
       SET HANDLER go_events->on_grid_drop FOR go_grid.
       lt_events = VALUE #( ( eventid = cl_gui_column_tree=>eventid_selection_changed appl_event = abap_true ) ).
-      go_tree->set_registered_events( events = lt_events ).
+      go_tree->set_registered_events( lt_events ).
       lt_events = VALUE #( ( eventid = cl_gui_toolbar=>m_id_function_selected appl_event = abap_true ) ).
-      go_toolbar->set_registered_events( events = lt_events ).
+      go_toolbar->set_registered_events( lt_events ).
       PERFORM populate_tree.
       PERFORM populate_toolbar.
       go_grid->set_table_for_first_display(
         EXPORTING is_layout = VALUE lvc_s_layo( zebra = abap_true grid_title = 'Products in active navigation scope' )
         CHANGING it_outtab = gt_rows it_fieldcatalog = gt_fieldcat ).
-      go_details->set_readonly_mode( readonly_mode = 1 ).
+      go_details->set_readonly_mode( 1 ).
       go_tree->expand_root_nodes( level_count = 3 ).
       gv_status = 'Workbench ready: select navigation, inspect grid rows, use toolbar commands, or drag between panes'.
       PERFORM add_log USING gv_status.
@@ -481,7 +481,7 @@ FORM refresh_details.
     ( |Detail: { gv_detail }| )
     ( 'Recent events' ) ).
   APPEND LINES OF gt_log TO lt_text.
-  go_details->set_text_as_r3table( table = lt_text ).
+  go_details->set_text_as_r3table( lt_text ).
 ENDFORM.
 
 FORM save_layout.
@@ -539,8 +539,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'The composed workbench controls are unavailable in this runtime.' )
     ( 'The native report retains nested splitters, navigation, toolbar, grid, details, coordinated events, drag/drop, and session layout state.' )
     ( 'The pinned open-abap hosted controls currently terminate in runtime assertions.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Composite workbench unavailable; diagnostic fallback shown'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

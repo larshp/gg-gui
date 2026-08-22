@@ -88,7 +88,7 @@ MODULE user_command_0100 INPUT.
   CLEAR gv_ok_code.
   CASE lv_ok_code.
     WHEN 'FOCUS'.
-      cl_gui_control=>set_focus( control = go_editor ).
+      cl_gui_control=>set_focus( go_editor ).
       cl_gui_control=>get_focus( IMPORTING control = lo_focus ).
       IF lo_focus IS BOUND.
         lcl_log=>add( 'Focus set and active control returned' ).
@@ -97,11 +97,11 @@ MODULE user_command_0100 INPUT.
       ENDIF.
     WHEN 'VISIBLE'.
       gv_visible = xsdbool( gv_visible = abap_false ).
-      go_editor->set_visible( visible = gv_visible ).
+      go_editor->set_visible( gv_visible ).
       lcl_log=>add( |Visible state: { gv_visible }| ).
     WHEN 'ENABLE'.
       gv_enabled = xsdbool( gv_enabled = abap_false ).
-      go_editor->set_enable( enable = gv_enabled ).
+      go_editor->set_enable( gv_enabled ).
       lcl_log=>add( |Enabled state: { gv_enabled }| ).
     WHEN 'EVENT'.
       gv_application_event = xsdbool( gv_application_event = abap_false ).
@@ -136,8 +136,8 @@ MODULE user_command_0100 INPUT.
       gv_enabled = abap_true.
       gv_application_event = abap_true.
       CLEAR gv_timer_ticks.
-      go_editor->set_visible( visible = gv_visible ).
-      go_editor->set_enable( enable = gv_enabled ).
+      go_editor->set_visible( gv_visible ).
+      go_editor->set_enable( gv_enabled ).
       PERFORM register_events.
       PERFORM set_initial_text.
       lcl_log=>add( 'Initial control state restored' ).
@@ -170,7 +170,7 @@ FORM register_events.
 
   lt_events = VALUE #( ( eventid = cl_gui_textedit=>event_double_click
     appl_event                   = gv_application_event ) ).
-  go_editor->set_registered_events( events = lt_events ).
+  go_editor->set_registered_events( lt_events ).
 ENDFORM.
 
 FORM set_initial_text.
@@ -180,7 +180,7 @@ FORM set_initial_text.
     ( 'Control Framework lifecycle sample' )
     ( 'The editor is created once and reused on every PBO.' )
     ( 'Use the screen buttons to change frontend control state.' ) ).
-  go_editor->set_text_as_r3table( table = lt_text ).
+  go_editor->set_text_as_r3table( lt_text ).
 ENDFORM.
 
 FORM free_controls.

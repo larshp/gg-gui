@@ -109,7 +109,7 @@ FORM create_controls.
         ( 'CL_GUI_DOCKING_CONTAINER' )
         ( 'Drag the docking grip to resize or float it where the frontend supports this.' )
         ( 'Use the dynpro buttons to change edge and extension.' ) ).
-      go_editor->set_text_as_r3table( table = lt_text ).
+      go_editor->set_text_as_r3table( lt_text ).
       gv_status = 'Docking container created and linked to the current dynpro'.
     CATCH cx_root INTO DATA(lx_error).
       FREE go_docking.

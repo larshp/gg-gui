@@ -456,7 +456,7 @@ FORM undo_last_drop.
         WHEN 'ADDNODE'.
           DATA lt_keys TYPE treev_nks.
           APPEND gv_added_node TO lt_keys.
-          go_tree->delete_nodes( node_key_table = lt_keys ).
+          go_tree->delete_nodes( lt_keys ).
           lcl_log=>add( |Undo removed transferred tree node { gv_added_node }| ).
         WHEN OTHERS.
           lcl_log=>add( 'Nothing to undo' ).
@@ -506,8 +506,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'Cross-control drag-and-drop is unavailable in this runtime.' )
     ( 'The native report defines flavors/effects/handles, grid reorder, tree reparenting, cross-control payloads, rejection, and undo.' )
     ( 'The pinned open-abap drag/drop and hosted controls currently contain runtime stubs.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Cross-control drag/drop unavailable; diagnostic fallback shown'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

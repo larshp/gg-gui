@@ -266,8 +266,8 @@ FORM show_comparison.
     APPEND CONV ty_text_line( |{ lv_name }: available { lv_available }| ) TO lt_text.
   ENDLOOP.
   CREATE OBJECT go_fallback EXPORTING parent = go_host.
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   CLEAR gv_active_model.
   gv_status = 'Tree control versus Tree Model capability comparison displayed'.
   gv_detail = 'Use Simple, List, or Column to create an installed model; missing classes are reported without terminating'.
@@ -290,8 +290,8 @@ FORM show_failure USING iv_class TYPE string iv_reason TYPE string.
     ( |Reason: { iv_reason }| )
     ( 'The native backend-model, node/item, CREATE_TREE_CONTROL, expand, reset, and cleanup calls remain in this report.' ) ).
   CREATE OBJECT go_fallback EXPORTING parent = go_host.
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   CLEAR gv_active_model.
   gv_status = |{ iv_class } unavailable; diagnostic fallback shown|.
   gv_detail = iv_reason.

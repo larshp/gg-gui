@@ -274,8 +274,8 @@ FORM reset_layout.
   gv_variant_name = 'GG_DEMO'.
   IF go_grid IS BOUND.
     TRY.
-        go_grid->set_frontend_fieldcatalog( it_fieldcatalog = gt_fieldcat ).
-        go_grid->set_frontend_layout( is_layout = gs_layout ).
+        go_grid->set_frontend_fieldcatalog( gt_fieldcat ).
+        go_grid->set_frontend_layout( gs_layout ).
         go_grid->refresh_table_display(
           is_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
         gv_status = 'Frontend layout and in-memory ownership tracking reset; stored variants were not deleted'.
@@ -293,8 +293,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'The ALV variant sample cannot display its owning grid in this runtime.' )
     ( 'CL_ALV_VARIANT is declared, but its methods do not persist or retrieve state in open-abap.' )
     ( 'The native SAP code remains syntax checked and all deletion is constrained to tracked GG_ keys.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'ALV variants unavailable; a non-terminating text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

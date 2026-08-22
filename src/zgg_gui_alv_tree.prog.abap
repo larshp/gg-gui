@@ -236,7 +236,7 @@ FORM configure_dragdrop.
   go_dragdrop->add(
     flavor = 'GG_TREE_ROWS' dragsrc = abap_true droptarget = abap_true
     effect = cl_dragdrop=>move effect_in_ctrl = cl_dragdrop=>move ).
-  go_tree->set_default_drop( i_drag_drop = go_dragdrop ).
+  go_tree->set_default_drop( go_dragdrop ).
 ENDFORM.
 
 FORM add_initial_nodes.
@@ -274,7 +274,7 @@ FORM add_initial_nodes.
   PERFORM add_leaf USING gv_input_key 'P110' 'Ergonomic Mouse' 'Input' 7 c_price_74 'EUR' abap_true lt_item_layout.
   PERFORM add_leaf USING gv_display_key 'P200' '27 Inch Display' 'Display' 4 c_price_389 'EUR' abap_true lt_item_layout.
   go_tree->expand_node( i_node_key = gv_root_key i_level_count = 2 ).
-  go_tree->set_top_node( i_node_key = gv_root_key ).
+  go_tree->set_top_node( gv_root_key ).
 ENDFORM.
 
 FORM add_leaf USING iv_parent TYPE lvc_nkey iv_id TYPE c iv_name TYPE c
@@ -390,17 +390,17 @@ FORM expand_and_select.
   DATA lt_select TYPE lvc_t_nkey.
 
   lt_select = VALUE #( ( gv_input_key ) ( gv_display_key ) ).
-  go_tree->expand_nodes( it_node_key = lt_select ).
-  go_tree->set_selected_nodes( it_selected_nodes = lt_select ).
-  go_tree->set_top_node( i_node_key = gv_root_key ).
+  go_tree->expand_nodes( lt_select ).
+  go_tree->set_selected_nodes( lt_select ).
+  go_tree->set_top_node( gv_root_key ).
   go_tree->frontend_update( ).
   gv_status = 'Input and Display folders expanded and selected; root retained as top node'.
 ENDFORM.
 
 FORM collapse_tree.
-  go_tree->collapse_subtree( i_node_key = gv_root_key ).
-  go_tree->unselect_nodes( it_node_key = VALUE lvc_t_nkey( ( gv_input_key ) ( gv_display_key ) ) ).
-  go_tree->set_top_node( i_node_key = gv_root_key ).
+  go_tree->collapse_subtree( gv_root_key ).
+  go_tree->unselect_nodes( VALUE lvc_t_nkey( ( gv_input_key ) ( gv_display_key ) ) ).
+  go_tree->set_top_node( gv_root_key ).
   go_tree->frontend_update( ).
   gv_status = 'Root subtree collapsed, folder selections cleared, and top node retained'.
 ENDFORM.
@@ -422,7 +422,7 @@ FORM delete_lazy_subtree.
 ENDFORM.
 
 FORM update_calculations.
-  go_tree->update_calculations( no_frontend_update = abap_false ).
+  go_tree->update_calculations( abap_false ).
   go_tree->column_optimize( i_include_heading = abap_true ).
   go_tree->frontend_update( ).
   gv_status = 'Calculated quantity and price columns updated and all columns optimized with headings'.
@@ -449,8 +449,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'CL_GUI_ALV_TREE is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP report retains hierarchy, data columns, events, mutations, and state round trips.' )
     ( 'The pinned open-abap tree constructor currently terminates with an assertion.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'ALV tree unavailable; a non-terminating text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

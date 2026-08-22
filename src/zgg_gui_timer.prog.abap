@@ -27,7 +27,7 @@ CLASS lcl_events IMPLEMENTATION.
     PERFORM refresh_document.
     go_timer->interval = gv_interval.
     go_timer->run( ).
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'TICK' ).
+    cl_gui_cfw=>set_new_ok_code( 'TICK' ).
   ENDMETHOD.
 ENDCLASS.
 
@@ -105,7 +105,7 @@ FORM refresh_document.
     ( |Completed ticks: { gv_ticks }| )
     ( |Current interval: { gv_interval } seconds| )
     ( |Running: { gv_running }| ) ).
-  go_editor->set_text_as_r3table( table = lt_text ).
+  go_editor->set_text_as_r3table( lt_text ).
   cl_gui_cfw=>flush( ).
 ENDFORM.
 

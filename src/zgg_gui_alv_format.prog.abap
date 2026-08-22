@@ -229,7 +229,7 @@ FORM toggle_groups.
         ENDIF.
         <field>-sp_group = COND #( WHEN <field>-sp_group IS INITIAL THEN 'STATE' ELSE space ).
       ENDLOOP.
-      go_grid->set_frontend_fieldcatalog( it_fieldcatalog = lt_frontend ).
+      go_grid->set_frontend_fieldcatalog( lt_frontend ).
       gv_status = |Special column-group assignments toggled for { lines( lt_frontend ) } frontend fields|.
       gv_detail = 'The group definitions remain available for the standard Choose Layout dialog'.
     CATCH cx_root INTO DATA(lx_error).
@@ -261,8 +261,8 @@ FORM reset_formatting.
   PERFORM build_field_catalog.
   IF go_grid IS BOUND.
     TRY.
-        go_grid->set_frontend_fieldcatalog( it_fieldcatalog = gt_fieldcat ).
-        go_grid->set_sort_criteria( it_sort = gt_sort ).
+        go_grid->set_frontend_fieldcatalog( gt_fieldcat ).
+        go_grid->set_sort_criteria( gt_sort ).
         PERFORM refresh_grid.
         gv_status = 'Rows, colors, styles, symbols, groups, fixed columns, totals, and subtotals reset'.
       CATCH cx_root INTO DATA(lx_error).
@@ -286,8 +286,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'Formatted CL_GUI_ALV_GRID output is unavailable in this runtime.' )
     ( 'The native SAP report retains its LVC color, style, group, format, total, and subtotal setup.' )
     ( 'The pinned open-abap-gui ALV Grid constructor currently terminates with an assertion.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Formatted ALV unavailable; a non-terminating text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

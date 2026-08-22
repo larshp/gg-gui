@@ -34,19 +34,19 @@ MODULE user_command_0100 INPUT.
   CASE lv_ok_code.
     WHEN 'READONLY'.
       gv_readonly = xsdbool( gv_readonly = abap_false ).
-      go_editor->set_readonly_mode( readonly_mode = CONV #( gv_readonly ) ).
+      go_editor->set_readonly_mode( CONV #( gv_readonly ) ).
       gv_status = |Read-only mode enabled: { gv_readonly }|.
     WHEN 'WRAP'.
       gv_wrap = xsdbool( gv_wrap = abap_false ).
       PERFORM set_wrap.
     WHEN 'CHROME'.
       gv_chrome = xsdbool( gv_chrome = abap_false ).
-      go_editor->set_toolbar_mode( toolbar_mode = CONV #( gv_chrome ) ).
-      go_editor->set_statusbar_mode( statusbar_mode = CONV #( gv_chrome ) ).
+      go_editor->set_toolbar_mode( CONV #( gv_chrome ) ).
+      go_editor->set_statusbar_mode( CONV #( gv_chrome ) ).
       gv_status = |Toolbar and status bar enabled: { gv_chrome }|.
     WHEN 'FONT'.
       gv_fixed = xsdbool( gv_fixed = abap_false ).
-      go_editor->set_font_fixed( mode = CONV #( gv_fixed ) ).
+      go_editor->set_font_fixed( CONV #( gv_fixed ) ).
       gv_status = |Fixed-width font enabled: { gv_fixed }|.
     WHEN 'TABLE'.
       PERFORM read_as_table.
@@ -81,8 +81,8 @@ FORM create_controls.
       wordwrap_mode              = cl_gui_textedit=>wordwrap_at_windowborder
       wordwrap_to_linebreak_mode = cl_gui_textedit=>false.
   PERFORM set_initial_text.
-  go_editor->set_toolbar_mode( toolbar_mode = cl_gui_textedit=>true ).
-  go_editor->set_statusbar_mode( statusbar_mode = cl_gui_textedit=>true ).
+  go_editor->set_toolbar_mode( cl_gui_textedit=>true ).
+  go_editor->set_statusbar_mode( cl_gui_textedit=>true ).
   gv_status = 'Editable document created with window-border wrapping'.
 ENDFORM.
 
@@ -94,7 +94,7 @@ FORM set_initial_text.
     ( 'Edit this document and compare table and stream retrieval.' )
     ( 'The file commands always open an explicit frontend chooser.' )
     ( 'The first line can be protected on frontend versions that support it.' ) ).
-  go_editor->set_text_as_r3table( table = lt_text ).
+  go_editor->set_text_as_r3table( lt_text ).
 ENDFORM.
 
 FORM set_wrap.
@@ -188,7 +188,7 @@ FORM load_file.
     EXPORTING filename = CONV #( lt_files[ 1 ]-filename ) filetype = 'ASC'
     IMPORTING filelength = lv_length header = lv_header
     CHANGING data_tab = lt_text ).
-  go_editor->set_text_as_r3table( table = lt_text ).
+  go_editor->set_text_as_r3table( lt_text ).
   gv_status = |Loaded { lines( lt_text ) } lines and { lv_length } bytes|.
 ENDFORM.
 

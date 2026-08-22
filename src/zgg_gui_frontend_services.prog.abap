@@ -76,7 +76,7 @@ FORM create_controls.
     TRY.
         CREATE OBJECT go_host EXPORTING container_name = 'CC_MAIN'.
         CREATE OBJECT go_log EXPORTING parent = go_host.
-        go_log->set_readonly_mode( readonly_mode = 1 ).
+        go_log->set_readonly_mode( 1 ).
       CATCH cx_root INTO DATA(lx_error).
         gv_status = |Event log control unavailable: { lx_error->get_text( ) }|.
     ENDTRY.
@@ -456,7 +456,7 @@ ENDFORM.
 FORM refresh_log.
   IF go_log IS BOUND.
     TRY.
-        go_log->set_text_as_stream( text = gt_log ).
+        go_log->set_text_as_stream( gt_log ).
         CALL METHOD go_log->('GO_TO_LINE') EXPORTING line = lines( gt_log ).
       CATCH cx_root.
     ENDTRY.

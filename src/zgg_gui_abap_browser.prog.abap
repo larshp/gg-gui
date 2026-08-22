@@ -84,7 +84,7 @@ FORM show_xml_xstring.
   DATA lv_xxml TYPE xstring.
 
   lv_xml = '<?xml version="1.0" encoding="utf-8"?><catalog><sample id="2">XSTRING XML</sample></catalog>'.
-  lv_xxml = cl_abap_codepage=>convert_to( source = lv_xml ).
+  lv_xxml = cl_abap_codepage=>convert_to( lv_xml ).
   TRY.
       cl_abap_browser=>show_xml(
         xml_string = '' xml_xstring = lv_xxml title = 'XML from XSTRING'

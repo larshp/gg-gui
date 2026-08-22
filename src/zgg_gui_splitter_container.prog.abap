@@ -79,8 +79,8 @@ MODULE user_command_0100 INPUT.
       ENDIF.
     WHEN 'BORDER'.
       gv_border = xsdbool( gv_border = abap_false ).
-      go_splitter->set_border( border = gv_border ).
-      go_nested->set_border( border = gv_border ).
+      go_splitter->set_border( gv_border ).
+      go_nested->set_border( gv_border ).
       gv_status = |Outer and nested borders enabled: { gv_border }|.
     WHEN 'READ'.
       PERFORM read_sizes.
@@ -123,8 +123,8 @@ FORM create_controls.
 
   PERFORM apply_sizes.
   PERFORM apply_sashes.
-  go_splitter->set_border( border = gv_border ).
-  go_nested->set_border( border = gv_border ).
+  go_splitter->set_border( gv_border ).
+  go_nested->set_border( gv_border ).
   gv_status = 'Standard 2x2 splitter, nested splitter, and easy-splitter comparison created'.
 ENDFORM.
 
@@ -137,7 +137,7 @@ FORM create_editor USING io_parent TYPE REF TO cl_gui_container
   lt_text = VALUE #(
     ( iv_title )
     ( 'This cell contains an editable CL_GUI_TEXTEDIT instance.' ) ).
-  go_editor->set_text_as_r3table( table = lt_text ).
+  go_editor->set_text_as_r3table( lt_text ).
 ENDFORM.
 
 FORM load_html.
@@ -165,9 +165,9 @@ FORM create_nested_editors.
   CREATE OBJECT go_nested_left EXPORTING parent = lo_left.
   CREATE OBJECT go_nested_right EXPORTING parent = lo_right.
   lt_text = VALUE #( ( 'Nested left cell' ) ).
-  go_nested_left->set_text_as_r3table( table = lt_text ).
+  go_nested_left->set_text_as_r3table( lt_text ).
   lt_text = VALUE #( ( 'Nested right cell' ) ).
-  go_nested_right->set_text_as_r3table( table = lt_text ).
+  go_nested_right->set_text_as_r3table( lt_text ).
 ENDFORM.
 
 FORM create_easy_splitter USING io_parent TYPE REF TO cl_gui_container.
@@ -182,20 +182,20 @@ FORM create_easy_splitter USING io_parent TYPE REF TO cl_gui_container.
       IF sy-subrc = 0 AND <lo_cell> IS BOUND.
         CREATE OBJECT go_easy_left EXPORTING parent = <lo_cell>.
         lt_text = VALUE #( ( 'Easy splitter: top/left' ) ).
-        go_easy_left->set_text_as_r3table( table = lt_text ).
+        go_easy_left->set_text_as_r3table( lt_text ).
       ENDIF.
       ASSIGN go_easy->('BOTTOM_RIGHT_CONTAINER') TO <lo_cell>.
       IF sy-subrc = 0 AND <lo_cell> IS BOUND.
         CREATE OBJECT go_easy_right EXPORTING parent = <lo_cell>.
         lt_text = VALUE #( ( 'Easy splitter: bottom/right' ) ).
-        go_easy_right->set_text_as_r3table( table = lt_text ).
+        go_easy_right->set_text_as_r3table( lt_text ).
       ENDIF.
     CATCH cx_root.
       CREATE OBJECT go_fallback EXPORTING parent = io_parent.
       lt_text = VALUE #(
         ( 'CL_GUI_EASY_SPLITTER_CONTAINER is unavailable.' )
         ( 'The standard splitter remains fully usable.' ) ).
-      go_fallback->set_text_as_r3table( table = lt_text ).
+      go_fallback->set_text_as_r3table( lt_text ).
   ENDTRY.
 ENDFORM.
 

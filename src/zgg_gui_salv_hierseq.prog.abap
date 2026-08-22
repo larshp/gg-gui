@@ -271,8 +271,8 @@ FORM show_fallback USING iv_error TYPE string.
     ( 'CL_SALV_HIERSEQ_TABLE and its helper classes are unavailable in this runtime.' )
     ( 'The native SAP sample retains factory bindings and separate level configuration behind capability checks.' )
     ( 'Static event handlers require the missing hierarchical-sequential SALV event class.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Hierarchical-sequential SALV unavailable; a text fallback is displayed'.
   gv_detail = iv_error.
 ENDFORM.

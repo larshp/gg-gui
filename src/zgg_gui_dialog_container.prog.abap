@@ -113,7 +113,7 @@ FORM create_dialog.
         ( 'CL_GUI_DIALOGBOX_CONTAINER' )
         ( 'This is a modeless control window; the owning dynpro remains active.' )
         ( 'Move or resize this window, then use Read geometry on the main screen.' ) ).
-      go_editor->set_text_as_r3table( table = lt_text ).
+      go_editor->set_text_as_r3table( lt_text ).
       gv_status = 'Modeless dialog and hosted text editor created'.
     CATCH cx_root INTO DATA(lx_error).
       FREE: go_dialog, go_container, go_editor.

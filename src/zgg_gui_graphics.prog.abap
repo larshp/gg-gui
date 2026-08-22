@@ -199,8 +199,8 @@ FORM show_audit.
     ( |CL_GUI_GP_PRES: { gv_graphics_proxy } - Graphical Framework business-graphics proxy| )
     ( |CL_GUI_SELECTOR: { gv_selector } - installed color selector| )
     ( 'Choose a variant to create it; missing classes and construction failures remain nonfatal.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
 ENDFORM.
 
 FORM show_missing USING iv_class TYPE string iv_reason TYPE string.
@@ -212,8 +212,8 @@ FORM show_missing USING iv_class TYPE string iv_reason TYPE string.
     ( |{ iv_class } is unavailable or could not be initialized.| )
     ( |Reason: { iv_reason }| )
     ( 'Use the availability audit to compare installed controls; no optional class is assumed.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = |{ iv_class } unavailable; diagnostic fallback shown|.
   gv_detail = iv_reason.
 ENDFORM.

@@ -268,8 +268,8 @@ FORM show_fallback USING iv_reason TYPE string.
     ( 'Desktop Office Integration is unavailable in this runtime.' )
     ( 'This optional sample requires SAP GUI for Windows and a locally installed, registered Office application.' )
     ( 'Spreadsheet, word-processing, in-place hosting, and deterministic cleanup calls remain in the native report.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Desktop Office Integration unavailable; diagnostic fallback shown'.
   gv_detail = iv_reason.
 ENDFORM.

@@ -70,12 +70,12 @@ MODULE user_command_0100 INPUT.
       IF gv_mode > cl_gui_picture=>display_mode_fit_center.
         gv_mode = cl_gui_picture=>display_mode_normal.
       ENDIF.
-      go_picture->set_display_mode( display_mode = gv_mode ).
+      go_picture->set_display_mode( gv_mode ).
       PERFORM describe_mode.
       gv_status = |Display mode changed to { gv_mode_text }|.
     WHEN 'BORDER'.
       gv_border = xsdbool( gv_border = abap_false ).
-      go_picture->set_3d_border( border = CONV #( gv_border ) ).
+      go_picture->set_3d_border( CONV #( gv_border ) ).
       gv_status = |3D border enabled: { gv_border }|.
     WHEN 'CLEAR'.
       go_picture->clear_picture( ).
@@ -87,8 +87,8 @@ MODULE user_command_0100 INPUT.
       p_async = abap_false.
       gv_mode = cl_gui_picture=>display_mode_fit_center.
       gv_border = abap_true.
-      go_picture->set_display_mode( display_mode = gv_mode ).
-      go_picture->set_3d_border( border = 1 ).
+      go_picture->set_display_mode( gv_mode ).
+      go_picture->set_3d_border( 1 ).
       PERFORM publish_demo_mime.
       IF gv_url IS NOT INITIAL.
         PERFORM load_picture.
@@ -111,8 +111,8 @@ FORM create_controls.
 
   CREATE OBJECT go_host EXPORTING container_name = 'CC_MAIN'.
   CREATE OBJECT go_picture EXPORTING parent = go_host.
-  go_picture->set_display_mode( display_mode = gv_mode ).
-  go_picture->set_3d_border( border = CONV #( gv_border ) ).
+  go_picture->set_display_mode( gv_mode ).
+  go_picture->set_3d_border( CONV #( gv_border ) ).
   PERFORM register_native_picture_events.
   IF gv_native_events_registered = abap_true.
     gv_status = 'Picture click and double-click events registered; choose an image source'.
@@ -221,7 +221,7 @@ FORM load_picture.
     RETURN.
   ENDIF.
   IF p_async = abap_true.
-    go_picture->load_picture_from_url_async( url = gv_url ).
+    go_picture->load_picture_from_url_async( gv_url ).
     gv_status = |Asynchronous image request queued: { gv_url }|.
     gv_last_url = gv_url.
   ELSE.

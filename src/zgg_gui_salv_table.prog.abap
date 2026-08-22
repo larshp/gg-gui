@@ -344,8 +344,8 @@ FORM inspect_layouts.
   ls_key-report = sy-repid.
   ls_key-handle = 'MAIN'.
   TRY.
-      DATA(ls_default) = cl_salv_layout_service=>get_default_layout( s_key = ls_key ).
-      DATA(lt_layouts) = cl_salv_layout_service=>get_layouts( s_key = ls_key ).
+      DATA(ls_default) = cl_salv_layout_service=>get_default_layout( ls_key ).
+      DATA(lt_layouts) = cl_salv_layout_service=>get_layouts( ls_key ).
       DATA(ls_chosen) = cl_salv_layout_service=>f4_layouts(
         s_key = ls_key layout = ls_default-layout restrict = cl_salv_layout=>restrict_none ).
       gv_status = |Available layouts: { lines( lt_layouts ) }; F4 returned { ls_chosen-layout }|.
@@ -361,7 +361,7 @@ FORM export_xml.
     RETURN.
   ENDIF.
   TRY.
-      DATA(lv_xml) = go_salv->to_xml( xml_type = 1 ).
+      DATA(lv_xml) = go_salv->to_xml( 1 ).
       gv_status = |TO_XML returned { xstrlen( lv_xml ) } bytes|.
       gv_detail = 'The sample measures the generated representation without writing to a frontend path'.
     CATCH cx_root INTO DATA(lx_error).
@@ -380,7 +380,7 @@ FORM refresh_data.
     <row>-quantity = 12 + gv_refresh_count.
   ENDIF.
   TRY.
-      go_salv->refresh( s_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
+      go_salv->refresh( VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
       gv_status = |Row P100 refreshed in place; quantity is now { <row>-quantity }|.
       gv_detail = 'Stable row and column positions were requested'.
     CATCH cx_root INTO DATA(lx_error).
@@ -393,7 +393,7 @@ FORM reset_data.
   PERFORM build_rows.
   IF go_salv IS BOUND.
     TRY.
-        go_salv->refresh( s_stable = VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
+        go_salv->refresh( VALUE lvc_s_stbl( row = abap_true col = abap_true ) ).
         gv_status = 'Deterministic rows restored and the current SALV refreshed'.
       CATCH cx_root INTO DATA(lx_error).
         gv_status = |SALV reset failed: { lx_error->get_text( ) }|.
@@ -463,8 +463,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'CL_SALV_TABLE is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP sample remains syntax checked and guarded by a capability check.' )
     ( 'The pinned open-abap-gui SALV factory currently terminates with an assertion.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'SALV unavailable; a non-terminating text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

@@ -323,7 +323,7 @@ FORM create_grid.
       SET HANDLER go_events->on_drop_complete FOR go_grid.
       SET HANDLER go_events->on_drop_flavor FOR go_grid.
       SET HANDLER go_events->on_top_of_page FOR go_grid.
-      go_grid->register_f4_for_fields( it_f4 = VALUE lvc_t_f4(
+      go_grid->register_f4_for_fields( VALUE lvc_t_f4(
         ( fieldname = 'NAME' register = abap_true getbefore = abap_true ) ) ).
       go_grid->set_table_for_first_display(
         EXPORTING is_layout = VALUE lvc_s_layo(
@@ -349,7 +349,7 @@ FORM raise_custom_command.
   ENDIF.
   TRY.
       go_grid->raise_event( i_ucomm = 'ZHELLO' i_user_command = abap_true ).
-      go_grid->set_user_command( i_ucomm = 'ZHELLO' ).
+      go_grid->set_user_command( 'ZHELLO' ).
       gv_status = 'Custom ZHELLO command raised through the ALV event and user-command paths'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Custom command failed: { lx_error->get_text( ) }|.
@@ -386,7 +386,7 @@ FORM request_print_events.
   ENDIF.
   TRY.
       go_grid->list_processing_events( i_event_name = 'TOP_OF_PAGE' i_table_index = 1 ).
-      go_grid->set_user_command( i_ucomm = '&PRINT' ).
+      go_grid->set_user_command( '&PRINT' ).
       gv_status = 'TOP_OF_PAGE list processing and the standard print command were requested'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Print event request failed or was canceled: { lx_error->get_text( ) }|.
@@ -427,8 +427,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'CL_GUI_ALV_GRID event behavior is unavailable in this runtime.' )
     ( 'The native SAP report retains its handlers, toolbar/context extensions, drag/drop, and print hooks.' )
     ( 'The delayed-selection callback is missing from the pinned open-abap class definition.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'ALV events unavailable; a non-terminating text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

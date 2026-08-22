@@ -189,8 +189,8 @@ FORM create_controls.
       SET HANDLER go_events->on_data_changed_finished FOR go_grid.
       SET HANDLER go_events->on_button_click FOR go_grid.
       SET HANDLER go_events->on_f4 FOR go_grid.
-      go_grid->register_edit_event( i_event_id = cl_gui_alv_grid=>mc_evt_enter ).
-      go_grid->register_edit_event( i_event_id = cl_gui_alv_grid=>mc_evt_modified ).
+      go_grid->register_edit_event( cl_gui_alv_grid=>mc_evt_enter ).
+      go_grid->register_edit_event( cl_gui_alv_grid=>mc_evt_modified ).
       go_grid->register_f4_for_fields( VALUE lvc_t_f4(
         ( fieldname = 'NAME' register = abap_true getbefore = abap_true chngeafter = abap_true ) ) ).
       go_grid->set_drop_down_table( it_drop_down = VALUE lvc_t_drop(
@@ -363,8 +363,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
     ( 'Editable CL_GUI_ALV_GRID behavior is unavailable in this runtime.' )
     ( 'The native SAP report keeps edit events and CL_ALV_CHANGED_DATA_PROTOCOL calls syntax checked.' )
     ( 'Save and discard are deliberately limited to an in-memory snapshot.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Editable ALV unavailable; a non-terminating text fallback is displayed'.
   gv_detail = io_error->get_text( ).
 ENDFORM.

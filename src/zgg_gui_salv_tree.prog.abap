@@ -308,8 +308,8 @@ FORM show_fallback USING iv_error TYPE string.
     ( 'CL_SALV_TREE and its helper classes are unavailable in this runtime.' )
     ( 'The native SAP sample keeps factory, node, column, function, and selection calls behind capability checks.' )
     ( 'Static link-click and double-click handlers require the missing SALV tree event class.' ) ).
-  go_fallback->set_text_as_r3table( table = lt_text ).
-  go_fallback->set_readonly_mode( readonly_mode = 1 ).
+  go_fallback->set_text_as_r3table( lt_text ).
+  go_fallback->set_readonly_mode( 1 ).
   gv_status = 'SALV tree unavailable; a non-terminating text fallback is displayed'.
   gv_detail = iv_error.
 ENDFORM.
