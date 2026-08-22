@@ -13,22 +13,7 @@ TYPES:
     currency TYPE c LENGTH 3,
   END OF ty_row,
   ty_rows TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY.
-TYPES:
-  BEGIN OF ty_node,
-    node_key   TYPE tv_nodekey,
-    relatkey   TYPE tv_nodekey,
-    relatship  TYPE i,
-    hidden     TYPE abap_bool,
-    disabled   TYPE abap_bool,
-    isfolder   TYPE abap_bool,
-    n_image    TYPE tv_image,
-    exp_image  TYPE tv_image,
-    style      TYPE i,
-    no_branch  TYPE abap_bool,
-    expander   TYPE abap_bool,
-    dragdropid TYPE i,
-  END OF ty_node,
-  ty_nodes TYPE STANDARD TABLE OF ty_node WITH EMPTY KEY.
+TYPES ty_nodes TYPE treev_ntab.
 TYPES:
   BEGIN OF ty_item,
     node_key   TYPE tv_nodekey,

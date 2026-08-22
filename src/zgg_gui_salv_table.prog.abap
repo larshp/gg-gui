@@ -29,11 +29,7 @@ TYPES:
   ty_text_line TYPE c LENGTH 255,
   ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
 
-TYPES:
-  BEGIN OF ty_layout_key,
-    report TYPE syrepid,
-    handle TYPE c LENGTH 4,
-  END OF ty_layout_key.
+TYPES ty_layout_key TYPE salv_s_layout_key.
 
 CLASS lcl_events DEFINITION FINAL.
   PUBLIC SECTION.

@@ -354,6 +354,7 @@ ENDFORM.
 
 FORM change_nodes_and_items.
   DATA ls_row TYPE ty_row.
+  DATA ls_item_layout TYPE lvc_s_laci.
   DATA lt_item_layout TYPE ty_item_layouts.
 
   IF gt_leaf_keys IS INITIAL.
@@ -366,6 +367,8 @@ FORM change_nodes_and_items.
   ls_row-quantity = COND #( WHEN gv_changed = abap_true THEN 15 ELSE 12 ).
   lt_item_layout = VALUE #(
     ( fieldname = 'NAME' class = cl_gui_column_tree=>item_class_link chosen = gv_changed ) ).
+  ls_item_layout = VALUE #(
+    fieldname = 'NAME' class = cl_gui_column_tree=>item_class_link chosen = gv_changed ).
   go_tree->change_node(
     i_node_key     = lv_key
     i_outtab_line  = ls_row
@@ -374,8 +377,7 @@ FORM change_nodes_and_items.
     i_node_key     = lv_key
     i_fieldname    = 'NAME'
     i_data         = ls_row-name
-    is_item_layout = VALUE ty_item_layout( fieldname = 'NAME'
-      class = cl_gui_column_tree=>item_class_link chosen = gv_changed ) ).
+    is_item_layout = ls_item_layout ).
   go_tree->frontend_update( ).
   gv_status = |Node output row and NAME item changed in place; alternate state { gv_changed }|.
 ENDFORM.
