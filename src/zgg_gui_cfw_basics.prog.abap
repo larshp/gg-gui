@@ -116,6 +116,7 @@ MODULE user_command_0100 INPUT.
                                height = 220 ).
       go_editor->get_width( IMPORTING width = lv_width ).
       go_editor->get_height( IMPORTING height = lv_height ).
+      cl_gui_cfw=>flush( ).
       lv_pixels = cl_gui_cfw=>compute_pixel_from_metric(
         x_or_y = 'X'
         in     = 100 ).

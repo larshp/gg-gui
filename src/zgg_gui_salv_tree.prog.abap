@@ -92,8 +92,6 @@ MODULE user_command_0100 INPUT.
 ENDMODULE.
 
 FORM create_controls.
-  DATA lv_class TYPE string VALUE 'CL_SALV_TREE'.
-  DATA lv_factory TYPE string VALUE 'FACTORY'.
   DATA lv_error TYPE string.
 
   IF go_host IS NOT BOUND.
@@ -104,11 +102,7 @@ FORM create_controls.
   ENDIF.
 
   TRY.
-      CALL METHOD (lv_class)=>(lv_factory)
-        EXPORTING r_container = go_host
-                  container_name = 'CC_MAIN'
-        IMPORTING r_salv_tree = go_tree
-        CHANGING t_table = gt_rows.
+      PERFORM create_native_salv_tree.
       CALL METHOD go_tree->('GET_NODES') RECEIVING value = go_nodes.
       CALL METHOD go_tree->('GET_COLUMNS') RECEIVING value = go_columns.
       CALL METHOD go_tree->('GET_FUNCTIONS') RECEIVING value = go_functions.

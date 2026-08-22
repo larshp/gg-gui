@@ -20,10 +20,10 @@ TYPES ty_text_line TYPE c LENGTH 255.
 TYPES ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
 
 DATA go_host TYPE REF TO cl_gui_custom_container.
-DATA go_office TYPE REF TO object.
-DATA go_document TYPE REF TO object.
-DATA go_sheet TYPE REF TO object.
-DATA go_word TYPE REF TO object.
+DATA go_office TYPE REF TO i_oi_container_control.
+DATA go_document TYPE REF TO i_oi_document_proxy.
+DATA go_sheet TYPE REF TO i_oi_spreadsheet.
+DATA go_word TYPE REF TO i_oi_word_processor_document.
 DATA go_fallback TYPE REF TO cl_gui_textedit.
 DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_status TYPE c LENGTH 108.

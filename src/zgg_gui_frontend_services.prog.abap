@@ -476,8 +476,10 @@ ENDFORM.
 FORM refresh_log.
   IF go_log IS BOUND.
     TRY.
-        go_log->set_text_as_stream( gt_log ).
-        CALL METHOD go_log->('GO_TO_LINE') EXPORTING line = lines( gt_log ).
+      go_log->set_text_as_stream( gt_log ).
+      cl_gui_cfw=>flush( ).
+      CALL METHOD go_log->('GO_TO_LINE') EXPORTING line = lines( gt_log ).
+      cl_gui_cfw=>flush( ).
       CATCH cx_root.
     ENDTRY.
   ENDIF.

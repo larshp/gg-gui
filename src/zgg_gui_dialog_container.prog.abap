@@ -146,6 +146,7 @@ FORM read_geometry.
   ENDIF.
   go_container->get_width( IMPORTING width = lv_width ).
   go_container->get_height( IMPORTING height = lv_height ).
+  cl_gui_cfw=>flush( ).
   gv_geometry = |Requested L{ gv_left } T{ gv_top }; measured { lv_width } x { lv_height }|.
 ENDFORM.
 
@@ -167,6 +168,7 @@ FORM detect_frontend_close.
   DATA lv_valid TYPE i.
 
   go_container->is_valid( IMPORTING result = lv_valid ).
+  cl_gui_cfw=>flush( ).
   IF lv_valid = 0.
     FREE: go_editor, go_container, go_dialog.
     gv_status = 'Frontend close detected after CFW dispatch; references were cleared'.

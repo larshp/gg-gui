@@ -188,6 +188,36 @@ for (const file of reportFiles) {
   const xml = read(join(srcDir, xmlName));
   const source = read(join(srcDir, file));
   const screens = [...xml.matchAll(/<SCREEN>(\d{4})<\/SCREEN>/g)].map((match) => match[1]);
+  const flowLogic = screenFiles
+    .filter((name) => name.startsWith(file.replace(/\.abap$/i, ".screen_")))
+    .map((name) => read(join(srcDir, name)))
+    .join("\n");
+  const dynproSource = `${source}\n${flowLogic}`;
+  const referencedScreens = new Set(
+    [...dynproSource.matchAll(/\bCALL\s+SCREEN\s+(\d{1,4})\b/gi)]
+      .map((match) => match[1].padStart(4, "0")),
+  );
+  for (const match of dynproSource.matchAll(
+    /\bCALL\s+SUBSCREEN\s+\w+\s+INCLUDING\s+sy-repid\s+(?:['`](\d{1,4})['`]|(\w+))/gi,
+  )) {
+    if (match[1]) {
+      referencedScreens.add(match[1].padStart(4, "0"));
+      continue;
+    }
+    const screenVariable = match[2].replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const assignedScreen = new RegExp(
+      `\\b${screenVariable}\\b[^\\r\\n.]*['\`](\\d{1,4})['\`]`,
+      "gi",
+    );
+    for (const assignment of dynproSource.matchAll(assignedScreen)) {
+      referencedScreens.add(assignment[1].padStart(4, "0"));
+    }
+  }
+  for (const screen of referencedScreens) {
+    if (!screens.includes(screen)) {
+      fail(`${file}: referenced screen ${screen} is missing from ${xmlName}`);
+    }
+  }
   for (const screen of new Set(screens)) {
     const include = file.replace(/\.abap$/i, `.screen_${screen}.abap`);
     if (!files.includes(include)) fail(`${xmlName}: missing flow logic ${include}`);

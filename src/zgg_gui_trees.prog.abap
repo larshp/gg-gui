@@ -247,7 +247,7 @@ FORM register_events.
   DATA lt_events TYPE cntl_simple_events.
 
   lt_events = VALUE #(
-    ( eventid = cl_gui_column_tree=>eventid_selection_changed appl_event = abap_true )
+    ( eventid = cl_gui_column_tree=>eventid_selection_changed appl_event = abap_false )
     ( eventid = cl_gui_column_tree=>eventid_node_double_click appl_event = abap_true )
     ( eventid = cl_gui_column_tree=>eventid_item_double_click appl_event = abap_true )
     ( eventid = cl_gui_column_tree=>eventid_expand_no_children appl_event = abap_true )
@@ -433,6 +433,7 @@ FORM change_header.
   go_tree->hierarchy_header_set_width(
     COND #( WHEN gv_header_alt = abap_true THEN 40 ELSE 30 ) ).
   go_tree->hierarchy_header_get_width( IMPORTING width = lv_width ).
+  cl_gui_cfw=>flush( ).
   gv_status = |Hierarchy heading changed; reported width { lv_width }|.
 ENDFORM.
 

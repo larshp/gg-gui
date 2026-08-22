@@ -161,6 +161,7 @@ FORM observe_geometry.
   ENDIF.
   go_container->get_width( IMPORTING width = lv_width ).
   go_container->get_height( IMPORTING height = lv_height ).
+  cl_gui_cfw=>flush( ).
   gv_geometry = |Measured { lv_width } x { lv_height }; extension { gv_extension }|.
   IF gv_last_width <> 0
       AND ( gv_last_width <> lv_width OR gv_last_height <> lv_height ).
@@ -174,6 +175,7 @@ FORM detect_close.
   DATA lv_valid TYPE i.
 
   go_container->is_valid( IMPORTING result = lv_valid ).
+  cl_gui_cfw=>flush( ).
   IF lv_valid = 0.
     FREE go_editor.
     FREE go_container.

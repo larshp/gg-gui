@@ -20,7 +20,7 @@ DATA gv_status TYPE c LENGTH 108.
 DATA gv_detail TYPE c LENGTH 108.
 DATA gv_sequence TYPE i.
 
-FIELD-SYMBOLS <gt_output> TYPE STANDARD TABLE.
+FIELD-SYMBOLS <gt_output> TYPE ANY TABLE.
 
 START-OF-SELECTION.
   CALL SCREEN 100.
@@ -141,7 +141,7 @@ FORM append_row USING iv_id TYPE c iv_name TYPE c iv_quantity TYPE i
 ENDFORM.
 
 FORM set_style_for_row USING is_row TYPE any.
-  FIELD-SYMBOLS <lt_styles> TYPE STANDARD TABLE.
+  FIELD-SYMBOLS <lt_styles> TYPE ANY TABLE.
   FIELD-SYMBOLS <ls_style> TYPE any.
   FIELD-SYMBOLS <lv_component> TYPE any.
 
@@ -176,7 +176,7 @@ ENDFORM.
 
 FORM change_runtime_style.
   FIELD-SYMBOLS <ls_row> TYPE any.
-  FIELD-SYMBOLS <lt_styles> TYPE STANDARD TABLE.
+  FIELD-SYMBOLS <lt_styles> TYPE ANY TABLE.
   FIELD-SYMBOLS <ls_style> TYPE any.
   FIELD-SYMBOLS <lv_style> TYPE any.
 

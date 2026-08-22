@@ -10,6 +10,15 @@ DATA go_native_hierseq TYPE REF TO cl_salv_hierseq_table.
 DATA go_native_hierseq_events TYPE REF TO cl_salv_events_hierseq.
 DATA go_hierseq_events TYPE REF TO lcl_hierseq_events.
 
+FORM create_native_hierseq.
+  cl_salv_hierseq_table=>factory(
+    EXPORTING t_binding_level1_level2 = gt_bindings
+    IMPORTING r_hierseq               = go_native_hierseq
+    CHANGING  t_table_level1          = gt_headers
+              t_table_level2          = gt_items ).
+  go_hierseq = go_native_hierseq.
+ENDFORM.
+
 CLASS lcl_hierseq_events IMPLEMENTATION.
   METHOD on_link.
     DATA lv_event TYPE c LENGTH 24 VALUE 'LINK_CLICK'.

@@ -194,7 +194,11 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table
   lo_columns->set_key_fixation( abap_true ).
   lo_columns->set_column_position( columnname = 'ID'
                                    position   = 1 ).
-  CALL METHOD lo_columns->('SET_COLOR_COLUMN') EXPORTING value = 'CELL_COLORS'.
+  TRY.
+      CALL METHOD lo_columns->('SET_COLOR_COLUMN') EXPORTING value = 'CELL_COLORS'.
+    CATCH cx_root.
+      " Cell-color metadata varies across SALV releases; keep the table usable.
+  ENDTRY.
   CALL METHOD lo_columns->('SET_CELL_TYPE_COLUMN') EXPORTING value = 'CELL_TYPES'.
   CALL METHOD lo_columns->('SET_EXCEPTION_COLUMN') EXPORTING value = 'EXCEPTION'.
   CALL METHOD lo_columns->('SET_HYPERLINK_ENTRY_COLUMN') EXPORTING value = 'LINK_HANDLES'.

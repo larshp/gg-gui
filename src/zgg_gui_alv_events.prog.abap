@@ -338,7 +338,7 @@ FORM create_grid.
         EXPORTING is_layout = VALUE lvc_s_layo(
           zebra = abap_true cwidth_opt = abap_true sel_mode = 'A'
           grid_title = 'ALV event and extension gallery' )
-          is_print = VALUE lvc_s_prnt( print = abap_true prnt_title = abap_true )
+          is_print = VALUE lvc_s_prnt( print = abap_false prnt_title = abap_true )
         CHANGING it_outtab = gt_rows it_fieldcatalog = gt_fieldcat it_sort = gt_sort ).
       go_grid->set_toolbar_interactive( ).
       gv_status = |ALV event handlers registered; application-event mode { gv_application_events }|.

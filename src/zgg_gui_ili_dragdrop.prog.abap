@@ -94,10 +94,29 @@ MODULE user_command_0100 INPUT.
 ENDMODULE.
 
 FORM create_controls.
+  DATA lv_clsid TYPE string.
+  DATA lv_reason TYPE string.
+
   IF go_host IS NOT BOUND.
     CREATE OBJECT go_host EXPORTING container_name = 'CC_MAIN'.
   ENDIF.
   IF go_ili IS BOUND OR go_fallback IS BOUND.
+    RETURN.
+  ENDIF.
+  TRY.
+      cl_gui_frontend_services=>registry_get_value(
+        EXPORTING root      = 0
+                  key       = 'SAPGUI.SAPILIDragNDropCtrl.1\CLSID'
+                  value     = space
+        IMPORTING reg_value = lv_clsid ).
+      cl_gui_cfw=>flush( ).
+    CATCH cx_root INTO DATA(lx_registry).
+      lv_reason = lx_registry->get_text( ).
+      PERFORM show_unavailable USING lv_reason.
+      RETURN.
+  ENDTRY.
+  IF lv_clsid IS INITIAL.
+    PERFORM show_unavailable USING 'SAPGUI.SAPILIDragNDropCtrl.1 is not registered on this frontend'.
     RETURN.
   ENDIF.
   TRY.
@@ -214,6 +233,13 @@ FORM reset_control.
 ENDFORM.
 
 FORM show_fallback USING io_error TYPE REF TO cx_root.
+  DATA lv_reason TYPE string.
+
+  lv_reason = io_error->get_text( ).
+  PERFORM show_unavailable USING lv_reason.
+ENDFORM.
+
+FORM show_unavailable USING iv_error TYPE string.
   DATA lt_text TYPE ty_text_lines.
 
   CREATE OBJECT go_fallback EXPORTING parent = go_host.
@@ -224,7 +250,7 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
   go_fallback->set_text_as_r3table( lt_text ).
   go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Interactive drag/resize unavailable; a text fallback is displayed'.
-  gv_detail = io_error->get_text( ).
+  gv_detail = iv_error.
 ENDFORM.
 
 FORM free_controls.

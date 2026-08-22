@@ -160,7 +160,8 @@ ENDFORM.
 FORM publish_image.
   CLEAR gv_image_url.
   CALL FUNCTION 'DP_PUBLISH_WWW_URL'
-    EXPORTING objid = 'HTMLCNTL_TESTHTM2_SAPLOGO'
+    EXPORTING objid    = 'HTMLCNTL_TESTHTM2_SAPLOGO'
+              lifetime = 'T'
     IMPORTING url = gv_image_url
     EXCEPTIONS dp_invalid_parameters = 1 no_object = 2
       dp_error_publish = 3 OTHERS = 4.

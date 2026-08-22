@@ -143,7 +143,7 @@ FORM build_configuration.
   gs_layout-smalltitle = abap_true.
   gs_layout-grid_title = 'Basic ALV Grid Control'.
 
-  gs_print-print = abap_true.
+  gs_print-print = abap_false.
   gs_print-prnt_title = abap_true.
   gs_print-footline = abap_true.
   gs_print-prnt_info = abap_true.

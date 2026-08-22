@@ -308,7 +308,7 @@ FORM create_controls.
       SET HANDLER go_events->on_tree_drop FOR go_tree.
       SET HANDLER go_events->on_grid_drag FOR go_grid.
       SET HANDLER go_events->on_grid_drop FOR go_grid.
-      lt_events = VALUE #( ( eventid = cl_gui_column_tree=>eventid_selection_changed appl_event = abap_true ) ).
+      lt_events = VALUE #( ( eventid = cl_gui_column_tree=>eventid_selection_changed appl_event = abap_false ) ).
       go_tree->set_registered_events( lt_events ).
       lt_events = VALUE #( ( eventid = cl_gui_toolbar=>m_id_function_selected appl_event = abap_true ) ).
       go_toolbar->set_registered_events( lt_events ).

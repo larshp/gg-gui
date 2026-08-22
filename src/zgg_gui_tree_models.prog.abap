@@ -143,7 +143,7 @@ FORM show_simple_model.
       CREATE OBJECT go_model TYPE (lv_class)
         EXPORTING node_selection_mode = 1
                   hide_selection      = abap_false.
-      CALL METHOD go_model->('ADD_NODES') EXPORTING nodes_table = lt_nodes.
+      CALL METHOD go_model->('ADD_NODES') EXPORTING node_table = lt_nodes.
       CALL METHOD go_model->('CREATE_TREE_CONTROL') EXPORTING parent = go_host.
       CALL METHOD go_model->('EXPAND_NODE') EXPORTING node_key = 'ROOT'.
       gv_active_model = lv_class.

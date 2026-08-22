@@ -67,6 +67,7 @@ MODULE user_command_0100 INPUT.
           IMPORTING result = lv_col_rc ).
       ENDIF.
       PERFORM set_minimum_sizes.
+      cl_gui_cfw=>flush( ).
       gv_status = |Sizes changed; row rc { lv_row_rc }, column rc { lv_col_rc }|.
     WHEN 'SASH'.
       gv_sashes = xsdbool( gv_sashes = abap_false ).
@@ -78,6 +79,7 @@ MODULE user_command_0100 INPUT.
           EXPORTING id     = 2
                     height = 0
           IMPORTING result = lv_hide_rc ).
+        cl_gui_cfw=>flush( ).
         gv_status = |Lower row hidden; rc { lv_hide_rc }|.
       ELSE.
         PERFORM apply_sizes.
@@ -253,6 +255,7 @@ FORM apply_sizes.
       IMPORTING result = lv_col_rc ).
     gv_status = 'Absolute mode: first row 220 pixels, first column 420 pixels'.
   ENDIF.
+  cl_gui_cfw=>flush( ).
   gv_hidden = abap_false.
 ENDFORM.
 
@@ -286,6 +289,7 @@ FORM apply_sashes.
               type   = cl_gui_splitter_container=>type_sashvisible
               value  = lv_value
     IMPORTING result = lv_rc ).
+  cl_gui_cfw=>flush( ).
   gv_status = |Movable and visible splitter sashes enabled: { gv_sashes }|.
 ENDFORM.
 
@@ -308,6 +312,7 @@ FORM read_sizes.
       CALL METHOD go_splitter->('GET_COLUMN_WIDTH')
         EXPORTING id = 2
         IMPORTING result = lv_col_2.
+      cl_gui_cfw=>flush( ).
       gv_status = |Rows { lv_row_1 }/{ lv_row_2 }; columns { lv_col_1 }/{ lv_col_2 }|.
     CATCH cx_root.
       gv_status = |Rows { lv_row_1 }/{ lv_row_2 }; column-width query unavailable|.

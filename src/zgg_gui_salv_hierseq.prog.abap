@@ -20,17 +20,12 @@ TYPES:
   ty_items TYPE STANDARD TABLE OF ty_item WITH EMPTY KEY.
 
 TYPES:
-  BEGIN OF ty_binding,
-    master TYPE lvc_fname,
-    slave  TYPE lvc_fname,
-  END OF ty_binding,
-  ty_bindings TYPE STANDARD TABLE OF ty_binding WITH EMPTY KEY,
   ty_text_line TYPE c LENGTH 255,
   ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
 
 DATA gt_headers TYPE ty_headers.
 DATA gt_items TYPE ty_items.
-DATA gt_bindings TYPE ty_bindings.
+DATA gt_bindings TYPE salv_t_hierseq_binding.
 DATA go_host TYPE REF TO cl_gui_custom_container.
 DATA go_hierseq TYPE REF TO object.
 DATA go_header_columns TYPE REF TO object.
@@ -82,8 +77,6 @@ MODULE user_command_0100 INPUT.
 ENDMODULE.
 
 FORM create_controls.
-  DATA lv_class TYPE string VALUE 'CL_SALV_HIERSEQ_TABLE'.
-  DATA lv_factory TYPE string VALUE 'FACTORY'.
   DATA lv_error TYPE string.
 
   IF go_host IS NOT BOUND.
@@ -96,10 +89,7 @@ FORM create_controls.
   PERFORM build_data.
   gt_bindings = VALUE #( ( master = 'GROUP_ID' slave = 'GROUP_ID' ) ).
   TRY.
-      CALL METHOD (lv_class)=>(lv_factory)
-        EXPORTING t_binding_level1_level2 = gt_bindings
-        IMPORTING r_hierseq = go_hierseq
-        CHANGING t_table_level1 = gt_headers t_table_level2 = gt_items.
+      PERFORM create_native_hierseq.
       IF go_hierseq IS NOT BOUND.
         PERFORM show_fallback USING 'Hierarchical-sequential SALV factory returned no object'.
         RETURN.
