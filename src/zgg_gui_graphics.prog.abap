@@ -154,10 +154,10 @@ FORM show_graphics_proxy.
 * CL_GUI_GP_PRES declares no constructor parameters in the dependency surface.
       CREATE OBJECT lo_proxy.
       lo_proxy->set_dc_names(
-        EXPORTING objid  = 'OBJID'
-                  grpid  = 'GRPID'
-                  x_val  = 'X_VAL'
-                  y_val  = 'Y_VAL'
+        EXPORTING obj_id = 'OBJ_ID'
+                  grp_id = 'GRP_ID'
+                  dim1   = 'DIM1'
+                  text   = 'TEXT'
         IMPORTING retval = lv_retval ).
       lo_proxy->if_graphic_proxy~activate( IMPORTING retval = lv_retval ).
       go_control = lo_proxy.
