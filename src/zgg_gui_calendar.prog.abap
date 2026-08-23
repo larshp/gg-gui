@@ -1,12 +1,6 @@
 REPORT zgg_gui_calendar.
 
-TYPES:
-  BEGIN OF ty_day_info,
-    date  TYPE d,
-    color TYPE i,
-    text  TYPE c LENGTH 80,
-  END OF ty_day_info,
-  ty_day_info_table TYPE STANDARD TABLE OF ty_day_info WITH EMPTY KEY.
+TYPE-POOLS cnca.
 
 CONSTANTS c_style_vertical TYPE i VALUE 4.
 CONSTANTS c_select_day TYPE i VALUE 1.
@@ -15,7 +9,7 @@ CONSTANTS c_select_month TYPE i VALUE 4.
 CONSTANTS c_select_interval TYPE i VALUE 8.
 
 DATA go_host TYPE REF TO cl_gui_custom_container.
-DATA go_calendar TYPE REF TO object.
+DATA go_calendar TYPE REF TO cl_gui_calendar.
 DATA go_control TYPE REF TO cl_gui_control.
 DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_focus TYPE d.
@@ -118,13 +112,12 @@ FORM create_controls.
 ENDFORM.
 
 FORM create_calendar.
-  DATA lv_class_name TYPE string VALUE 'CL_GUI_CALENDAR'.
 
   IF go_calendar IS BOUND.
     RETURN.
   ENDIF.
   TRY.
-      CREATE OBJECT go_calendar TYPE (lv_class_name)
+      CREATE OBJECT go_calendar
         EXPORTING
           parent          = go_host
           view_style      = c_style_vertical
@@ -152,8 +145,7 @@ ENDFORM.
 
 FORM go_to_focus.
   TRY.
-      CALL METHOD go_calendar->('GO_TO_DATE')
-        EXPORTING focus_date = gv_focus.
+      go_calendar->go_to_date( gv_focus ).
       gv_status = |Calendar navigated to { gv_focus DATE = USER }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |GO_TO_DATE failed: { lx_error->get_text( ) }|.
@@ -166,10 +158,9 @@ FORM set_selection.
   lv_end = COND #( WHEN gv_selection_style = c_select_day
     THEN gv_focus ELSE gv_focus + 7 ).
   TRY.
-      CALL METHOD go_calendar->('SET_SELECTION')
-        EXPORTING date_begin = gv_focus
-                  date_end = lv_end
-                  no_scroll = abap_false.
+      go_calendar->set_selection( date_begin = gv_focus
+                                  date_end   = lv_end
+                                  no_scroll  = abap_false ).
       gv_status = |Selection set from { gv_focus DATE = USER } to { lv_end DATE = USER }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SET_SELECTION failed: { lx_error->get_text( ) }|.
@@ -181,8 +172,8 @@ FORM read_selection.
   DATA lv_end TYPE d.
 
   TRY.
-      CALL METHOD go_calendar->('GET_SELECTION')
-        IMPORTING date_begin = lv_begin date_end = lv_end.
+      go_calendar->get_selection( IMPORTING date_begin = lv_begin
+                                            date_end   = lv_end ).
       gv_status = |Selected { lv_begin DATE = USER } through { lv_end DATE = USER }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |GET_SELECTION failed: { lx_error->get_text( ) }|.
@@ -190,14 +181,13 @@ FORM read_selection.
 ENDFORM.
 
 FORM set_day_info.
-  DATA lt_day_info TYPE ty_day_info_table.
+  DATA lt_day_info TYPE cnca_itab_day_info.
 
   lt_day_info = VALUE #(
     ( date = gv_focus color = 1 text = 'Focused sample day' )
     ( date = gv_focus + 1 color = 4 text = 'Follow-up sample day' ) ).
   TRY.
-      CALL METHOD go_calendar->('SET_DAY_INFO')
-        EXPORTING day_info = lt_day_info.
+      go_calendar->set_day_info( lt_day_info ).
       gv_status = 'Two dates marked with color and tooltip day information'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SET_DAY_INFO failed: { lx_error->get_text( ) }|.

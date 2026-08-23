@@ -366,10 +366,10 @@ FORM move_node.
   gv_moved = xsdbool( gv_moved = abap_false ).
   lv_parent = COND #( WHEN gv_moved = abap_true THEN 'LAZY' ELSE 'ROOT' ).
   TRY.
-      CALL METHOD go_tree->('MOVE_NODE')
-        EXPORTING node_key = 'EVENTS'
-                  relative_node_key = lv_parent
-          relationship = cl_gui_column_tree=>relat_last_child.
+      go_tree->move_node(
+        node_key          = 'EVENTS'
+        relative_node_key = lv_parent
+        relationship      = cl_gui_column_tree=>relat_last_child ).
       gv_status = |EVENTS moved under { lv_parent }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |MOVE_NODE unavailable: { lx_error->get_text( ) }|.

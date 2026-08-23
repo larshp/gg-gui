@@ -483,7 +483,7 @@ FORM refresh_log.
     TRY.
       go_log->set_text_as_r3table( lt_text ).
       cl_gui_cfw=>flush( ).
-      CALL METHOD go_log->('GO_TO_LINE') EXPORTING line = lines( gt_log ).
+      go_log->go_to_line( lines( gt_log ) ).
       cl_gui_cfw=>flush( ).
       CATCH cx_root.
     ENDTRY.

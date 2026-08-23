@@ -5,7 +5,7 @@ TYPES ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
 
 CONSTANTS c_lifetime_dynpro TYPE i VALUE 1.
 
-DATA go_dialog TYPE REF TO object.
+DATA go_dialog TYPE REF TO cl_gui_dialogbox_container.
 DATA go_container TYPE REF TO cl_gui_container.
 DATA go_editor TYPE REF TO cl_gui_textedit.
 DATA gv_ok_code TYPE sy-ucomm.
@@ -90,14 +90,13 @@ MODULE user_command_0100 INPUT.
 ENDMODULE.
 
 FORM create_dialog.
-  DATA lv_class_name TYPE string VALUE 'CL_GUI_DIALOGBOX_CONTAINER'.
   DATA lt_text TYPE ty_text_lines.
 
   IF go_dialog IS BOUND.
     RETURN.
   ENDIF.
   TRY.
-      CREATE OBJECT go_dialog TYPE (lv_class_name)
+      CREATE OBJECT go_dialog
         EXPORTING
           repid    = sy-repid
           dynnr    = sy-dynnr
@@ -156,8 +155,7 @@ FORM set_caption.
     RETURN.
   ENDIF.
   TRY.
-      CALL METHOD go_dialog->('SET_CAPTION')
-        EXPORTING caption = gv_caption.
+      go_dialog->set_caption( gv_caption ).
       gv_status = |Dialog caption changed to "{ gv_caption }"|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SET_CAPTION unavailable: { lx_error->get_text( ) }|.

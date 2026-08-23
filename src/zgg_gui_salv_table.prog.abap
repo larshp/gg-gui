@@ -181,6 +181,7 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table
     RAISING cx_salv_error.
   DATA lo_columns TYPE REF TO cl_salv_columns_table.
   DATA lo_column TYPE REF TO cl_salv_column.
+  DATA lo_column_list TYPE REF TO cl_salv_column_list.
   DATA lo_functions TYPE REF TO cl_salv_functions_list.
   DATA lo_settings TYPE REF TO cl_salv_display_settings.
   DATA lo_selections TYPE REF TO cl_salv_selections.
@@ -194,14 +195,10 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table
   lo_columns->set_key_fixation( abap_true ).
   lo_columns->set_column_position( columnname = 'ID'
                                    position   = 1 ).
-  TRY.
-      CALL METHOD lo_columns->('SET_COLOR_COLUMN') EXPORTING value = 'CELL_COLORS'.
-    CATCH cx_root.
-      " Cell-color metadata varies across SALV releases; keep the table usable.
-  ENDTRY.
-  CALL METHOD lo_columns->('SET_CELL_TYPE_COLUMN') EXPORTING value = 'CELL_TYPES'.
-  CALL METHOD lo_columns->('SET_EXCEPTION_COLUMN') EXPORTING value = 'EXCEPTION'.
-  CALL METHOD lo_columns->('SET_HYPERLINK_ENTRY_COLUMN') EXPORTING value = 'LINK_HANDLES'.
+  lo_columns->set_color_column( 'CELL_COLORS' ).
+  lo_columns->set_cell_type_column( 'CELL_TYPES' ).
+  lo_columns->set_exception_column( 'EXCEPTION' ).
+  lo_columns->set_hyperlink_entry_column( 'LINK_HANDLES' ).
 
   lo_column = lo_columns->get_column( 'ID' ).
   lo_column->set_short_text( 'ID' ).
@@ -209,7 +206,8 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table
   lo_column->set_long_text( 'Product identifier' ).
   lo_column->set_output_length( 10 ).
   lo_column->set_tooltip( 'Stable demo product identifier' ).
-  CALL METHOD lo_column->('SET_KEY') EXPORTING value = abap_true.
+  lo_column_list ?= lo_column.
+  lo_column_list->set_key( abap_true ).
 
   lo_column = lo_columns->get_column( 'NAME' ).
   lo_column->set_long_text( 'Product name (hyperlink)' ).
@@ -233,10 +231,12 @@ FORM configure_salv USING io_salv TYPE REF TO cl_salv_table
   CLEAR ls_color.
   ls_color-col = 5.
   ls_color-int = 0.
-  CALL METHOD lo_column->('SET_COLOR') EXPORTING value = ls_color.
+  lo_column_list ?= lo_column.
+  lo_column_list->set_color( ls_color ).
 
   lo_column = lo_columns->get_column( 'STATUS' ).
-  CALL METHOD lo_column->('SET_CELL_TYPE') EXPORTING value = if_salv_c_cell_type=>hotspot.
+  lo_column_list ?= lo_column.
+  lo_column_list->set_cell_type( if_salv_c_cell_type=>hotspot ).
 
   lo_column = lo_columns->get_column( 'TECHNICAL' ).
   lo_column->set_technical( abap_true ).
@@ -322,30 +322,26 @@ FORM configure_hyperlinks USING io_salv TYPE REF TO cl_salv_table
 ENDFORM.
 
 FORM configure_forms USING io_salv TYPE REF TO cl_salv_table.
-  DATA lo_top TYPE REF TO object.
-  DATA lo_end TYPE REF TO object.
-  DATA lv_grid_class TYPE string VALUE 'CL_SALV_FORM_LAYOUT_GRID'.
+  DATA lo_top TYPE REF TO cl_salv_form_layout_grid.
+  DATA lo_end TYPE REF TO cl_salv_form_layout_grid.
 
-  CREATE OBJECT lo_top TYPE (lv_grid_class).
-  CALL METHOD lo_top->('CREATE_HEADER_INFORMATION')
-    EXPORTING row = 1
-              column = 1
-              text = 'SALV table sample'
-      tooltip = 'Top-of-list form element'.
-  CALL METHOD lo_top->('CREATE_LABEL')
-    EXPORTING row = 2
-              column = 1
-              text = 'Five deterministic products'.
+  CREATE OBJECT lo_top.
+  lo_top->create_header_information( row     = 1
+                                     column  = 1
+                                     text    = 'SALV table sample'
+                                     tooltip = 'Top-of-list form element' ).
+  lo_top->create_label( row    = 2
+                        column = 1
+                        text   = 'Five deterministic products' ).
 
-  CREATE OBJECT lo_end TYPE (lv_grid_class).
-  CALL METHOD lo_end->('CREATE_LABEL')
-    EXPORTING row = 1
-              column = 1
-              text = 'End of SALV output'.
+  CREATE OBJECT lo_end.
+  lo_end->create_label( row    = 1
+                        column = 1
+                        text   = 'End of SALV output' ).
 
-  CALL METHOD io_salv->('SET_TOP_OF_LIST') EXPORTING value = lo_top.
-  CALL METHOD io_salv->('SET_TOP_OF_LIST_PRINT') EXPORTING value = lo_top.
-  CALL METHOD io_salv->('SET_END_OF_LIST') EXPORTING value = lo_end.
+  io_salv->set_top_of_list( lo_top ).
+  io_salv->set_top_of_list_print( lo_top ).
+  io_salv->set_end_of_list( lo_end ).
 ENDFORM.
 
 FORM read_selection.

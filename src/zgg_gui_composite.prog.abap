@@ -515,8 +515,8 @@ ENDFORM.
 
 FORM save_layout.
   TRY.
-      CALL METHOD go_root_splitter->('GET_COLUMN_WIDTH')
-        EXPORTING id = 1 IMPORTING result = gv_saved_nav_width.
+      go_root_splitter->get_column_width(
+        EXPORTING id = 1 IMPORTING result = gv_saved_nav_width ).
       go_right_splitter->get_row_height( EXPORTING id = 2 IMPORTING result = gv_saved_grid_height ).
       go_right_splitter->get_row_height( EXPORTING id = 3 IMPORTING result = gv_saved_detail_height ).
       gv_layout_saved = abap_true.

@@ -9,7 +9,7 @@ CONSTANTS c_dock_top TYPE i VALUE 4.
 CONSTANTS c_dock_bottom TYPE i VALUE 8.
 CONSTANTS c_lifetime_dynpro TYPE i VALUE 1.
 
-DATA go_docking TYPE REF TO object.
+DATA go_docking TYPE REF TO cl_gui_docking_container.
 DATA go_container TYPE REF TO cl_gui_container.
 DATA go_editor TYPE REF TO cl_gui_textedit.
 DATA gv_ok_code TYPE sy-ucomm.
@@ -89,7 +89,6 @@ MODULE user_command_0100 INPUT.
 ENDMODULE.
 
 FORM create_controls.
-  DATA lv_class_name TYPE string VALUE 'CL_GUI_DOCKING_CONTAINER'.
   DATA lt_text TYPE ty_text_lines.
 
   IF go_docking IS BOUND.
@@ -97,7 +96,7 @@ FORM create_controls.
   ENDIF.
 
   TRY.
-      CREATE OBJECT go_docking TYPE (lv_class_name)
+      CREATE OBJECT go_docking
         EXPORTING
           repid                   = sy-repid
           dynnr                   = sy-dynnr
@@ -123,8 +122,7 @@ ENDFORM.
 
 FORM dock_at_side.
   TRY.
-      CALL METHOD go_docking->('DOCK_AT')
-        EXPORTING side = gv_side.
+      go_docking->dock_at( gv_side ).
       PERFORM describe_side.
       gv_status = |Docked at { gv_side_text }|.
     CATCH cx_root INTO DATA(lx_error).
@@ -134,8 +132,7 @@ ENDFORM.
 
 FORM set_extension.
   TRY.
-      CALL METHOD go_docking->('SET_EXTENSION')
-        EXPORTING extension = gv_extension.
+      go_docking->set_extension( gv_extension ).
       gv_status = |Docking extension set to { gv_extension }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SET_EXTENSION failed: { lx_error->get_text( ) }|.

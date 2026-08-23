@@ -27,12 +27,12 @@ DATA gt_headers TYPE ty_headers.
 DATA gt_items TYPE ty_items.
 DATA gt_bindings TYPE salv_t_hierseq_binding.
 DATA go_host TYPE REF TO cl_gui_custom_container.
-DATA go_hierseq TYPE REF TO object.
-DATA go_header_columns TYPE REF TO object.
-DATA go_item_columns TYPE REF TO object.
-DATA go_item_sorts TYPE REF TO object.
-DATA go_item_filters TYPE REF TO object.
-DATA go_item_aggregations TYPE REF TO object.
+DATA go_hierseq TYPE REF TO cl_salv_hierseq_table.
+DATA go_header_columns TYPE REF TO cl_salv_columns_hierseq.
+DATA go_item_columns TYPE REF TO cl_salv_columns_hierseq.
+DATA go_item_sorts TYPE REF TO cl_salv_sorts.
+DATA go_item_filters TYPE REF TO cl_salv_filters.
+DATA go_item_aggregations TYPE REF TO cl_salv_aggregations.
 DATA go_fallback TYPE REF TO cl_gui_textedit.
 DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_status TYPE c LENGTH 108.
@@ -100,7 +100,7 @@ FORM create_controls.
       ENDIF.
       PERFORM configure_levels.
       PERFORM register_native_hierseq_events.
-      CALL METHOD go_hierseq->('DISPLAY').
+      go_hierseq->display( ).
       PERFORM consume_native_hierseq_event.
       IF gv_hierseq_event IS INITIAL.
         IF gv_native_events_registered = abap_true.
@@ -134,48 +134,52 @@ FORM build_data.
 ENDFORM.
 
 FORM configure_levels.
-  DATA lo_column TYPE REF TO object.
-  DATA lo_functions TYPE REF TO object.
+  DATA lo_column TYPE REF TO cl_salv_column.
+  DATA lo_column_list TYPE REF TO cl_salv_column_list.
+  DATA lo_functions TYPE REF TO cl_salv_functions_list.
 
-  CALL METHOD go_hierseq->('GET_COLUMNS') EXPORTING level = 1 RECEIVING value = go_header_columns.
-  CALL METHOD go_hierseq->('GET_COLUMNS') EXPORTING level = 2 RECEIVING value = go_item_columns.
-  CALL METHOD go_header_columns->('SET_OPTIMIZE') EXPORTING value = abap_true.
-  CALL METHOD go_item_columns->('SET_OPTIMIZE') EXPORTING value = abap_true.
+  TRY.
+      go_header_columns = go_hierseq->get_columns( 1 ).
+      go_item_columns = go_hierseq->get_columns( 2 ).
+      go_header_columns->set_optimize( abap_true ).
+      go_item_columns->set_optimize( abap_true ).
 
-  CALL METHOD go_header_columns->('GET_COLUMN') EXPORTING columnname = 'GROUP_ID' RECEIVING value = lo_column.
-  CALL METHOD lo_column->('SET_TECHNICAL') EXPORTING value = abap_true.
-  CALL METHOD go_header_columns->('GET_COLUMN') EXPORTING columnname = 'GROUP_NAME' RECEIVING value = lo_column.
-  CALL METHOD lo_column->('SET_LONG_TEXT') EXPORTING value = 'Product group'.
+      lo_column = go_header_columns->get_column( 'GROUP_ID' ).
+      lo_column->set_technical( abap_true ).
+      lo_column = go_header_columns->get_column( 'GROUP_NAME' ).
+      lo_column->set_long_text( 'Product group' ).
 
-  CALL METHOD go_item_columns->('GET_COLUMN') EXPORTING columnname = 'GROUP_ID' RECEIVING value = lo_column.
-  CALL METHOD lo_column->('SET_TECHNICAL') EXPORTING value = abap_true.
-  CALL METHOD go_item_columns->('GET_COLUMN') EXPORTING columnname = 'ITEM_ID' RECEIVING value = lo_column.
-  CALL METHOD lo_column->('SET_KEY') EXPORTING value = abap_true.
-  CALL METHOD lo_column->('SET_CELL_TYPE') EXPORTING value = if_salv_c_cell_type=>hotspot.
-  CALL METHOD go_item_columns->('GET_COLUMN') EXPORTING columnname = 'PRICE' RECEIVING value = lo_column.
-  CALL METHOD lo_column->('SET_CURRENCY_COLUMN') EXPORTING value = 'CURRENCY'.
+      lo_column = go_item_columns->get_column( 'GROUP_ID' ).
+      lo_column->set_technical( abap_true ).
+      lo_column = go_item_columns->get_column( 'ITEM_ID' ).
+      lo_column_list ?= lo_column.
+      lo_column_list->set_key( abap_true ).
+      lo_column_list->set_cell_type( if_salv_c_cell_type=>hotspot ).
+      lo_column = go_item_columns->get_column( 'PRICE' ).
+      lo_column->set_currency_column( 'CURRENCY' ).
 
-  CALL METHOD go_hierseq->('GET_FUNCTIONS') RECEIVING value = lo_functions.
-  CALL METHOD lo_functions->('SET_ALL') EXPORTING value = abap_true.
-  CALL METHOD go_hierseq->('GET_SORTS') EXPORTING level = 2 RECEIVING value = go_item_sorts.
-  CALL METHOD go_hierseq->('GET_FILTERS') EXPORTING level = 2 RECEIVING value = go_item_filters.
-  CALL METHOD go_hierseq->('GET_AGGREGATIONS') EXPORTING level = 2 RECEIVING value = go_item_aggregations.
-  CALL METHOD go_item_sorts->('ADD_SORT')
-    EXPORTING columnname = 'NAME'
-              sequence = 1
-              position = 1
-              subtotal = abap_false.
-  CALL METHOD go_item_filters->('ADD_FILTER')
-    EXPORTING columnname = 'QUANTITY'
-              sign = 'I'
-              option = 'GE'
-              low = 0.
-  CALL METHOD go_item_aggregations->('ADD_AGGREGATION')
-    EXPORTING columnname = 'QUANTITY'
-              aggregation = if_salv_c_aggregation=>total.
-  CALL METHOD go_item_aggregations->('ADD_AGGREGATION')
-    EXPORTING columnname = 'PRICE'
-              aggregation = if_salv_c_aggregation=>average.
+      lo_functions = go_hierseq->get_functions( ).
+      lo_functions->set_all( abap_true ).
+      go_item_sorts = go_hierseq->get_sorts( 2 ).
+      go_item_filters = go_hierseq->get_filters( 2 ).
+      go_item_aggregations = go_hierseq->get_aggregations( 2 ).
+      go_item_sorts->add_sort( columnname = 'NAME'
+                               sequence   = 1
+                               position   = 1
+                               subtotal   = abap_false ).
+      go_item_filters->add_filter( columnname = 'QUANTITY'
+                                   sign       = 'I'
+                                   option     = 'GE'
+                                   low        = 0 ).
+      go_item_aggregations->add_aggregation(
+        columnname  = 'QUANTITY'
+        aggregation = if_salv_c_aggregation=>total ).
+      go_item_aggregations->add_aggregation(
+        columnname  = 'PRICE'
+        aggregation = if_salv_c_aggregation=>average ).
+    CATCH cx_salv_error INTO DATA(lx_levels).
+      gv_status = |Hierseq level setup failed: { lx_levels->get_text( ) }|.
+  ENDTRY.
 ENDFORM.
 
 
@@ -198,21 +202,19 @@ FORM toggle_filter.
   ENDIF.
   gv_filtered = xsdbool( gv_filtered = abap_false ).
   TRY.
-      CALL METHOD go_item_filters->('CLEAR').
+      go_item_filters->clear( ).
       IF gv_filtered = abap_true.
-        CALL METHOD go_item_filters->('ADD_FILTER')
-          EXPORTING columnname = 'QUANTITY'
-                    sign = 'I'
-                    option = 'GE'
-                    low = 8.
+        go_item_filters->add_filter( columnname = 'QUANTITY'
+                                     sign       = 'I'
+                                     option     = 'GE'
+                                     low        = 8 ).
       ELSE.
-        CALL METHOD go_item_filters->('ADD_FILTER')
-          EXPORTING columnname = 'QUANTITY'
-                    sign = 'I'
-                    option = 'GE'
-                    low = 0.
+        go_item_filters->add_filter( columnname = 'QUANTITY'
+                                     sign       = 'I'
+                                     option     = 'GE'
+                                     low        = 0 ).
       ENDIF.
-      CALL METHOD go_hierseq->('REFRESH').
+      go_hierseq->refresh( ).
       gv_status = |Item-level quantity filter toggled; threshold-eight mode { gv_filtered }|.
       gv_detail = 'Header rows remain linked to their surviving item rows through the GROUP_ID binding'.
     CATCH cx_root INTO DATA(lx_error).
@@ -226,16 +228,15 @@ FORM configure_totals.
     RETURN.
   ENDIF.
   TRY.
-      CALL METHOD go_item_sorts->('CLEAR').
-      CALL METHOD go_item_sorts->('ADD_SORT')
-        EXPORTING columnname = 'NAME'
-                  sequence = 1
-                  position = 1
-                  subtotal = abap_false.
-      CALL METHOD go_item_aggregations->('ADD_AGGREGATION')
-        EXPORTING columnname = 'QUANTITY'
-                  aggregation = if_salv_c_aggregation=>maximum.
-      CALL METHOD go_hierseq->('REFRESH').
+      go_item_sorts->clear( ).
+      go_item_sorts->add_sort( columnname = 'NAME'
+                               sequence   = 1
+                               position   = 1
+                               subtotal   = abap_false ).
+      go_item_aggregations->add_aggregation(
+        columnname  = 'QUANTITY'
+        aggregation = if_salv_c_aggregation=>maximum ).
+      go_hierseq->refresh( ).
       gv_status = 'Item sorting restored; total quantity, average price, and maximum quantity aggregations requested'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Hierarchical-sequential aggregation failed: { lx_error->get_text( ) }|.
@@ -261,13 +262,12 @@ FORM reset_data.
   PERFORM build_data.
   IF go_hierseq IS BOUND.
     TRY.
-        CALL METHOD go_item_filters->('CLEAR').
-        CALL METHOD go_item_filters->('ADD_FILTER')
-          EXPORTING columnname = 'QUANTITY'
-                    sign = 'I'
-                    option = 'GE'
-                    low = 0.
-        CALL METHOD go_hierseq->('REFRESH').
+        go_item_filters->clear( ).
+        go_item_filters->add_filter( columnname = 'QUANTITY'
+                                     sign       = 'I'
+                                     option     = 'GE'
+                                     low        = 0 ).
+        go_hierseq->refresh( ).
         gv_status = 'Header rows, item rows, binding assumptions, filter, and displayed hierarchy reset'.
       CATCH cx_root INTO DATA(lx_error).
         gv_status = |Hierarchical-sequential reset failed: { lx_error->get_text( ) }|.

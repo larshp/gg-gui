@@ -249,16 +249,16 @@ CLASS lcl_events IMPLEMENTATION.
             gt_last_nodes = lo_payload->node_keys.
           ENDIF.
           IF lo_payload->node_keys IS INITIAL.
-            CALL METHOD go_tree->('MOVE_NODE')
-              EXPORTING node_key = lo_payload->node_key
-                        relative_node_key = node_key
-                relationship = cl_gui_column_tree=>relat_last_child.
+            go_tree->move_node(
+              node_key          = lo_payload->node_key
+              relative_node_key = node_key
+              relationship      = cl_gui_column_tree=>relat_last_child ).
           ELSE.
             LOOP AT lo_payload->node_keys INTO DATA(lv_key).
-              CALL METHOD go_tree->('MOVE_NODE')
-                EXPORTING node_key = lv_key
-                          relative_node_key = node_key
-                  relationship = cl_gui_column_tree=>relat_last_child.
+              go_tree->move_node(
+                node_key          = lv_key
+                relative_node_key = node_key
+                relationship      = cl_gui_column_tree=>relat_last_child ).
             ENDLOOP.
           ENDIF.
           gv_last_action = 'TREE'.
@@ -458,10 +458,10 @@ FORM undo_last_drop.
           LOOP AT gt_last_nodes INTO DATA(lv_key).
             DATA(lv_parent) = COND tv_nodekey(
               WHEN lv_key = 'P100' OR lv_key = 'P110' THEN 'INPUT' ELSE 'DISPLAY' ).
-            CALL METHOD go_tree->('MOVE_NODE')
-              EXPORTING node_key = lv_key
-                        relative_node_key = lv_parent
-                relationship = cl_gui_column_tree=>relat_last_child.
+            go_tree->move_node(
+              node_key          = lv_key
+              relative_node_key = lv_parent
+              relationship      = cl_gui_column_tree=>relat_last_child ).
           ENDLOOP.
           lcl_log=>add( |Undo restored { lines( gt_last_nodes ) } tree nodes to their initial parents| ).
         WHEN 'ADDNODE'.

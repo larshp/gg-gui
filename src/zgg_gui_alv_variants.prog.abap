@@ -232,9 +232,7 @@ FORM delete_current_variant.
   ENDIF.
   APPEND ls_key TO lt_delete.
   TRY.
-      CALL METHOD go_variant->('DELETE_VARIANTS')
-        EXPORTING it_variants = lt_delete
-        RECEIVING boolean = lv_deleted.
+      lv_deleted = go_variant->delete_variants( lt_delete ).
       IF lv_deleted = abap_true.
         DELETE gt_owned_variants WHERE variant = ls_key-variant.
       ENDIF.
@@ -263,9 +261,7 @@ FORM cleanup_owned_variants.
     RETURN.
   ENDIF.
   TRY.
-      CALL METHOD go_variant->('DELETE_VARIANTS')
-        EXPORTING it_variants = gt_owned_variants
-        RECEIVING boolean = lv_deleted.
+      lv_deleted = go_variant->delete_variants( gt_owned_variants ).
       IF lv_deleted = abap_true.
         CLEAR gt_owned_variants.
       ENDIF.
