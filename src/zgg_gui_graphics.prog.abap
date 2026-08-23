@@ -127,7 +127,7 @@ FORM show_chart_engine.
     && '<Point label="Display" value="4"/></Series></Data></Chart>'.
   TRY.
       CREATE OBJECT lo_engine EXPORTING parent = go_host.
-      lo_engine->set_data( lv_xml ).
+      lo_engine->set_data( data = lv_xml ).
       lo_engine->render( ).
       go_control = lo_engine.
       gv_active_class = lv_class.
