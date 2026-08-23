@@ -551,6 +551,31 @@ GUI frontend features, or local development-environment failures in this file.
   visible when a class or frontend capability is unavailable.
 - Upstream reference: Not reported
 
+### Graphics dependency declarations deviate from the native SAP surface
+
+- Status: Open, confirmed
+- Sample: `ZGG_GUI_GRAPHICS`
+- Component: `open-abap-gui` dependency surface
+- Version or commit: `dc251c0` (`open-abap-gui` local checkout, 2026-08-23)
+- Native SAP behavior: `CL_GUI_CHART_ENGINE` is a standalone class that drives
+  either the frontend ActiveX engine or the IGS renderer; it does not inherit
+  from `CL_GUI_CONTROL` and therefore has no control lifetime methods.
+  `CL_GUI_GP_PRES->SET_DC_NAMES` requires the dimension parameters, so `DIM2`
+  cannot be omitted.
+- open-abap behavior: `CL_GUI_CHART_ENGINE` is declared as
+  `INHERITING FROM cl_gui_control`, and every `SET_DC_NAMES` parameter is
+  declared `OPTIONAL`. Both deviations are accepted by the lint run while a
+  native syntax check rejects the same source, so the dependency surface is
+  more permissive than the system it models.
+- Reproduction: Assign a `CL_GUI_CHART_ENGINE` reference to a
+  `CL_GUI_CONTROL` variable, or call `SET_DC_NAMES` without `DIM2`. The lint
+  run reports no issue; the native syntax check reports a type conversion
+  error and a missing mandatory parameter.
+- Workaround: The sample keeps the chart engine in its own reference instead of
+  the shared control variable, releases it by dropping that reference, and
+  passes the dimension parameters explicitly.
+- Upstream reference: Not reported
+
 ### Picture event surface and Data Provider lifetime constant are missing
 
 - Status: Open, confirmed

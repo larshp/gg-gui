@@ -12,6 +12,9 @@ TYPES ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
 
 DATA go_host TYPE REF TO cl_gui_custom_container.
 DATA go_control TYPE REF TO cl_gui_control.
+* CL_GUI_CHART_ENGINE is no CL_GUI_CONTROL subclass on a native system, so the
+* engine needs its own reference to survive the dialog round trips.
+DATA go_chart_engine TYPE REF TO cl_gui_chart_engine.
 DATA go_fallback TYPE REF TO cl_gui_textedit.
 DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_status TYPE c LENGTH 108.
@@ -112,7 +115,6 @@ ENDFORM.
 
 FORM show_chart_engine.
   DATA lv_class TYPE string VALUE 'CL_GUI_CHART_ENGINE'.
-  DATA lo_engine TYPE REF TO cl_gui_chart_engine.
   DATA lv_xml TYPE string.
   DATA lv_reason TYPE string.
 
@@ -126,13 +128,12 @@ FORM show_chart_engine.
     && '<Point label="Keyboard" value="12"/><Point label="Mouse" value="7"/>'
     && '<Point label="Display" value="4"/></Series></Data></Chart>'.
   TRY.
-      CREATE OBJECT lo_engine EXPORTING parent = go_host.
-      lo_engine->set_data( data = lv_xml ).
-      lo_engine->render( ).
-      go_control = lo_engine.
+      CREATE OBJECT go_chart_engine EXPORTING parent = go_host.
+      go_chart_engine->set_data( data = lv_xml ).
+      go_chart_engine->render( ).
       gv_active_class = lv_class.
       gv_status = 'CL_GUI_CHART_ENGINE created with deterministic XML chart data'.
-      gv_detail = 'SAP GUI for Windows uses the ActiveX engine when present and can fall back to the IGS implementation'.
+      gv_detail = 'Engine is kept outside the control reference because it does not inherit from CL_GUI_CONTROL'.
     CATCH cx_root INTO DATA(lx_error).
       lv_reason = lx_error->get_text( ).
       PERFORM show_missing USING lv_class lv_reason.
@@ -157,6 +158,7 @@ FORM show_graphics_proxy.
         EXPORTING obj_id = 'OBJ_ID'
                   grp_id = 'GRP_ID'
                   dim1   = 'DIM1'
+                  dim2   = 'DIM2'
                   text   = 'TEXT'
         IMPORTING retval = lv_retval ).
       lo_proxy->if_graphic_proxy~activate( IMPORTING retval = lv_retval ).
@@ -228,6 +230,9 @@ FORM release_active.
     go_control->free( ).
     FREE go_control.
   ENDIF.
+* The chart engine exposes no control lifetime method, so only its reference is
+* dropped and the frontend output disappears with the next rendered variant.
+  FREE go_chart_engine.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
   CLEAR gv_active_class.
 ENDFORM.
