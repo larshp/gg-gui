@@ -11,6 +11,7 @@ returns without behavior, fails an `ASSERT`, or yields a placeholder result is
 not an anomaly and is not recorded. Record only surface that is absent,
 incompletely declared, or declared differently from native SAP.
 
+
 ## Entry Template
 
 ### Short title
