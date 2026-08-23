@@ -92,8 +92,9 @@ GUI frontend features, or local development-environment failures in this file.
   dialog with close and resize events.
 - open-abap behavior: `CL_GUI_DOCKING_CONTAINER`, `CL_GUI_DIALOGBOX_CONTAINER`,
   and `CL_GUI_EASY_SPLITTER_CONTAINER` are now declared with their native
-  constructor, `DOCK_AT`, `SET_EXTENSION`, `SET_CAPTION`, `CLOSE` event, and
-  inner-container attributes, so static code resolves. Every method body
+  constructor, `DOCK_AT`, `SET_EXTENSION`, `FLOAT`, `SET_CAPTION`, `CLOSE`
+  event, and inner-container attributes, so static code resolves. Every
+  method body
   returns without creating a frontend control, and the easy-splitter
   `TOP_LEFT_CONTAINER` / `BOTTOM_RIGHT_CONTAINER` attributes stay unbound.
   `CL_GUI_SPLITTER_CONTAINER` still has no minimum-size API in native SAP
@@ -118,8 +119,8 @@ GUI frontend features, or local development-environment failures in this file.
   events, and attaches colors and tooltip text to dates.
 - open-abap behavior: `CL_GUI_CALENDAR` and the `CNCA` type pool are now
   declared, covering the native constructor, `GO_TO_DATE`, `SET_SELECTION`,
-  `GET_SELECTION`, `SET_DAY_INFO`, and the `DATE_SELECTED` / `INFO_REQUEST`
-  events, so the sample is statically checked. All method bodies return without
+  `GET_SELECTION`, `SET_DAY_INFO`, `RESET_DAY_INFO`, `RESET_SELECTION`, and the
+  `DATE_SELECTED` / `INFO_REQUEST` events, so the sample is statically checked. All method bodies return without
   frontend state. The `M_ID_DATE_SELECTED` and `M_ID_INFO_REQUEST` event-ID
   constants required by `SET_REGISTERED_EVENTS` are still absent.
 - Reproduction: Reference `cl_gui_calendar=>m_id_date_selected` in a checked

@@ -8,6 +8,10 @@ CONSTANTS c_dock_right TYPE i VALUE 2.
 CONSTANTS c_dock_top TYPE i VALUE 4.
 CONSTANTS c_dock_bottom TYPE i VALUE 8.
 CONSTANTS c_lifetime_dynpro TYPE i VALUE 1.
+* FLOAT takes a single DO_FLOAT flag: a set value floats the container, a
+* cleared one docks it again at the configured side.
+CONSTANTS c_do_float TYPE i VALUE 1.
+CONSTANTS c_do_dock TYPE i VALUE 0.
 
 DATA go_docking TYPE REF TO cl_gui_docking_container.
 DATA go_container TYPE REF TO cl_gui_container.
@@ -71,9 +75,9 @@ MODULE user_command_0100 INPUT.
                            val2 = gv_extension - 40 ).
       PERFORM set_extension.
     WHEN 'FLOAT'.
-      PERFORM optional_docking_method USING 'DETACH'.
+      PERFORM float_docking USING c_do_float.
     WHEN 'ATTACH'.
-      PERFORM optional_docking_method USING 'ATTACH'.
+      PERFORM float_docking USING c_do_dock.
       PERFORM dock_at_side.
     WHEN 'RELINK'.
       go_container->link(
@@ -139,23 +143,17 @@ FORM set_extension.
   ENDTRY.
 ENDFORM.
 
-FORM optional_docking_method USING iv_method TYPE c.
-* DETACH and ATTACH are release dependent and absent from the checked surface,
-* so they are called with a literal name that stays statically readable.
-  TRY.
-      CASE iv_method.
-        WHEN 'DETACH'.
-          CALL METHOD go_docking->('DETACH').
-        WHEN 'ATTACH'.
-          CALL METHOD go_docking->('ATTACH').
-        WHEN OTHERS.
-          gv_status = |{ iv_method } is not part of the sample surface|.
-          RETURN.
-      ENDCASE.
-      gv_status = |Optional docking method { iv_method } executed|.
-    CATCH cx_root.
-      gv_status = |{ iv_method } is not exposed; use the frontend docking grip|.
-  ENDTRY.
+FORM float_docking USING iv_do_float TYPE i.
+  go_docking->float( EXPORTING do_float = iv_do_float
+                     EXCEPTIONS cntl_error = 1 cntl_system_error = 2
+                                OTHERS = 3 ).
+  IF sy-subrc <> 0.
+    gv_status = |FLOAT refused with rc { sy-subrc }; use the frontend docking grip|.
+    RETURN.
+  ENDIF.
+  gv_status = COND #( WHEN iv_do_float = c_do_dock
+    THEN 'Container docked again at the configured side'
+    ELSE 'Container floated away from the docking side' ).
 ENDFORM.
 
 FORM observe_geometry.

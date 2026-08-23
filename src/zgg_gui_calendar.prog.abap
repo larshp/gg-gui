@@ -84,9 +84,9 @@ MODULE user_command_0100 INPUT.
     WHEN 'MARK'.
       PERFORM set_day_info.
     WHEN 'RESET_INFO'.
-      PERFORM optional_no_parameter USING 'RESET_DAY_INFO'.
+      PERFORM reset_day_info.
     WHEN 'RESET_SEL'.
-      PERFORM optional_no_parameter USING 'RESET_SELECTION'.
+      PERFORM reset_selection.
     WHEN 'RECREATE'.
       PERFORM free_calendar.
       PERFORM create_calendar.
@@ -208,22 +208,21 @@ FORM set_day_info.
   ENDTRY.
 ENDFORM.
 
-FORM optional_no_parameter USING iv_method TYPE c.
-* The reset methods are release dependent and absent from the checked surface,
-* so they are called with a literal name that stays statically readable.
+FORM reset_day_info.
   TRY.
-      CASE iv_method.
-        WHEN 'RESET_DAY_INFO'.
-          CALL METHOD go_calendar->('RESET_DAY_INFO').
-        WHEN 'RESET_SELECTION'.
-          CALL METHOD go_calendar->('RESET_SELECTION').
-        WHEN OTHERS.
-          gv_status = |{ iv_method } is not part of the sample surface|.
-          RETURN.
-      ENDCASE.
-      gv_status = |{ iv_method } completed|.
+      go_calendar->reset_day_info( ).
+      gv_status = 'RESET_DAY_INFO removed the color and tooltip day information'.
     CATCH cx_root INTO DATA(lx_error).
-      gv_status = |{ iv_method } failed: { lx_error->get_text( ) }|.
+      gv_status = |RESET_DAY_INFO failed: { lx_error->get_text( ) }|.
+  ENDTRY.
+ENDFORM.
+
+FORM reset_selection.
+  TRY.
+      go_calendar->reset_selection( ).
+      gv_status = 'RESET_SELECTION cleared the marked days'.
+    CATCH cx_root INTO DATA(lx_error).
+      gv_status = |RESET_SELECTION failed: { lx_error->get_text( ) }|.
   ENDTRY.
 ENDFORM.
 

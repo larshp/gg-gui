@@ -73,11 +73,13 @@ MODULE user_command_0100 INPUT.
       go_viewer->go_back( ).
       gv_status = 'Back navigation requested'.
     WHEN 'FORWARD'.
-      PERFORM optional_navigation USING 'GO_FORWARD'.
+      go_viewer->go_forward( ).
+      gv_status = 'Forward navigation requested'.
     WHEN 'HOME'.
       PERFORM show_generated USING abap_false.
     WHEN 'REFRESH'.
-      PERFORM optional_navigation USING 'DO_REFRESH'.
+      go_viewer->do_refresh( ).
+      gv_status = 'Document refresh requested'.
     WHEN 'CURRENT'.
       DATA lv_current TYPE ty_url.
       go_viewer->get_current_url( IMPORTING url = lv_current ).
@@ -214,26 +216,6 @@ FORM show_generated USING iv_direct TYPE abap_bool.
                          in_place = abap_true ).
     gv_status = 'Generated document loaded with LOAD_DATA and displayed with SHOW_URL'.
   ENDIF.
-ENDFORM.
-
-FORM optional_navigation USING iv_method TYPE c.
-* The navigation methods are release dependent and absent from the checked
-* surface, so they are called with a literal name that stays statically
-* readable.
-  TRY.
-      CASE iv_method.
-        WHEN 'GO_FORWARD'.
-          CALL METHOD go_viewer->('GO_FORWARD').
-        WHEN 'DO_REFRESH'.
-          CALL METHOD go_viewer->('DO_REFRESH').
-        WHEN OTHERS.
-          gv_status = |{ iv_method } is not part of the sample surface|.
-          RETURN.
-      ENDCASE.
-      gv_status = |Optional navigation method { iv_method } requested|.
-    CATCH cx_root INTO DATA(lx_error).
-      gv_status = |Navigation method unavailable: { lx_error->get_text( ) }|.
-  ENDTRY.
 ENDFORM.
 
 FORM free_controls.
