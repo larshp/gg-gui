@@ -15,7 +15,7 @@ DATA gv_last_url TYPE ty_url.
 DATA gv_mode TYPE i VALUE cl_gui_picture=>display_mode_fit_center.
 DATA gv_mode_text TYPE c LENGTH 26.
 DATA gv_border TYPE abap_bool VALUE abap_true.
-DATA gv_status TYPE c LENGTH 100.
+DATA: gv_status TYPE c LENGTH 100, gv_load_result TYPE i.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_picture_event TYPE c LENGTH 24.
 DATA gv_mouse_x TYPE i.
@@ -201,7 +201,7 @@ FORM publish_format_fixture USING iv_format TYPE sy-ucomm.
 ENDFORM.
 
 FORM publish_demo_mime.
-  DATA lv_provider_url TYPE c LENGTH 255.
+  DATA lv_provider_url TYPE c LENGTH 256.
 
   CLEAR: gv_url, lv_provider_url.
   CALL FUNCTION 'DP_PUBLISH_WWW_URL'
@@ -223,8 +223,7 @@ FORM publish_demo_mime.
 ENDFORM.
 
 FORM load_picture.
-  DATA lv_result TYPE i.
-
+  " Persistent result buffer is declared globally.
   IF gv_url IS INITIAL.
     gv_status = 'No image URL was supplied'.
     RETURN.
@@ -236,8 +235,8 @@ FORM load_picture.
   ELSE.
     go_picture->load_picture_from_url(
       EXPORTING url    = gv_url
-      IMPORTING result = lv_result ).
-    IF lv_result = 0.
+      IMPORTING result = gv_load_result ).
+    IF gv_load_result <> 0.
       gv_status = |Synchronous load failed or source was rejected: { gv_url }|.
     ELSE.
       gv_status = |Synchronous image loaded: { gv_url }|.

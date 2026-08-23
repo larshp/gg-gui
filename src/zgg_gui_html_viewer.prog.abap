@@ -160,7 +160,7 @@ FORM detect_frontend.
 ENDFORM.
 
 FORM publish_image.
-  DATA lv_provider_url TYPE c LENGTH 255.
+  DATA lv_provider_url TYPE c LENGTH 256.
 
   CLEAR: gv_image_url, lv_provider_url.
   CALL FUNCTION 'DP_PUBLISH_WWW_URL'

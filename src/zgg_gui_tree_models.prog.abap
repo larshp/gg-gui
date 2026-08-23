@@ -93,9 +93,9 @@ FORM show_simple_model.
   ENDIF.
   lt_nodes = VALUE #(
     ( node_key = 'ROOT' isfolder = abap_true text = 'Simple Tree Model' n_image = '@04@' exp_image = '@05@' )
-    ( node_key = 'INPUT' relatkey = 'ROOT' relatship = 6 isfolder = abap_true text = 'Input devices' )
-    ( node_key = 'P100' relatkey = 'INPUT' relatship = 6 text = 'Mechanical Keyboard' )
-    ( node_key = 'P110' relatkey = 'INPUT' relatship = 6 text = 'Ergonomic Mouse' ) ).
+    ( node_key = 'INPUT' relatkey = 'ROOT' relatship = 2 isfolder = abap_true text = 'Input devices' )
+    ( node_key = 'P100' relatkey = 'INPUT' relatship = 2 text = 'Mechanical Keyboard' )
+    ( node_key = 'P110' relatkey = 'INPUT' relatship = 2 text = 'Ergonomic Mouse' ) ).
   TRY.
       CREATE OBJECT lo_simple
         EXPORTING node_selection_mode = 1
@@ -131,8 +131,8 @@ FORM show_list_model.
   ls_header = VALUE #( heading = 'List Tree Model' tooltip = 'Multiple items arranged as a list' width = 32 ).
   lt_nodes = VALUE #(
     ( node_key = 'ROOT' isfolder = abap_true n_image = '@04@' exp_image = '@05@' )
-    ( node_key = 'P100' relatkey = 'ROOT' relatship = 6 )
-    ( node_key = 'P200' relatkey = 'ROOT' relatship = 6 ) ).
+    ( node_key = 'P100' relatkey = 'ROOT' relatship = 2 )
+    ( node_key = 'P200' relatkey = 'ROOT' relatship = 2 ) ).
   lt_items = VALUE #(
     ( node_key = 'ROOT' item_name = 'NODE' class = 1 text = 'List Tree Model' )
     ( node_key = 'P100' item_name = 'NODE' class = 1 text = 'P100' )
@@ -178,8 +178,8 @@ FORM show_column_model.
   ls_header = VALUE #( heading = 'Product hierarchy' tooltip = 'Column Tree Model hierarchy' width = 28 ).
   lt_nodes = VALUE #(
     ( node_key = 'ROOT' isfolder = abap_true n_image = '@04@' exp_image = '@05@' )
-    ( node_key = 'P100' relatkey = 'ROOT' relatship = 6 )
-    ( node_key = 'P200' relatkey = 'ROOT' relatship = 6 ) ).
+    ( node_key = 'P100' relatkey = 'ROOT' relatship = 2 )
+    ( node_key = 'P200' relatkey = 'ROOT' relatship = 2 ) ).
   lt_items = VALUE #(
     ( node_key = 'ROOT' item_name = 'NODE' class = 1 text = 'Column Tree Model' )
     ( node_key = 'ROOT' item_name = 'NAME' class = 1 text = 'Backend model' )
