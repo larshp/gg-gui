@@ -144,7 +144,7 @@ FORM show_graphics_proxy.
   DATA lv_class TYPE string VALUE 'CL_GUI_GP_PRES'.
   DATA lo_proxy TYPE REF TO cl_gui_gp_pres.
   DATA lv_reason TYPE string.
-  DATA lv_retval TYPE i.
+  DATA lv_retval TYPE n LENGTH 3.
 
   PERFORM release_active.
   IF gv_graphics_proxy = abap_false.
