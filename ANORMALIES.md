@@ -387,14 +387,19 @@ GUI frontend features, or local development-environment failures in this file.
   `CL_SALV_EVENTS_TREE` are now declared, along with `SALV_DE_NODE_KEY` and
   `SALV_T_NODES`. Every method body returns without behavior, so `FACTORY`
   yields an unbound tree, `ADD_NODE` returns no node reference, and
-  `GET_SELECTED_NODES` returns an empty table. `CL_SALV_COLUMN_TREE` extends
-  `CL_SALV_COLUMN` directly, so the list-column extras such as `SET_KEY` are
-  not available on a tree column, and `CL_SALV_SELECTIONS_TREE` exposes no
-  selection-mode setter.
+  `GET_SELECTED_NODES` returns an empty table. Only the confirmed part of the
+  surface is declared: `CL_SALV_COLUMN_TREE` extends `CL_SALV_COLUMN` directly,
+  so list-column extras such as `SET_KEY` are not available on a tree column;
+  `CL_SALV_SELECTIONS_TREE` exposes no selection-mode setter;
+  `CL_SALV_COLUMNS_TREE` offers only the exception-column accessors and no
+  hierarchy-column getter; and `CL_SALV_TREE` has `DISPLAY` but no `REFRESH`.
 - Reproduction: Call `CL_SALV_TREE=>FACTORY` with any internal table and inspect
   `R_SALV_TREE`; it remains initial because the body returns immediately.
 - Workaround: `ZGG_GUI_SALV_TREE` declares the whole family statically, guards
-  the factory, and displays a text fallback when the tree is unbound. Static
+  the factory, and displays a text fallback when the tree is unbound. Runtime
+  node changes redraw with `DISPLAY` because no refresh entry point exists, and
+  the sample no longer marks a key column or renames the hierarchy column.
+  Static
   include `ZGG_NATIVE_SALV_TREE` declares typed native `LINK_CLICK` and
   `DOUBLE_CLICK` handlers, returns node and column payloads through ABAP memory,
   and deregisters on exit. That include now has no unresolved type references;

@@ -212,7 +212,6 @@ ENDFORM.
 
 FORM configure_columns.
   DATA lo_column TYPE REF TO cl_salv_column.
-  DATA lo_hierarchy TYPE REF TO cl_salv_column_tree.
 
   go_columns->set_optimize( abap_true ).
   TRY.
@@ -224,9 +223,6 @@ FORM configure_columns.
     CATCH cx_salv_error INTO DATA(lx_column).
       gv_status = |SALV tree column setup failed: { lx_column->get_text( ) }|.
   ENDTRY.
-  lo_hierarchy = go_columns->get_hierarchy_column( ).
-  lo_hierarchy->set_long_text( 'Product hierarchy' ).
-  lo_hierarchy->set_tooltip( 'SALV tree folder and leaf hierarchy' ).
 ENDFORM.
 
 FORM add_runtime_leaf.
@@ -241,8 +237,8 @@ FORM add_runtime_leaf.
   TRY.
       PERFORM add_leaf USING gv_root_key lv_id 'Runtime SALV tree node'
         'Runtime' gv_sequence c_price_42 'EUR'.
-      go_tree->refresh( ).
-      gv_status = |SALV node { lv_id } added under the root and refreshed|.
+      go_tree->display( ).
+      gv_status = |SALV node { lv_id } added under the root and redisplayed|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SALV node insertion failed: { lx_error->get_text( ) }|.
   ENDTRY.
@@ -317,7 +313,7 @@ FORM reset_tree.
       go_nodes->delete_all( ).
       gv_sequence = 500.
       PERFORM populate_nodes.
-      go_tree->refresh( ).
+      go_tree->display( ).
       gv_status = 'SALV hierarchy, rows, link item types, expansion, and runtime keys reset'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SALV tree reset failed: { lx_error->get_text( ) }|.
