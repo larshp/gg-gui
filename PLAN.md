@@ -824,7 +824,9 @@ Every sample must:
 - [x] Exclude Screen Painter icon aliases known to fail native object import;
   repository verification rejects these values before delivery.
 - [x] Separate top-level Screen Painter elements that share rows by at least one
-  column; repository verification rejects touching or overlapping elements.
+  column, and keep every element clear of the border row and column of the
+  frame it sits in; repository verification rejects touching or overlapping
+  elements and elements that reach a frame border.
 - [x] Give top-level `QUAN` and `CURR` fields explicit unit and currency
   references; repository verification checks matching visible reference types.
 - [ ] Work at common window sizes and DPI scaling levels.
@@ -836,7 +838,8 @@ Every sample must:
 
 `npm run verify:repo` enforces the independently executable report shape,
 catalog parity and schema, screen/XML pairing, dynpro exit paths, event-receiver
-cleanup, Screen Painter icon aliases, top-level element spacing, quantity and
+cleanup, Screen Painter icon aliases, top-level element spacing, frame border
+clearance, quantity and
 currency references, PLAN coverage, anomaly record structure, the
 direct-database-DML rule, the generated-subroutine-pool ban, and exact static
 native-include ownership and metadata. Behavioral and visual requirements still

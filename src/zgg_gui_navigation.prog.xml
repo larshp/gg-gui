@@ -39,7 +39,7 @@
        <COLUMN>001</COLUMN>
        <LENGTH>098</LENGTH>
        <VISLENGTH>098</VISLENGTH>
-       <HEIGHT>005</HEIGHT>
+       <HEIGHT>006</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
@@ -140,11 +140,11 @@
        <TYPE>FRAME</TYPE>
        <NAME>FRAME_NAV</NAME>
        <TEXT>Navigation_statements_____________________________________________________________________________</TEXT>
-       <LINE>007</LINE>
+       <LINE>008</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>098</LENGTH>
        <VISLENGTH>098</VISLENGTH>
-       <HEIGHT>008</HEIGHT>
+       <HEIGHT>007</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
@@ -156,7 +156,7 @@
        <TEXT>CALL_SCREEN____</TEXT>
        <ICON_NAME>ICON_NEXT_OBJECT</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
-       <LINE>008</LINE>
+       <LINE>009</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>020</LENGTH>
        <VISLENGTH>018</VISLENGTH>
@@ -173,7 +173,7 @@
        <TEXT>SET_SCREEN_____</TEXT>
        <ICON_NAME>ICON_CHANGE</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
-       <LINE>008</LINE>
+       <LINE>009</LINE>
        <COLUMN>025</COLUMN>
        <LENGTH>020</LENGTH>
        <VISLENGTH>018</VISLENGTH>
@@ -190,7 +190,7 @@
        <TEXT>List_processing</TEXT>
        <ICON_NAME>ICON_DISPLAY</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
-       <LINE>008</LINE>
+       <LINE>009</LINE>
        <COLUMN>047</COLUMN>
        <LENGTH>020</LENGTH>
        <VISLENGTH>018</VISLENGTH>
@@ -207,7 +207,7 @@
        <TEXT>Suppress_dialog</TEXT>
        <ICON_NAME>ICON_DISPLAY_MORE</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
-       <LINE>008</LINE>
+       <LINE>009</LINE>
        <COLUMN>069</COLUMN>
        <LENGTH>020</LENGTH>
        <VISLENGTH>018</VISLENGTH>
@@ -224,7 +224,7 @@
        <TEXT>SPA/GPA_memory_</TEXT>
        <ICON_NAME>ICON_LINK</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
-       <LINE>010</LINE>
+       <LINE>011</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>020</LENGTH>
        <VISLENGTH>018</VISLENGTH>
@@ -241,7 +241,7 @@
        <TEXT>SUBMIT_report__</TEXT>
        <ICON_NAME>ICON_EXECUTE_OBJECT</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
-       <LINE>010</LINE>
+       <LINE>011</LINE>
        <COLUMN>025</COLUMN>
        <LENGTH>020</LENGTH>
        <VISLENGTH>018</VISLENGTH>
@@ -258,7 +258,7 @@
        <TEXT>Call_transaction</TEXT>
        <ICON_NAME>ICON_ENTER_MORE</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
-       <LINE>010</LINE>
+       <LINE>011</LINE>
        <COLUMN>047</COLUMN>
        <LENGTH>020</LENGTH>
        <VISLENGTH>018</VISLENGTH>
@@ -275,7 +275,7 @@
        <TEXT>Reset__________</TEXT>
        <ICON_NAME>ICON_REFRESH</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
-       <LINE>010</LINE>
+       <LINE>011</LINE>
        <COLUMN>069</COLUMN>
        <LENGTH>020</LENGTH>
        <VISLENGTH>018</VISLENGTH>
@@ -292,7 +292,7 @@
        <TEXT>LEAVE_PROGRAM__</TEXT>
        <ICON_NAME>ICON_CANCEL</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
-       <LINE>012</LINE>
+       <LINE>013</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>020</LENGTH>
        <VISLENGTH>018</VISLENGTH>
@@ -309,7 +309,7 @@
        <TEXT>Back___________</TEXT>
        <ICON_NAME>ICON_PREVIOUS_OBJECT</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
-       <LINE>012</LINE>
+       <LINE>013</LINE>
        <COLUMN>025</COLUMN>
        <LENGTH>020</LENGTH>
        <VISLENGTH>018</VISLENGTH>
@@ -357,11 +357,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>FRAME_CALLED</NAME>
-       <TEXT>Called_screen_0200____________________________________________________________________</TEXT>
+       <TEXT>Called_screen_0200______________________________________________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
-       <LENGTH>086</LENGTH>
-       <VISLENGTH>086</VISLENGTH>
+       <LENGTH>088</LENGTH>
+       <VISLENGTH>088</VISLENGTH>
        <HEIGHT>007</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
@@ -517,11 +517,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>FRAME_LEAF</NAME>
-       <TEXT>Screen_0300___________________________________________________________________________</TEXT>
+       <TEXT>Screen_0300_____________________________________________________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
-       <LENGTH>086</LENGTH>
-       <VISLENGTH>086</VISLENGTH>
+       <LENGTH>088</LENGTH>
+       <VISLENGTH>088</VISLENGTH>
        <HEIGHT>007</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
