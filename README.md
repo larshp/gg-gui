@@ -76,10 +76,11 @@ sample-owned `GG_` names after confirmation.
 
 ## Known Limitations
 
-Observed missing classes, missing DDIC and type-pool surface, stubbed methods,
-event-surface differences, and runtime assertions in open-abap are recorded in
+Observed missing classes, missing DDIC and type-pool surface, partially declared
+APIs, and event-surface or signature differences in open-abap are recorded in
 [ANORMALIES.md](ANORMALIES.md). That filename intentionally follows the
-requested spelling. Local network or sandbox failures are not runtime anomalies.
+requested spelling. Stubbed method bodies are expected and are not recorded, and
+local network or sandbox failures are not runtime anomalies.
 
 Code that depends on native-only surface lives in the `ZGG_NATIVE_*` static
 includes. They are lint checked like the rest of `src/`, with no per-file
