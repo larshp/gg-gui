@@ -44,7 +44,7 @@
     "downport": false,
     "easy_to_find_messages": true,
     "empty_event": true,
-    "empty_structure": true,
+    "empty_structure": false,
     "exit_or_check": true,
     "expand_macros": true,
     "fm_global_parameters_obsolete": true,
