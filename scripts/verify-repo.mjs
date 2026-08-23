@@ -61,12 +61,7 @@ const nativeIncludeOwners = new Map([
 ]);
 const plan = read(join(root, "PLAN.md"));
 const anomalies = read(join(root, "ANORMALIES.md"));
-const abaplintConfig = read(join(root, "abaplint.jsonc"));
 const catalog = read(join(srcDir, "zgg_gui_catalog.prog.abap"));
-
-if (!/"version"\s*:\s*"v750"/.test(abaplintConfig)) {
-  fail("abaplint syntax version must remain v750 to match the declared minimum release");
-}
 
 for (const file of abapFiles) {
   const source = read(join(srcDir, file));

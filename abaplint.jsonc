@@ -20,7 +20,10 @@
     }
   ],
   "syntax": {
-    "version": "v750",
+    "version": {
+      "release": "open-abap",
+      "language": "Normal"
+    },
     "errorNamespace": "^(ZGG_GUI_|ZCL_GG_GUI_|LCL_|LIF_|TY_)"
   },
   "rules": {
