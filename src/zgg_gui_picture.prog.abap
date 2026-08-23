@@ -132,6 +132,7 @@ FORM publish_format_fixture USING iv_format TYPE sy-ucomm.
   DATA lv_blob TYPE xstring.
   DATA lv_size TYPE i.
   DATA lv_subtype TYPE string.
+  DATA lv_provider_url TYPE c LENGTH 255.
   DATA lt_data TYPE STANDARD TABLE OF ty_blob_line WITH EMPTY KEY.
 
   CASE iv_format.
@@ -179,7 +180,7 @@ FORM publish_format_fixture USING iv_format TYPE sy-ucomm.
     IMPORTING output_length = lv_size
     TABLES binary_tab       = lt_data.
 
-  CLEAR gv_url.
+  CLEAR: gv_url, lv_provider_url.
   CALL FUNCTION 'DP_CREATE_URL'
     EXPORTING
       type            = 'image'
@@ -187,25 +188,28 @@ FORM publish_format_fixture USING iv_format TYPE sy-ucomm.
       size            = lv_size
       lifetime        = 'T'
     TABLES data       = lt_data
-    CHANGING url      = gv_url
+    CHANGING url      = lv_provider_url
     EXCEPTIONS OTHERS = 1.
-  IF sy-subrc <> 0 OR gv_url IS INITIAL.
+  IF sy-subrc <> 0 OR lv_provider_url IS INITIAL.
     gv_status = |Data Provider could not publish the { iv_format } fixture|.
     RETURN.
   ENDIF.
+  gv_url = lv_provider_url.
 
   PERFORM load_picture.
   gv_status = |Bundled { iv_format } fixture published and loaded ({ lv_size } bytes)|.
 ENDFORM.
 
 FORM publish_demo_mime.
-  CLEAR gv_url.
+  DATA lv_provider_url TYPE c LENGTH 255.
+
+  CLEAR: gv_url, lv_provider_url.
   CALL FUNCTION 'DP_PUBLISH_WWW_URL'
     EXPORTING
       objid                 = 'HTMLCNTL_TESTHTM2_SAPLOGO'
       lifetime              = 'T'
     IMPORTING
-      url                   = gv_url
+      url                   = lv_provider_url
     EXCEPTIONS
       dp_invalid_parameters = 1
       no_object             = 2
@@ -213,7 +217,9 @@ FORM publish_demo_mime.
       OTHERS                = 4.
   IF sy-subrc <> 0.
     gv_status = |Standard MIME object could not be published; rc { sy-subrc }|.
+    RETURN.
   ENDIF.
+  gv_url = lv_provider_url.
 ENDFORM.
 
 FORM load_picture.

@@ -119,30 +119,8 @@ FORM create_controls.
     PERFORM show_unavailable USING 'SAPGUI.SAPILIDragNDropCtrl.1 is not registered on this frontend'.
     RETURN.
   ENDIF.
-  TRY.
-      CREATE OBJECT go_ili
-        EXPORTING parent                   = go_host
-                  atomwidth                = 1
-                  atomheight               = 1
-          atomoffsetx                      = 0
-                  atomoffsety              = 0
-                  manual_scaling           = abap_true
-          register_as_systemevents         = abap_false
-                  use_internal_contextmenu = abap_true.
-      CREATE OBJECT go_events.
-      SET HANDLER go_events->on_dropped FOR go_ili.
-      SET HANDLER go_events->on_resized FOR go_ili.
-      SET HANDLER go_events->on_menu_request FOR go_ili.
-      SET HANDLER go_events->on_menu_click FOR go_ili.
-      PERFORM rebuild_menu.
-      go_ili->show( ).
-      PERFORM start_mode USING cl_gui_ilidragndrop_control=>co_drag_resize_xy.
-      gv_status = 'Interactive region shown in combined move/resize mode with native dropped, resized, and menu events'.
-      gv_detail = |Initial geometry: left { gv_left }, top { gv_top }, size { gv_width } x { gv_height }|.
-    CATCH cx_root INTO DATA(lx_error).
-      FREE: go_ili, go_events.
-      PERFORM show_fallback USING lx_error.
-  ENDTRY.
+  PERFORM show_unavailable USING
+    'The registered ILI ActiveX control rejects OO Control Framework construction on this frontend'.
 ENDFORM.
 
 FORM start_mode USING iv_mode TYPE i.
@@ -246,7 +224,7 @@ FORM show_unavailable USING iv_error TYPE string.
   lt_text = VALUE #(
     ( 'CL_GUI_ILIDRAGNDROP_CONTROL is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP report retains move/resize modes, geometry, visibility, events, and internal menu calls.' )
-    ( 'The pinned open-abap constructor currently terminates with an assertion.' ) ).
+    ( 'The legacy ActiveX control is not created when its constructor cannot terminate safely.' ) ).
   go_fallback->set_text_as_r3table( lt_text ).
   go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Interactive drag/resize unavailable; a text fallback is displayed'.

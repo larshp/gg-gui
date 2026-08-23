@@ -188,6 +188,12 @@ for (const file of reportFiles) {
   const xml = read(join(srcDir, xmlName));
   const source = read(join(srcDir, file));
   const screens = [...xml.matchAll(/<SCREEN>(\d{4})<\/SCREEN>/g)].map((match) => match[1]);
+  const screenTypes = new Map(
+    [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)].map((match) => {
+      const header = match[1].match(/<HEADER>([\s\S]*?)<\/HEADER>/i)?.[1] ?? "";
+      return [elementValue(header, "SCREEN"), elementValue(header, "TYPE").toUpperCase()];
+    }),
+  );
   const flowLogic = screenFiles
     .filter((name) => name.startsWith(file.replace(/\.abap$/i, ".screen_")))
     .map((name) => read(join(srcDir, name)))
@@ -197,11 +203,14 @@ for (const file of reportFiles) {
     [...dynproSource.matchAll(/\bCALL\s+SCREEN\s+(\d{1,4})\b/gi)]
       .map((match) => match[1].padStart(4, "0")),
   );
+  const referencedSubscreens = new Set();
   for (const match of dynproSource.matchAll(
     /\bCALL\s+SUBSCREEN\s+\w+\s+INCLUDING\s+sy-repid\s+(?:['`](\d{1,4})['`]|(\w+))/gi,
   )) {
     if (match[1]) {
-      referencedScreens.add(match[1].padStart(4, "0"));
+      const screen = match[1].padStart(4, "0");
+      referencedScreens.add(screen);
+      referencedSubscreens.add(screen);
       continue;
     }
     const screenVariable = match[2].replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -210,12 +219,19 @@ for (const file of reportFiles) {
       "gi",
     );
     for (const assignment of dynproSource.matchAll(assignedScreen)) {
-      referencedScreens.add(assignment[1].padStart(4, "0"));
+      const screen = assignment[1].padStart(4, "0");
+      referencedScreens.add(screen);
+      referencedSubscreens.add(screen);
     }
   }
   for (const screen of referencedScreens) {
     if (!screens.includes(screen)) {
       fail(`${file}: referenced screen ${screen} is missing from ${xmlName}`);
+    }
+  }
+  for (const screen of referencedSubscreens) {
+    if (screenTypes.get(screen) !== "I") {
+      fail(`${xmlName}: subscreen ${screen} must have dynpro type I`);
     }
   }
   for (const screen of new Set(screens)) {

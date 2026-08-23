@@ -247,7 +247,6 @@ FORM register_events.
   DATA lt_events TYPE cntl_simple_events.
 
   lt_events = VALUE #(
-    ( eventid = cl_gui_column_tree=>eventid_selection_changed appl_event = abap_false )
     ( eventid = cl_gui_column_tree=>eventid_node_double_click appl_event = abap_true )
     ( eventid = cl_gui_column_tree=>eventid_item_double_click appl_event = abap_true )
     ( eventid = cl_gui_column_tree=>eventid_expand_no_children appl_event = abap_true )

@@ -290,7 +290,7 @@ FORM create_controls.
       ls_header = VALUE #( heading = 'Navigation' width = 28 tooltip = 'Select a category or drag products' ).
       CREATE OBJECT go_tree EXPORTING parent                = go_nav_host
         node_selection_mode                                 = cl_gui_column_tree=>node_sel_mode_single
-        item_selection                                      = abap_true
+        item_selection                                      = abap_false
                                       hierarchy_column_name = 'NODE'
         hierarchy_header                                    = ls_header.
       go_tree->add_column( name        = 'NAME'

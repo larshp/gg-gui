@@ -31,7 +31,6 @@ ENDCLASS.
 FORM create_native_salv_tree.
   cl_salv_tree=>factory(
     EXPORTING r_container  = go_host
-              container_name = 'CC_MAIN'
     IMPORTING r_salv_tree  = go_native_salv_tree
     CHANGING  t_table      = gt_rows ).
   go_tree = go_native_salv_tree.
