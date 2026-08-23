@@ -100,7 +100,6 @@ FORM show_barchart.
     ( label = '27 Inch Display' value = 4 group = 'Display' ) ).
   TRY.
       CREATE OBJECT lo_barchart EXPORTING parent = go_host.
-      lo_barchart->display( ).
       go_control = lo_barchart.
       gv_active_class = lv_class.
       gv_status = |CL_GUI_BARCHART hosted; { lines( lt_bars ) } deterministic categories prepared|.
