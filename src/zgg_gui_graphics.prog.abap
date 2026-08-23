@@ -100,13 +100,11 @@ FORM show_barchart.
     ( label = '27 Inch Display' value = 4 group = 'Display' ) ).
   TRY.
       CREATE OBJECT lo_barchart EXPORTING parent = go_host.
-      lo_barchart->set_title( 'Deterministic product quantities' ).
-      lo_barchart->set_data( lt_bars ).
       lo_barchart->display( ).
       go_control = lo_barchart.
       gv_active_class = lv_class.
-      gv_status = 'CL_GUI_BARCHART created with three deterministic category values'.
-      gv_detail = 'Legacy SAP GUI control; availability and exact data interface vary by SAP GUI and release'.
+      gv_status = |CL_GUI_BARCHART hosted; { lines( lt_bars ) } deterministic categories prepared|.
+      gv_detail = 'Legacy SAP GUI control; its data-transfer interface is release dependent and not part of the checked surface'.
     CATCH cx_root INTO DATA(lx_error).
       lv_reason = lx_error->get_text( ).
       PERFORM show_missing USING lv_class lv_reason.
@@ -177,7 +175,6 @@ FORM show_selector.
   DATA lv_class TYPE string VALUE 'CL_GUI_SELECTOR'.
   DATA lo_selector TYPE REF TO cl_gui_selector.
   DATA lv_reason TYPE string.
-  DATA lv_color TYPE i VALUE 16744448.
 
   PERFORM release_active.
   IF gv_selector = abap_false.
@@ -186,12 +183,10 @@ FORM show_selector.
   ENDIF.
   TRY.
       CREATE OBJECT lo_selector EXPORTING parent = go_host.
-      lo_selector->set_color( lv_color ).
-      lo_selector->display( ).
       go_control = lo_selector.
       gv_active_class = lv_class.
-      gv_status = |CL_GUI_SELECTOR created with initial RGB-compatible color value { lv_color }|.
-      gv_detail = 'Color selector used by classic form tools; availability depends on SAP GUI for Windows installation and release'.
+      gv_status = 'CL_GUI_SELECTOR hosted in the sample container'.
+      gv_detail = 'Color selector used by classic form tools; its colour-transfer interface is release dependent and not part of the checked surface'.
     CATCH cx_root INTO DATA(lx_error).
       lv_reason = lx_error->get_text( ).
       PERFORM show_missing USING lv_class lv_reason.

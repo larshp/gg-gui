@@ -212,15 +212,13 @@ ENDFORM.
 
 FORM configure_columns.
   DATA lo_column TYPE REF TO cl_salv_column.
-  DATA lo_column_tree TYPE REF TO cl_salv_column_tree.
   DATA lo_hierarchy TYPE REF TO cl_salv_column_tree.
 
   go_columns->set_optimize( abap_true ).
   TRY.
       lo_column = go_columns->get_column( 'ID' ).
       lo_column->set_long_text( 'Product identifier' ).
-      lo_column_tree ?= lo_column.
-      lo_column_tree->set_key( abap_true ).
+      lo_column->set_output_length( 10 ).
       lo_column = go_columns->get_column( 'PRICE' ).
       lo_column->set_currency_column( 'CURRENCY' ).
     CATCH cx_salv_error INTO DATA(lx_column).

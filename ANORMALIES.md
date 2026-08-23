@@ -387,7 +387,10 @@ GUI frontend features, or local development-environment failures in this file.
   `CL_SALV_EVENTS_TREE` are now declared, along with `SALV_DE_NODE_KEY` and
   `SALV_T_NODES`. Every method body returns without behavior, so `FACTORY`
   yields an unbound tree, `ADD_NODE` returns no node reference, and
-  `GET_SELECTED_NODES` returns an empty table.
+  `GET_SELECTED_NODES` returns an empty table. `CL_SALV_COLUMN_TREE` extends
+  `CL_SALV_COLUMN` directly, so the list-column extras such as `SET_KEY` are
+  not available on a tree column, and `CL_SALV_SELECTIONS_TREE` exposes no
+  selection-mode setter.
 - Reproduction: Call `CL_SALV_TREE=>FACTORY` with any internal table and inspect
   `R_SALV_TREE`; it remains initial because the body returns immediately.
 - Workaround: `ZGG_GUI_SALV_TREE` declares the whole family statically, guards
@@ -524,7 +527,12 @@ GUI frontend features, or local development-environment failures in this file.
 - open-abap behavior: `CL_GUI_BARCHART`, `CL_GUI_CHART_ENGINE`,
   `CL_GUI_GP_PRES`, and `CL_GUI_SELECTOR` are now declared, together with the
   `IF_GRAPHIC_PROXY` interface used to activate the business-graphics proxy.
-  Every method body returns without hosting a control. The wider Graphical
+  Every method body returns without hosting a control. Only the release-stable
+  part of each surface is declared: the bar chart offers `DISPLAY`, the Chart
+  Engine `SET_DATA` and `RENDER`, and the selector nothing beyond its
+  constructor. The data- and colour-transfer entry points of the bar chart and
+  selector, and any constructor parameters for `CL_GUI_GP_PRES`, are release
+  dependent and therefore not part of the checked surface. The wider Graphical
   Framework multiplexer and data-container family is still absent, so a native
   application cannot connect a data container before activating the proxy.
 - Reproduction: Construct `CL_GUI_CHART_ENGINE` with a container and call
