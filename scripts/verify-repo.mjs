@@ -51,6 +51,7 @@ const sampleFiles = reportFiles.filter((name) => name !== "zgg_gui_catalog.prog.
 const abapFiles = files.filter((name) => /\.abap$/i.test(name));
 const programFor = (name) => name.replace(/\.prog\.abap$/i, "").toUpperCase();
 const nativeIncludeOwners = new Map([
+  ["ZGG_NATIVE_ALV_CLASSIC", "zgg_gui_alv_classic.prog.abap"],
   ["ZGG_NATIVE_ALV_EVENTS", "zgg_gui_alv_events.prog.abap"],
   ["ZGG_NATIVE_ALV_TREE", "zgg_gui_alv_tree.prog.abap"],
   ["ZGG_NATIVE_CALENDAR", "zgg_gui_calendar.prog.abap"],
@@ -58,6 +59,8 @@ const nativeIncludeOwners = new Map([
   ["ZGG_NATIVE_PICTURE", "zgg_gui_picture.prog.abap"],
   ["ZGG_NATIVE_SALV_HSEQ", "zgg_gui_salv_hierseq.prog.abap"],
   ["ZGG_NATIVE_SALV_TREE", "zgg_gui_salv_tree.prog.abap"],
+  ["ZGG_NATIVE_SEL_FREE", "zgg_gui_sel_free.prog.abap"],
+  ["ZGG_NATIVE_SEL_VARIANTS", "zgg_gui_sel_variants.prog.abap"],
 ]);
 const plan = read(join(root, "PLAN.md"));
 const anomalies = read(join(root, "ANORMALIES.md"));

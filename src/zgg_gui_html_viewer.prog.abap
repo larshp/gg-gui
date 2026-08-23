@@ -90,6 +90,8 @@ MODULE user_command_0100 INPUT.
         COND #( WHEN gv_borderless = abap_true
           THEN cl_gui_html_viewer=>uiflag_no3dborder ELSE 0 ) ).
       gv_status = |No-3D-border UI flag enabled: { gv_borderless }|.
+    WHEN 'PDF'.
+      PERFORM show_pdf.
     WHEN 'CLOSE'.
       go_viewer->close_document( ).
       CLEAR gv_generated_url.
@@ -193,6 +195,8 @@ FORM build_html CHANGING ct_html TYPE ty_html.
   IF gv_image_url IS NOT INITIAL.
     APPEND |<img src="{ gv_image_url }" alt="Published SAP MIME object" style="max-width:240px">| TO ct_html.
   ENDIF.
+  APPEND '<p>Show PDF loads a generated document with LOAD_DATA and the MIME' TO ct_html.
+  APPEND ' type application/pdf; only the frontend decides how it is rendered.</p>' TO ct_html.
   APPEND '<p><a href="SAPEVENT:DETAIL?source=generated">Send SAPEVENT to ABAP</a></p>' TO ct_html.
   APPEND '<p><a href="https://help.sap.com">Normal HTTPS link</a></p>' TO ct_html.
   APPEND '</body></html>' TO ct_html.
@@ -216,6 +220,83 @@ FORM show_generated USING iv_direct TYPE abap_bool.
                          in_place = abap_true ).
     gv_status = 'Generated document loaded with LOAD_DATA and displayed with SHOW_URL'.
   ENDIF.
+ENDFORM.
+
+* A PDF is not HTML: it is loaded as binary data with its own MIME type and is
+* then rendered by whatever PDF component the frontend browser control offers.
+FORM build_pdf CHANGING cv_pdf TYPE xstring.
+  DATA lv_document TYPE string.
+  DATA lv_stream TYPE string.
+  DATA lv_body TYPE string.
+  DATA lv_xref TYPE string.
+  DATA lt_offset TYPE STANDARD TABLE OF i WITH EMPTY KEY.
+  DATA lv_offset TYPE n LENGTH 10.
+
+  lv_stream =
+    |BT /F1 18 Tf 60 780 Td (ZGG_GUI_HTML_VIEWER) Tj ET\n| &&
+    |BT /F1 11 Tf 60 752 Td | &&
+    |(This PDF was generated in ABAP and loaded with LOAD_DATA.) Tj ET\n| &&
+    |BT /F1 11 Tf 60 732 Td | &&
+    |(Rendering depends on the PDF component of the frontend.) Tj ET\n|.
+
+  lv_document = |%PDF-1.4\n|.
+
+  APPEND strlen( lv_document ) TO lt_offset.
+  lv_body = |1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n|.
+  lv_document = lv_document && lv_body.
+
+  APPEND strlen( lv_document ) TO lt_offset.
+  lv_body = |2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n|.
+  lv_document = lv_document && lv_body.
+
+  APPEND strlen( lv_document ) TO lt_offset.
+  lv_body = |3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842]| &&
+            | /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n|.
+  lv_document = lv_document && lv_body.
+
+  APPEND strlen( lv_document ) TO lt_offset.
+  lv_body = |4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n|.
+  lv_document = lv_document && lv_body.
+
+  APPEND strlen( lv_document ) TO lt_offset.
+  lv_body = |5 0 obj\n<< /Length { strlen( lv_stream ) } >>\nstream\n| &&
+            lv_stream && |endstream\nendobj\n|.
+  lv_document = lv_document && lv_body.
+
+* Every cross-reference entry has to be exactly twenty bytes long.
+  lv_xref = |xref\n0 6\n0000000000 65535 f \n|.
+  LOOP AT lt_offset INTO DATA(lv_position).
+    lv_offset = lv_position.
+    lv_xref = lv_xref && |{ lv_offset } 00000 n \n|.
+  ENDLOOP.
+
+  lv_offset = strlen( lv_document ).
+  lv_document = lv_document && lv_xref &&
+    |trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n{ lv_offset }\n%%EOF\n|.
+
+  cv_pdf = cl_abap_codepage=>convert_to( lv_document ).
+ENDFORM.
+
+FORM show_pdf.
+  DATA lv_pdf TYPE xstring.
+  DATA lt_binary TYPE solix_tab.
+  DATA lv_pdf_url TYPE ty_url.
+
+  PERFORM build_pdf CHANGING lv_pdf.
+  lt_binary = cl_bcs_convert=>xstring_to_solix( lv_pdf ).
+
+  go_viewer->load_data(
+    EXPORTING
+      type         = 'application'
+      subtype      = 'pdf'
+      size         = xstrlen( lv_pdf )
+    IMPORTING
+      assigned_url = lv_pdf_url
+    CHANGING
+      data_table   = lt_binary ).
+  go_viewer->show_url( url      = lv_pdf_url
+                       in_place = abap_true ).
+  gv_status = |PDF of { xstrlen( lv_pdf ) } bytes displayed by the frontend PDF component|.
 ENDFORM.
 
 FORM free_controls.

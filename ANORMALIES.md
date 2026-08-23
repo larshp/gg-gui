@@ -602,3 +602,78 @@ GUI frontend features, or local development-environment failures in this file.
   disabled only for this native include because open-abap lacks the event;
   activation and event behavior remain native-SAP checks.
 - Upstream reference: Not reported
+
+### The SLIS type pool and the REUSE_ALV_* family are missing
+
+- Status: Open, confirmed
+- Sample: `ZGG_GUI_ALV_CLASSIC`
+- Component: `open-abap-core` and `open-abap-gui` dependency surface
+- Version or commit: `5623d54` (`open-abap-core`) and `a3453bd`
+  (`open-abap-gui`), both resolved on 2026-08-23
+- Native SAP behavior: The type pool `SLIS` supplies the field catalog, layout,
+  sort, event, key-info, and list-header types, and function group `SLVC`
+  supplies `REUSE_ALV_GRID_DISPLAY`, `REUSE_ALV_LIST_DISPLAY`,
+  `REUSE_ALV_HIERSEQ_LIST_DISPLAY`, the block-list function modules,
+  `REUSE_ALV_POPUP_TO_SELECT`, `REUSE_ALV_FIELDCATALOG_MERGE`,
+  `REUSE_ALV_EVENTS_GET`, `REUSE_ALV_COMMENTARY_WRITE`, and
+  `REUSE_ALV_VARIANT_F4`. The display function modules call back into form
+  routines of the calling program for status, user command, and page headers.
+- open-abap behavior: None of the `SLIS_*` types resolve, so every declaration
+  that uses them is reported by `unknown_types`. Unknown function modules are
+  not reported at all, so a call without typed parameters passes the lint run
+  without any runtime behavior behind it.
+- Reproduction: Declare `DATA lt TYPE slis_t_fieldcat_alv.` in any report under
+  `src/` and run `npm test`; abaplint reports `SLIS_T_FIELDCAT_ALV not found`.
+- Workaround: All SLIS-typed declarations, the `REUSE_ALV_*` calls, and the
+  callback form routines are isolated in the static include
+  `ZGG_NATIVE_ALV_CLASSIC`. Lint issue reporting is disabled only for that
+  include; activation, the five display flavors, and the callbacks remain
+  native-SAP checks.
+- Upstream reference: Not reported
+
+### Selection-variant types and RS_VARIANT_* function modules are missing
+
+- Status: Open, confirmed
+- Sample: `ZGG_GUI_SEL_VARIANTS`
+- Component: `open-abap-core` dependency surface
+- Version or commit: `5623d54` (`open-abap-core`), resolved on 2026-08-23
+- Native SAP behavior: `RSPARAMS`, `VARID`, `VARIT`, and `RSVAR` describe the
+  contents and the directory entry of a selection variant.
+  `RS_REFRESH_FROM_SELECTOPTIONS` reads the current selection screen,
+  `RS_VARIANT_CATALOG` offers the variant value help, `RS_VARIANT_CONTENTS`
+  reads a stored variant, and `RS_CREATE_VARIANT`,
+  `RS_CHANGE_CREATED_VARIANT`, and `RS_VARIANT_DELETE` maintain it.
+- open-abap behavior: None of the four structures resolve, so the sample cannot
+  declare the variant contents, the variant description, or the F4 result.
+  Variant persistence itself has no open-abap equivalent.
+- Reproduction: Declare `DATA lt TYPE STANDARD TABLE OF rsparams.` in a report
+  under `src/` and run `npm test`; abaplint reports `RSPARAMS not found`.
+- Workaround: All variant-typed declarations, the `RS_*` calls, and the
+  `SUBMIT` statements that pass a selection table or a selection set are
+  isolated in the static include `ZGG_NATIVE_SEL_VARIANTS`. Only sample-owned
+  `GG_` variants are written, and only after an explicit confirmation.
+- Upstream reference: Not reported
+
+### Dynamic-selection types and FREE_SELECTIONS_* function modules are missing
+
+- Status: Open, confirmed
+- Sample: `ZGG_GUI_SEL_FREE`
+- Component: `open-abap-core` dependency surface
+- Version or commit: `5623d54` (`open-abap-core`), resolved on 2026-08-23
+- Native SAP behavior: `RSDSTABS`, `RSDSFIELDS`, `RSDS_TEXPR`, `RSDS_TRANGE`,
+  `RSDS_TWHERE`, and `RSDYNSEL-SELID` describe the tables, fields,
+  expressions, ranges, WHERE clauses, and the selection id of a dynamic
+  selection. `FREE_SELECTIONS_INIT` prepares it, `FREE_SELECTIONS_DIALOG`
+  displays it as a window or full screen, and `FREE_SELECTIONS_RANGE_2_WHERE`
+  converts the returned ranges into a WHERE clause.
+- open-abap behavior: None of the `RSDS*` types or `RSDYNSEL` resolve, so the
+  selection id, the field list, and every returned structure are unknown types.
+  The dialog has no open-abap runtime.
+- Reproduction: Declare `DATA lt TYPE STANDARD TABLE OF rsdsfields.` in a
+  report under `src/` and run `npm test`; abaplint reports
+  `RSDSFIELDS not found`.
+- Workaround: The dynamic-selection state and all `FREE_SELECTIONS_*` calls are
+  isolated in the static include `ZGG_NATIVE_SEL_FREE`. The sample displays the
+  returned ranges and WHERE clauses and reads no data, so no database access is
+  added to the repository.
+- Upstream reference: Not reported
