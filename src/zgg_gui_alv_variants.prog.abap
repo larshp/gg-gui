@@ -209,8 +209,24 @@ FORM switch_variant.
   gv_detail = |Switched to tracked sample variant { gv_switch_index } of { lines( gt_owned_variants ) }|.
 ENDFORM.
 
+FORM as_ltvariants USING it_keys TYPE ty_variants
+                   CHANGING ct_variants TYPE ltvariants.
+* DELETE_VARIANTS expects the full LTDX layout record; the sample only tracks
+* the DISVARIANT key subset, so the shared key fields are mapped across.
+  CLEAR ct_variants.
+  LOOP AT it_keys INTO DATA(ls_source).
+    APPEND VALUE ltvariant( report    = ls_source-report
+                            handle    = ls_source-handle
+                            log_group = ls_source-log_group
+                            username  = ls_source-username
+                            variant   = ls_source-variant
+                            text      = ls_source-text ) TO ct_variants.
+  ENDLOOP.
+ENDFORM.
+
 FORM delete_current_variant.
-  DATA lt_delete TYPE ty_variants.
+  DATA lt_keys TYPE ty_variants.
+  DATA lt_delete TYPE ltvariants.
   DATA ls_key TYPE disvariant.
   DATA lv_answer TYPE c LENGTH 1.
   DATA lv_deleted TYPE abap_bool.
@@ -230,7 +246,8 @@ FORM delete_current_variant.
     gv_status = 'Variant deletion canceled'.
     RETURN.
   ENDIF.
-  APPEND ls_key TO lt_delete.
+  APPEND ls_key TO lt_keys.
+  PERFORM as_ltvariants USING lt_keys CHANGING lt_delete.
   TRY.
       lv_deleted = go_variant->delete_variants( lt_delete ).
       IF lv_deleted = abap_true.
@@ -244,6 +261,7 @@ FORM delete_current_variant.
 ENDFORM.
 
 FORM cleanup_owned_variants.
+  DATA lt_delete TYPE ltvariants.
   DATA lv_answer TYPE c LENGTH 1.
   DATA lv_deleted TYPE abap_bool.
 
@@ -260,8 +278,9 @@ FORM cleanup_owned_variants.
     gv_status = 'Variant cleanup canceled'.
     RETURN.
   ENDIF.
+  PERFORM as_ltvariants USING gt_owned_variants CHANGING lt_delete.
   TRY.
-      lv_deleted = go_variant->delete_variants( gt_owned_variants ).
+      lv_deleted = go_variant->delete_variants( lt_delete ).
       IF lv_deleted = abap_true.
         CLEAR gt_owned_variants.
       ENDIF.

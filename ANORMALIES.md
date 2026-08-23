@@ -296,8 +296,8 @@ GUI frontend features, or local development-environment failures in this file.
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_ALV_VARIANTS`
 - Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `08bd747` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: `CL_ALV_VARIANT` binds an output table, LVC field
   catalog, layout, and `DISVARIANT` key; it reads stored field catalogs and can
   delete a supplied set of layout variants. The owning grid applies, saves, and
@@ -305,7 +305,9 @@ GUI frontend features, or local development-environment failures in this file.
 - open-abap behavior: `CL_ALV_VARIANT` is declared under `src/alv`, but its
   constructor, `GET_VARIANT_INFO_FROM_DB`, and `DELETE_VARIANTS` all return
   without retaining state, reading storage, or deleting anything. The related
-  `CL_GUI_ALV_GRID` variant methods are also no-ops.
+  `CL_GUI_ALV_GRID` variant methods are also no-ops. `DELETE_VARIANTS` takes
+  `LTVARIANTS`, the full LTDX layout record, rather than a table of the
+  `DISVARIANT` key structure the grid and the sample otherwise work with.
 - Reproduction: Construct `CL_ALV_VARIANT`, call
   `GET_VARIANT_INFO_FROM_DB`, and inspect `ET_FCAT`; it remains initial because
   the implementation immediately returns in
@@ -313,7 +315,7 @@ GUI frontend features, or local development-environment failures in this file.
 - Workaround: The sample remains native-SAP-only for persistence. It tracks
   only successfully saved `GG_` keys for its own report and `GGV1` handle,
   requires explicit confirmation, and supplies only those tracked keys to
-  `DELETE_VARIANTS`.
+  `DELETE_VARIANTS`, mapping them onto `LTVARIANTS` rows first.
 - Upstream reference: Not reported
 
 ### Editable ALV and changed-data protocol behavior is stubbed
