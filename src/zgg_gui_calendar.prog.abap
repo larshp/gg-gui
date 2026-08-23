@@ -112,17 +112,20 @@ FORM create_controls.
 ENDFORM.
 
 FORM create_calendar.
+* The control expects CNCA_UTC_DATE character dates, not the ABAP date type.
+  DATA lv_focus TYPE cnca_utc_date.
 
   IF go_calendar IS BOUND.
     RETURN.
   ENDIF.
+  lv_focus = gv_focus.
   TRY.
       CREATE OBJECT go_calendar
         EXPORTING
           parent          = go_host
           view_style      = c_style_vertical
           selection_style = gv_selection_style
-          focus_date      = gv_focus
+          focus_date      = lv_focus
           display_months  = 3
           stand_alone     = abap_false
           week_begin_day  = '1'
@@ -144,8 +147,11 @@ ENDFORM.
 
 
 FORM go_to_focus.
+  DATA lv_focus TYPE cnca_utc_date.
+
+  lv_focus = gv_focus.
   TRY.
-      go_calendar->go_to_date( gv_focus ).
+      go_calendar->go_to_date( lv_focus ).
       gv_status = |Calendar navigated to { gv_focus DATE = USER }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |GO_TO_DATE failed: { lx_error->get_text( ) }|.
@@ -154,12 +160,16 @@ ENDFORM.
 
 FORM set_selection.
   DATA lv_end TYPE d.
+  DATA lv_begin_utc TYPE cnca_utc_date.
+  DATA lv_end_utc TYPE cnca_utc_date.
 
   lv_end = COND #( WHEN gv_selection_style = c_select_day
     THEN gv_focus ELSE gv_focus + 7 ).
+  lv_begin_utc = gv_focus.
+  lv_end_utc = lv_end.
   TRY.
-      go_calendar->set_selection( date_begin = gv_focus
-                                  date_end   = lv_end
+      go_calendar->set_selection( date_begin = lv_begin_utc
+                                  date_end   = lv_end_utc
                                   no_scroll  = abap_false ).
       gv_status = |Selection set from { gv_focus DATE = USER } to { lv_end DATE = USER }|.
     CATCH cx_root INTO DATA(lx_error).
@@ -170,10 +180,14 @@ ENDFORM.
 FORM read_selection.
   DATA lv_begin TYPE d.
   DATA lv_end TYPE d.
+  DATA lv_begin_utc TYPE cnca_utc_date.
+  DATA lv_end_utc TYPE cnca_utc_date.
 
   TRY.
-      go_calendar->get_selection( IMPORTING date_begin = lv_begin
-                                            date_end   = lv_end ).
+      go_calendar->get_selection( IMPORTING date_begin = lv_begin_utc
+                                            date_end   = lv_end_utc ).
+      lv_begin = lv_begin_utc.
+      lv_end = lv_end_utc.
       gv_status = |Selected { lv_begin DATE = USER } through { lv_end DATE = USER }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |GET_SELECTION failed: { lx_error->get_text( ) }|.

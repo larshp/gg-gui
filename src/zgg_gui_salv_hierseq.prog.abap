@@ -170,7 +170,7 @@ FORM configure_levels.
       go_item_filters->add_filter( columnname = 'QUANTITY'
                                    sign       = 'I'
                                    option     = 'GE'
-                                   low        = 0 ).
+                                   low        = '0' ).
       go_item_aggregations->add_aggregation(
         columnname  = 'QUANTITY'
         aggregation = if_salv_c_aggregation=>total ).
@@ -207,12 +207,12 @@ FORM toggle_filter.
         go_item_filters->add_filter( columnname = 'QUANTITY'
                                      sign       = 'I'
                                      option     = 'GE'
-                                     low        = 8 ).
+                                     low        = '8' ).
       ELSE.
         go_item_filters->add_filter( columnname = 'QUANTITY'
                                      sign       = 'I'
                                      option     = 'GE'
-                                     low        = 0 ).
+                                     low        = '0' ).
       ENDIF.
       go_hierseq->refresh( ).
       gv_status = |Item-level quantity filter toggled; threshold-eight mode { gv_filtered }|.
@@ -266,7 +266,7 @@ FORM reset_data.
         go_item_filters->add_filter( columnname = 'QUANTITY'
                                      sign       = 'I'
                                      option     = 'GE'
-                                     low        = 0 ).
+                                     low        = '0' ).
         go_hierseq->refresh( ).
         gv_status = 'Header rows, item rows, binding assumptions, filter, and displayed hierarchy reset'.
       CATCH cx_root INTO DATA(lx_error).
