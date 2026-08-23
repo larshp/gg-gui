@@ -7,6 +7,7 @@ partially implemented in open-abap.
 Do not record ordinary sample defects, SAP release differences, unsupported SAP
 GUI frontend features, or local development-environment failures in this file.
 
+
 ## Entry Template
 
 ### Short title
