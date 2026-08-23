@@ -121,11 +121,8 @@ FORM initialize_paths.
 ENDFORM.
 
 FORM inspect_gui_available.
-  DATA lv_class TYPE string VALUE 'CL_GUI_FRONTEND_SERVICES'.
-  DATA lv_method TYPE string VALUE 'GUI_IS_AVAILABLE'.
-
   TRY.
-      CALL METHOD (lv_class)=>(lv_method) RECEIVING return = gv_gui_available.
+      gv_gui_available = cl_gui_frontend_services=>gui_is_available( ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |GUI_IS_AVAILABLE returned { gv_gui_available }|
         CHANGING log    = gt_log ).
@@ -292,10 +289,12 @@ FORM clipboard_roundtrip.
   lt_export = VALUE #( ( 'ZGG_GUI clipboard sample' )
     ( |Generated for { sy-uname } at { sy-uzeit TIME = ISO }| ) ).
   TRY.
-      CALL METHOD cl_gui_frontend_services=>('CLIPBOARD_EXPORT')
-        EXPORTING data = lt_export CHANGING rc = lv_rc.
-      CALL METHOD cl_gui_frontend_services=>('CLIPBOARD_IMPORT')
-        IMPORTING data = lt_import length = lv_length.
+      cl_gui_frontend_services=>clipboard_export(
+        IMPORTING data = lt_export
+        CHANGING  rc   = lv_rc ).
+      cl_gui_frontend_services=>clipboard_import(
+        IMPORTING data   = lt_import
+                  length = lv_length ).
       gv_status = |Clipboard export rc { lv_rc }; imported lines { lines( lt_import ) }; length { lv_length }|.
       gv_detail = 'Clipboard content is text only and contains no productive data'.
       PERFORM add_log USING gv_status.
@@ -306,8 +305,6 @@ FORM clipboard_roundtrip.
 ENDFORM.
 
 FORM inspect_capabilities.
-  DATA lv_class TYPE string VALUE 'CL_GUI_FRONTEND_SERVICES'.
-  DATA lv_method TYPE string.
   DATA lv_gui_type TYPE i.
   DATA lv_platform TYPE i.
   DATA lv_computer TYPE string.
@@ -325,8 +322,7 @@ FORM inspect_capabilities.
         cl_gui_frontend_services=>get_drive_type(
           EXPORTING drive = lv_drive CHANGING drive_type = lv_drive_type ).
       ENDIF.
-      lv_method = 'GET_GUI_TYPE'.
-      CALL METHOD (lv_class)=>(lv_method) RECEIVING return = lv_gui_type.
+      lv_gui_type = cl_gui_frontend_services=>get_gui_type( ).
       gv_status = |GUI type { lv_gui_type }; platform { lv_platform }; computer { lv_computer }; drive { lv_drive_type }|.
       gv_detail = |GUI version rows { lines( lt_version ) }, rc { lv_rc }, path separator { gv_separator }, GUI available { gv_gui_available }|.
       PERFORM add_log USING gv_status.
@@ -345,8 +341,6 @@ FORM inspect_directories.
   DATA lv_download TYPE string.
   DATA lv_current TYPE string.
   DATA lv_sapgui TYPE string.
-  DATA lv_class TYPE string VALUE 'CL_GUI_FRONTEND_SERVICES'.
-  DATA lv_method TYPE string VALUE 'GET_SAPGUI_DIRECTORY'.
 
   TRY.
       cl_gui_frontend_services=>get_desktop_directory( CHANGING desktop_directory = lv_desktop ).
@@ -355,7 +349,8 @@ FORM inspect_directories.
       cl_gui_frontend_services=>get_upload_download_path(
         CHANGING upload_path = lv_upload download_path = lv_download ).
       cl_gui_frontend_services=>directory_get_current( CHANGING current_directory = lv_current ).
-      CALL METHOD (lv_class)=>(lv_method) CHANGING sapgui_directory = lv_sapgui.
+      cl_gui_frontend_services=>get_sapgui_directory(
+        CHANGING sapgui_directory = lv_sapgui ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Temp { gv_temp_dir }; Desktop { lv_desktop }|
         CHANGING log    = gt_log ).
@@ -366,8 +361,7 @@ FORM inspect_directories.
         EXPORTING event = |Upload { lv_upload }; Download { lv_download }; Current { lv_current }|
         CHANGING log    = gt_log ).
 
-      lv_method = 'DIRECTORY_SET_CURRENT'.
-      CALL METHOD (lv_class)=>(lv_method) EXPORTING current_directory = gv_sample_dir.
+      cl_gui_frontend_services=>directory_set_current( gv_sample_dir ).
       gv_status = 'Frontend directories queried; current directory change was limited to the sample-owned path'.
       gv_detail = 'Use Create files first if the sample-owned directory does not yet exist'.
     CATCH cx_root INTO DATA(lx_error).
