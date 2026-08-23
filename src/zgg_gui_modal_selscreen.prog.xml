@@ -37,13 +37,13 @@
      <ID>S</ID>
      <KEY>S_CAT</KEY>
      <ENTRY>Category</ENTRY>
-     <LENGTH>13</LENGTH>
+     <LENGTH>16</LENGTH>
     </item>
     <item>
      <ID>S</ID>
      <KEY>P_CODE</KEY>
      <ENTRY>Sample code</ENTRY>
-     <LENGTH>12</LENGTH>
+     <LENGTH>19</LENGTH>
     </item>
    </TPOOL>
   </asx:values>

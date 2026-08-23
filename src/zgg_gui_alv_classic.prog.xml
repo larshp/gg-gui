@@ -31,7 +31,7 @@
      <ID>S</ID>
      <KEY>P_HIER</KEY>
      <ENTRY>Hierarchical-sequential</ENTRY>
-     <LENGTH>28</LENGTH>
+     <LENGTH>31</LENGTH>
     </item>
     <item>
      <ID>S</ID>
@@ -43,25 +43,25 @@
      <ID>S</ID>
      <KEY>P_POPUP</KEY>
      <ENTRY>Selection popup</ENTRY>
-     <LENGTH>20</LENGTH>
+     <LENGTH>23</LENGTH>
     </item>
     <item>
      <ID>S</ID>
      <KEY>P_EVENT</KEY>
      <ENTRY>Event table only</ENTRY>
-     <LENGTH>20</LENGTH>
+     <LENGTH>24</LENGTH>
     </item>
     <item>
      <ID>S</ID>
      <KEY>P_MERGE</KEY>
      <ENTRY>Merge field catalog</ENTRY>
-     <LENGTH>24</LENGTH>
+     <LENGTH>27</LENGTH>
     </item>
     <item>
      <ID>S</ID>
      <KEY>P_VARI</KEY>
      <ENTRY>Layout variant</ENTRY>
-     <LENGTH>20</LENGTH>
+     <LENGTH>22</LENGTH>
     </item>
    </TPOOL>
   </asx:values>

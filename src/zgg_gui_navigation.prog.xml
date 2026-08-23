@@ -34,7 +34,7 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>FRAME_STATE</NAME>
-       <TEXT>Current_state_____________________________________________________________________________________</TEXT>
+       <TEXT>Current_state____________________________________________________________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>098</LENGTH>
@@ -139,7 +139,7 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>FRAME_NAV</NAME>
-       <TEXT>Navigation_statements_____________________________________________________________________________</TEXT>
+       <TEXT>Navigation_statements____________________________________________________________________________</TEXT>
        <LINE>008</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>098</LENGTH>
@@ -255,7 +255,7 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>PUSH</TYPE>
        <NAME>BTN_TCODE</NAME>
-       <TEXT>Call_transaction</TEXT>
+       <TEXT>Call_transactio</TEXT>
        <ICON_NAME>ICON_ENTER_MORE</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
        <LINE>011</LINE>
@@ -357,7 +357,7 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>FRAME_CALLED</NAME>
-       <TEXT>Called_screen_0200______________________________________________________________________</TEXT>
+       <TEXT>Called_screen_0200_____________________________________________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>088</LENGTH>
@@ -517,7 +517,7 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>FRAME_LEAF</NAME>
-       <TEXT>Screen_0300_____________________________________________________________________________</TEXT>
+       <TEXT>Screen_0300____________________________________________________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>088</LENGTH>
