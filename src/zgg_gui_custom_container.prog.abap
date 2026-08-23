@@ -3,14 +3,10 @@ REPORT zgg_gui_custom_container.
 TYPES ty_text_line TYPE c LENGTH 255.
 TYPES ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
 
-CONSTANTS c_lifetime_default TYPE i VALUE 0.
-CONSTANTS c_lifetime_dynpro TYPE i VALUE 1.
-CONSTANTS c_lifetime_imode TYPE i VALUE 2.
-
 DATA go_container TYPE REF TO cl_gui_custom_container.
 DATA go_editor TYPE REF TO cl_gui_textedit.
 DATA gv_ok_code TYPE sy-ucomm.
-DATA gv_lifetime TYPE i VALUE c_lifetime_dynpro.
+DATA gv_lifetime TYPE i.
 DATA gv_lifetime_text TYPE c LENGTH 18.
 DATA gv_screen0_state TYPE c LENGTH 32.
 DATA gv_default_state TYPE c LENGTH 32.
@@ -20,6 +16,7 @@ DATA gv_large TYPE abap_bool.
 DATA gv_generation TYPE i.
 
 START-OF-SELECTION.
+  gv_lifetime = cl_gui_control=>lifetime_dynpro.
   CALL SCREEN 100.
 
 MODULE status_0100 OUTPUT.
@@ -53,12 +50,12 @@ MODULE user_command_0100 INPUT.
       gv_link_state = |Linked by program, screen, and custom-control name; rc { sy-subrc }|.
     WHEN 'LIFETIME'.
       CASE gv_lifetime.
-        WHEN c_lifetime_default.
-          gv_lifetime = c_lifetime_dynpro.
-        WHEN c_lifetime_dynpro.
-          gv_lifetime = c_lifetime_imode.
+        WHEN cl_gui_control=>lifetime_default.
+          gv_lifetime = cl_gui_control=>lifetime_dynpro.
+        WHEN cl_gui_control=>lifetime_dynpro.
+          gv_lifetime = cl_gui_control=>lifetime_imode.
         WHEN OTHERS.
-          gv_lifetime = c_lifetime_default.
+          gv_lifetime = cl_gui_control=>lifetime_default.
       ENDCASE.
       PERFORM free_controls.
       PERFORM create_container.
@@ -87,7 +84,7 @@ MODULE user_command_0100 INPUT.
       gv_link_state = |Hosted child replaced; generation { gv_generation }|.
     WHEN 'RESET'.
       PERFORM free_controls.
-      gv_lifetime = c_lifetime_dynpro.
+      gv_lifetime = cl_gui_control=>lifetime_dynpro.
       gv_large = abap_false.
       PERFORM create_container.
       gv_link_state = 'Initial custom-container state restored'.
@@ -127,11 +124,11 @@ ENDFORM.
 
 FORM describe_hosts.
   CASE gv_lifetime.
-    WHEN c_lifetime_default.
+    WHEN cl_gui_control=>lifetime_default.
       gv_lifetime_text = 'DEFAULT (0)'.
-    WHEN c_lifetime_dynpro.
+    WHEN cl_gui_control=>lifetime_dynpro.
       gv_lifetime_text = 'DYNPRO (1)'.
-    WHEN c_lifetime_imode.
+    WHEN cl_gui_control=>lifetime_imode.
       gv_lifetime_text = 'IMODE (2)'.
   ENDCASE.
 

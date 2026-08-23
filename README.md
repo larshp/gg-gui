@@ -58,33 +58,3 @@ coverage audit is pinned to the exact `open-abap-gui` commit in `PLAN.md`.
 The complete per-program feature checklist and current implementation status is
 in [PLAN.md](PLAN.md). The launcher intentionally stores only category, program
 name, and title; it has no separate catalog metadata schema.
-
-## Compatibility
-
-| Environment | Status |
-| --- | --- |
-| SAP GUI for Windows on ABAP Platform 7.50+ | Primary target; native execution and visual verification still required |
-| SAP GUI for Java | Best effort; Windows-specific controls are unavailable |
-| SAP GUI for HTML | Best effort; Control Framework and frontend-service coverage differs |
-| open-abap transpiler/runtime | Full repository syntax check; many GUI classes are missing, assertions, or no-op stubs |
-
-Every optional control is created behind a runtime capability check and has a
-diagnostic fallback. File mutations in the Frontend Services sample are limited
-to a derived `ZGG_GUI_<user>` directory below the frontend temporary directory.
-ALV variant cleanup and selection-variant maintenance are restricted to
-sample-owned `GG_` names after confirmation.
-
-## Known Limitations
-
-Observed missing classes, missing DDIC and type-pool surface, stubbed methods,
-event-surface differences, and runtime assertions in open-abap are recorded in
-[ANORMALIES.md](ANORMALIES.md). That filename intentionally follows the
-requested spelling. Local network or sandbox failures are not runtime anomalies.
-
-Code that depends on native-only surface lives in the `ZGG_NATIVE_*` static
-includes, which are excluded from lint issue reporting and therefore still have
-to be activated and exercised on a native system.
-
-Native SAP syntax/ATC, multi-frontend behavior, DPI/high-contrast layout,
-keyboard navigation, dialog cancellation, representative screenshots, and
-end-to-end catalog return behavior remain Phase 6 verification work.

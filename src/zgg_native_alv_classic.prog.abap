@@ -1,8 +1,7 @@
 * Static include owned by ZGG_GUI_ALV_CLASSIC.
-* The SLIS type pool and the REUSE_ALV_* function modules are part of the
-* native SAP list-ALV surface and are absent from the open-abap dependency
-* surface, so all code that depends on them is isolated here. Lint issue
-* reporting is disabled for this include; activation, the callbacks, and the
+* The SLIS type pool resolves against the open-abap dependency surface, but the
+* REUSE_ALV_* function modules have no open-abap implementation, so all code
+* that depends on them is isolated here. Activation, the callbacks, and the
 * displayed lists remain native SAP checks.
 
 TYPE-POOLS slis.

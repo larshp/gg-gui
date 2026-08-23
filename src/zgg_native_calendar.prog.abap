@@ -15,7 +15,7 @@ CLASS lcl_calendar_events IMPLEMENTATION.
 
     EXPORT event = lv_event date_begin = date_begin date_end = date_end
       TO MEMORY ID 'ZGG_GUI_CALENDAR_EVENT'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'CAL_EVENT' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'CAL_EVENT' ).
   ENDMETHOD.
 
   METHOD on_info.
@@ -23,7 +23,7 @@ CLASS lcl_calendar_events IMPLEMENTATION.
 
     EXPORT event = lv_event date_begin = date_begin date_end = date_end
       TO MEMORY ID 'ZGG_GUI_CALENDAR_EVENT'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'CAL_EVENT' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'CAL_EVENT' ).
   ENDMETHOD.
 ENDCLASS.
 
