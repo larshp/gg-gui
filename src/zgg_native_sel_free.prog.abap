@@ -1,9 +1,8 @@
 * Static include owned by ZGG_GUI_SEL_FREE.
-* The RSDS* dynamic-selection types and the FREE_SELECTIONS_* function modules
-* belong to the native selection surface and are absent from the open-abap
-* dependency surface, so every statement that needs them is isolated here.
-* Lint issue reporting is disabled for this include; activation and the
-* interactive dialog remain native SAP checks.
+* The RSDS* dynamic-selection types resolve against the open-abap dependency
+* surface, but the FREE_SELECTIONS_* function modules have no open-abap
+* implementation, so every statement that needs them is isolated here.
+* Activation and the interactive dialog remain native SAP checks.
 
 TYPES ty_tables TYPE STANDARD TABLE OF rsdstabs WITH EMPTY KEY.
 TYPES ty_fields TYPE STANDARD TABLE OF rsdsfields WITH EMPTY KEY.

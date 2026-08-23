@@ -52,7 +52,7 @@
     "forbidden_pseudo_and_pragma": true,
     "forbidden_void_type": true,
     "form_tables_obsolete": true,
-    "function_module_recommendations": true,
+    "function_module_recommendations": false,
     "functional_writing": true,
     "identical_conditions": true,
     "identical_contents": true,

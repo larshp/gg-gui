@@ -1,9 +1,9 @@
 * Static include owned by ZGG_GUI_SEL_VARIANTS.
-* RSPARAMS, VARID, VARIT, and the RS_VARIANT_* function modules belong to the
-* native selection-variant surface and are absent from the open-abap
-* dependency surface, so every statement that needs them is isolated here.
-* Lint issue reporting is disabled for this include; activation, variant
-* persistence, and the started reports remain native SAP checks.
+* RSPARAMS, VARID, VARIT, and RSVAR resolve against the open-abap dependency
+* surface, but the RS_VARIANT_* function modules have no open-abap
+* implementation, so every statement that needs them is isolated here.
+* Activation, variant persistence, and the started reports remain native SAP
+* checks.
 
 TYPES ty_params TYPE STANDARD TABLE OF rsparams WITH EMPTY KEY.
 

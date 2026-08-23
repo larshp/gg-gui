@@ -82,8 +82,10 @@ event-surface differences, and runtime assertions in open-abap are recorded in
 requested spelling. Local network or sandbox failures are not runtime anomalies.
 
 Code that depends on native-only surface lives in the `ZGG_NATIVE_*` static
-includes, which are excluded from lint issue reporting and therefore still have
-to be activated and exercised on a native system.
+includes. They are lint checked like the rest of `src/`, with no per-file
+exclusions, but the function modules and frontend behavior behind them have no
+open-abap equivalent, so they still have to be activated and exercised on a
+native system.
 
 Native SAP syntax/ATC, multi-frontend behavior, DPI/high-contrast layout,
 keyboard navigation, dialog cancellation, representative screenshots, and

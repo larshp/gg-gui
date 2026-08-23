@@ -108,32 +108,33 @@ GUI frontend features, or local development-environment failures in this file.
   dialog-box, and easy-splitter behavior cannot run under open-abap.
 - Upstream reference: Not reported
 
-### `CL_GUI_CALENDAR` event-ID constants are missing and its runtime is stubbed
+### `CL_GUI_CALENDAR` is fully declared but its runtime is stubbed
 
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_CALENDAR`
 - Component: `open-abap-gui`
-- Version or commit: `08bd747` (`open-abap-gui` local checkout, 2026-08-23);
+- Version or commit: `1949361` (`open-abap-gui` local checkout, 2026-08-23);
   originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: `CL_GUI_CALENDAR` displays localized calendar views,
   selects single dates or ranges, supplies date-selection and information
   events, and attaches colors and tooltip text to dates.
-- open-abap behavior: `CL_GUI_CALENDAR` and the `CNCA` type pool are now
-  declared, covering the native constructor, `GO_TO_DATE`, `SET_SELECTION`,
+- open-abap behavior: `CL_GUI_CALENDAR` and the `CNCA` type pool are declared,
+  covering the native constructor, `GO_TO_DATE`, `SET_SELECTION`,
   `GET_SELECTION`, `SET_DAY_INFO`, `RESET_DAY_INFO`, `RESET_SELECTION`, and the
-  `DATE_SELECTED` / `INFO_REQUEST` events, so the sample is statically checked. All method bodies return without
-  frontend state. The `M_ID_DATE_SELECTED` and `M_ID_INFO_REQUEST` event-ID
-  constants required by `SET_REGISTERED_EVENTS` are still absent.
-- Reproduction: Reference `cl_gui_calendar=>m_id_date_selected` in a checked
-  report and run `npm test`; abaplint reports the constant as not found. Calling
-  `GET_SELECTION` returns initial dates because the body returns immediately.
+  `DATE_SELECTED` / `INFO_REQUEST` events. The `M_ID_CTXMENU_REQUEST`,
+  `M_ID_DATE_SELECTED`, `M_ID_INFO_REQUEST`, `M_ID_PRE_SELECTION`, `M_ID_F2`,
+  and `M_ID_F12` event-ID constants required by `SET_REGISTERED_EVENTS` are now
+  declared with their native values, so the whole sample resolves statically.
+  All method bodies still return without frontend state.
+- Reproduction: Call `GET_SELECTION` on a constructed calendar and inspect the
+  exported dates; they stay initial because the body returns immediately.
 - Workaround: `ZGG_GUI_CALENDAR` declares the control statically and guards
   construction. Static include `ZGG_NATIVE_CALENDAR` declares handlers for
   `DATE_SELECTED` and `INFO_REQUEST`, registers the native event IDs, returns
   event ranges through ABAP memory, and deregisters before recreation or exit.
-  Day-info fixtures use the native `CNCA_ITAB_DAY_INFO` type. Because the
-  event-ID constants are still missing, lint issue reporting stays disabled for
-  this native include; activation and event behavior remain native-SAP checks.
+  Day-info fixtures use the native `CNCA_ITAB_DAY_INFO` type. The include is
+  lint checked without exclusions; activation and event behavior remain
+  native-SAP checks.
 - Upstream reference: Not reported
 
 ### The Dynamic Documents API is partial and its runtime behavior is stubbed
@@ -141,32 +142,32 @@ GUI frontend features, or local development-environment failures in this file.
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_DYNAMIC_DOCUMENT`
 - Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `1949361` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: `CL_DD_DOCUMENT` and its `CL_DD_AREA`, table, form,
   link, button, input, and select element classes build an HTML-backed Dynamic
   Document. Native applications can display the document in a GUI container,
   register element events, refresh retained elements, and print it.
-- open-abap behavior: `src/dd` now declares the full element family used by the
+- open-abap behavior: `src/dd` declares the full element family used by the
   sample, including `CL_DD_LINK_ELEMENT`, `CL_DD_SELECT_ELEMENT`, `ADD_LINK`,
   `ADD_SELECT_ELEMENT`, the `SDYDO_OPTION_TAB` option type, and the `CLICKED`,
-  `ENTERED`, `HELP_F1`, and `SELECTED` element events. Every method body still
-  returns without constructing HTML or element objects, so `VERTICAL_SPLIT`
-  leaves `RIGHT_AREA` unbound and `ADD_FORM` leaves `FORMAREA` unbound. The
-  `NAME` attribute of `CL_DD_INPUT_ELEMENT` and the `VALUE` attribute of
-  `CL_DD_SELECT_ELEMENT`, both read by the event handlers, are still absent.
+  `ENTERED`, `HELP_F1`, and `SELECTED` element events. `CL_DD_INPUT_ELEMENT`
+  now inherits from `CL_DD_FORM_ELEMENT` as it does natively and therefore
+  resolves `NAME` through `CL_DD_ELEMENT`, and `CL_DD_SELECT_ELEMENT` declares
+  the native `VALUE` and `OPTIONS` attributes, so both attributes read by the
+  event handlers resolve. Every method body still returns without constructing
+  HTML or element objects, so `VERTICAL_SPLIT` leaves `RIGHT_AREA` unbound and
+  `ADD_FORM` leaves `FORMAREA` unbound.
 - Reproduction: Create `CL_DD_DOCUMENT`, call `VERTICAL_SPLIT`, and inspect the
   exported `RIGHT_AREA`; it remains initial because the implementation returns
-  immediately. Reference `input_element->name` in a checked report and run
-  `npm test`; abaplint reports the attribute as not found.
+  immediately.
 - Workaround: `ZGG_GUI_DYNAMIC_DOCUMENT` declares every element statically and,
   if the document returns no child areas, displays an HTML fallback through
   `CL_GUI_HTML_VIEWER`. Static include `ZGG_NATIVE_DOCUMENT` declares typed
   handlers for link/button `CLICKED`, input `ENTERED`/`HELP_F1`, and select
   `SELECTED`, returns the sender name and current value through ABAP memory, and
-  deregisters before reset or exit. Because the two element attributes are still
-  missing, lint issue reporting stays disabled for this native include;
-  activation and event behavior remain native-SAP checks.
+  deregisters before reset or exit. The include is lint checked without
+  exclusions; activation and event behavior remain native-SAP checks.
 - Upstream reference: Not reported
 
 ### Tree control coverage is partial and runtime methods are stubbed
@@ -174,8 +175,8 @@ GUI frontend features, or local development-environment failures in this file.
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_TREES`, `ZGG_GUI_TREE_MODELS`, and `ZGG_GUI_ALV_TREE`
 - Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `1949361` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: SAP provides simple, list, and column tree controls plus
   corresponding backend tree-model classes. Column trees create frontend
   nodes and items, retain selection and expansion state, raise item and header
@@ -191,8 +192,9 @@ GUI frontend features, or local development-environment failures in this file.
   table types; every model method body returns without behavior.
   `CL_GUI_SIMPLE_TREE` and `CL_GUI_LIST_TREE` remain absent. The ALV tree
   constructor and core display/node/state methods are assertion stubs or
-  no-ops, and its native `NODE_CONTEXT_MENU_REQUEST` event is still not
-  declared even though context-menu selection is present.
+  no-ops. Its native `NODE_CONTEXT_MENU_REQUEST` event is now declared,
+  exporting `NODE_KEY` typed `LVC_NKEY` and `MENU` typed
+  `REF TO CL_CTMENU`, alongside the existing context-menu selection event.
 - Reproduction: Create `CL_GUI_COLUMN_TREE` with a valid parent and hierarchy
   header; the constructor reaches `ASSERT 1 = 'todo'` in
   `src/cl_gui_column_tree.clas.abap`. A static reference to
@@ -201,12 +203,14 @@ GUI frontend features, or local development-environment failures in this file.
   fallback; `ZGG_GUI_TREE_MODELS` declares each model class statically and keeps
   a shared `CL_TREE_MODEL` reference for the lifecycle calls. The class-audit
   action reports which GUI and model variants exist on the current system.
-  Static include `ZGG_NATIVE_ALV_TREE` declares a typed handler for the missing
-  native `NODE_CONTEXT_MENU_REQUEST`, preserves the tree's existing frontend
-  event registrations, adds two menu commands, and deregisters the handler on
-  exit. Because that event and two `CL_CTMENU` methods are still missing, lint
-  issue reporting stays disabled for this native include; activation and event
-  behavior remain native-SAP checks.
+  Static include `ZGG_NATIVE_ALV_TREE` declares a typed handler for
+  `NODE_CONTEXT_MENU_REQUEST`, preserves the tree's existing frontend event
+  registrations, adds two menu commands, and deregisters the handler on exit.
+  Now that the event carries a typed `MENU` parameter, the handler's
+  `ADD_SEPARATOR` and `ADD_FUNCTION` calls resolve against the declared
+  `CL_CTMENU` methods, and the include is lint checked without exclusions.
+  Those two methods have empty bodies, so no runtime menu is built; activation
+  and menu behavior remain native-SAP checks.
 - Upstream reference: Not reported
 
 ### SALV table API is declared but core runtime behavior is stubbed
@@ -363,16 +367,19 @@ GUI frontend features, or local development-environment failures in this file.
   methods are assertion stubs or no-ops. `CL_DRAGDROP->ADD`, `GET`, and
   `GET_HANDLE` return without creating registrations, and
   `CL_DRAGDROPOBJECT->ABORT` is a no-op.
-- Reproduction: Declare a handler `FOR EVENT DELAYED_CHANGED_SEL_CALLBACK OF
-  CL_GUI_ALV_GRID` and run `npm test`; abaplint reports that the event does not
-  exist. Inspect the grid and drag/drop implementations at the tested commit
-  for the placeholder bodies.
+- Reproduction: Search `src/cl_gui_alv_grid.clas.abap` for the event;
+  `MC_EVT_DELAYED_CHANGE_SELECT` and `REGISTER_DELAYED_EVENT` are present but
+  no `DELAYED_CHANGED_SEL_CALLBACK` event is declared. A handler that imports
+  no event parameters is not reported by abaplint, so the missing event stays
+  silent in the lint run and only fails a native syntax check. Inspect the grid
+  and drag/drop implementations at the tested commit for the placeholder bodies.
 - Workaround: Static include `ZGG_NATIVE_ALV_EVENTS` declares a typed handler
   for the missing callback, registers `MC_EVT_DELAYED_CHANGE_SELECT`, preserves
   the handler across application/system event-mode recreation, and deregisters
-  it before freeing the grid. Lint issue reporting is disabled only for this
-  native include; activation and event behavior remain native-SAP checks. Grid
-  construction stays guarded with a text fallback under open-abap.
+  it before freeing the grid. The handler imports no parameters, so the include
+  is lint checked without exclusions; existence of the event, activation, and
+  event behavior remain native-SAP checks. Grid construction stays guarded with
+  a text fallback under open-abap.
 - Upstream reference: Not reported
 
 ### SALV tree class family is declared but has no runtime behavior
@@ -406,9 +413,8 @@ GUI frontend features, or local development-environment failures in this file.
   Static
   include `ZGG_NATIVE_SALV_TREE` declares typed native `LINK_CLICK` and
   `DOUBLE_CLICK` handlers, returns node and column payloads through ABAP memory,
-  and deregisters on exit. That include now has no unresolved type references;
-  lint issue reporting stays disabled for it only because of repository style
-  rules such as the ban on `EXPORT TO MEMORY`.
+  and deregisters on exit. That include has no unresolved type references and is
+  lint checked without exclusions.
 - Upstream reference: Not reported
 
 ### Hierarchical-sequential SALV family is declared but has no runtime behavior
@@ -436,9 +442,8 @@ GUI frontend features, or local development-environment failures in this file.
   `T_BINDING_LEVEL1_LEVEL2` contract, and shows a text fallback when the factory
   returns nothing. Static include `ZGG_NATIVE_SALV_HSEQ` declares typed
   `LINK_CLICK` and `DOUBLE_CLICK` handlers, records level, row, and column
-  payloads, and deregisters on exit. That include now has no unresolved type
-  references; lint issue reporting stays disabled for it only because of
-  repository style rules such as the ban on `EXPORT TO MEMORY`.
+  payloads, and deregisters on exit. That include has no unresolved type
+  references and is lint checked without exclusions.
 - Upstream reference: Not reported
 
 ### Frontend Services is partial, stubbed, and has signature differences
@@ -578,38 +583,45 @@ GUI frontend features, or local development-environment failures in this file.
   passes the dimension parameters explicitly.
 - Upstream reference: Not reported
 
-### Picture event surface and Data Provider lifetime constant are missing
+### The Data Provider lifetime constants are missing
 
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_PICTURE`
 - Component: `open-abap-gui` dependency surface
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `1949361` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: `CL_GUI_PICTURE` exposes picture click/double-click
   events, and the CNDP type pool supplies `CNDP_LIFETIME_TRANSACTION` for
   `DP_CREATE_URL` data kept for the current transaction.
-- open-abap behavior: `CL_GUI_PICTURE` declares no events, and the configured
-  dependencies do not resolve `CNDP_LIFETIME_TRANSACTION`. A static event
-  handler or use of the named lifetime constant therefore fails syntax/type
-  checking.
-- Reproduction: Declare a handler `FOR EVENT PICTURE_DBLCLICK OF
-  CL_GUI_PICTURE`, or pass `CNDP_LIFETIME_TRANSACTION` to `DP_CREATE_URL`, and
-  run `npm test`.
+- open-abap behavior: `CL_GUI_PICTURE` now declares the native
+  `PICTURE_CLICK` and `PICTURE_DBLCLICK` events with their `MOUSE_POS_X` /
+  `MOUSE_POS_Y` parameters, plus the `EVENTID_CONTEXT_MENU`,
+  `EVENTID_PICTURE_CLICK`, `EVENTID_PICTURE_DBLCLICK`,
+  `EVENTID_CONTROL_CLICK`, `EVENTID_CONTROL_DBLCLICK`, and
+  `EVENTID_CONTEXT_MENU_SELECTED` constants with their native values, so a
+  static handler and `SET_REGISTERED_EVENTS` both resolve. The CNDP type pool
+  is still absent from the dependency surface, so
+  `CNDP_LIFETIME_TRANSACTION` does not resolve. All method bodies remain
+  no-ops or failed assertions, so no picture is ever loaded and no event is
+  raised.
+- Reproduction: Pass `CNDP_LIFETIME_TRANSACTION` to `DP_CREATE_URL` and run
+  `npm test`; abaplint reports the constant as not found.
 - Workaround: The format fixtures use the documented transaction lifetime
   value `'T'`. Static include `ZGG_NATIVE_PICTURE` declares the real
   click/double-click handlers, registers both event IDs, returns coordinates
-  through ABAP memory, and deregisters during cleanup. Lint issue reporting is
-  disabled only for this native include because open-abap lacks the event;
-  activation and event behavior remain native-SAP checks.
+  through ABAP memory, and deregisters during cleanup. The include is lint
+  checked without exclusions; activation and event behavior remain native-SAP
+  checks.
 - Upstream reference: Not reported
 
-### The SLIS type pool and the REUSE_ALV_* family are missing
+### The REUSE_ALV_* function modules are missing
 
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_ALV_CLASSIC`
-- Component: `open-abap-core` and `open-abap-gui` dependency surface
-- Version or commit: `5623d54` (`open-abap-core`) and `a3453bd`
-  (`open-abap-gui`), both resolved on 2026-08-23
+- Component: `open-abap-gui` dependency surface
+- Version or commit: `1949361` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `5623d54` (`open-abap-core`) and `a3453bd`
+  (`open-abap-gui`)
 - Native SAP behavior: The type pool `SLIS` supplies the field catalog, layout,
   sort, event, key-info, and list-header types, and function group `SLVC`
   supplies `REUSE_ALV_GRID_DISPLAY`, `REUSE_ALV_LIST_DISPLAY`,
@@ -618,62 +630,92 @@ GUI frontend features, or local development-environment failures in this file.
   `REUSE_ALV_EVENTS_GET`, `REUSE_ALV_COMMENTARY_WRITE`, and
   `REUSE_ALV_VARIANT_F4`. The display function modules call back into form
   routines of the calling program for status, user command, and page headers.
-- open-abap behavior: None of the `SLIS_*` types resolve, so every declaration
-  that uses them is reported by `unknown_types`. Unknown function modules are
-  not reported at all, so a call without typed parameters passes the lint run
-  without any runtime behavior behind it.
-- Reproduction: Declare `DATA lt TYPE slis_t_fieldcat_alv.` in any report under
-  `src/` and run `npm test`; abaplint reports `SLIS_T_FIELDCAT_ALV not found`.
+- open-abap behavior: The `SLIS` type pool in
+  `open-abap-gui/src/ddic/pools/slis.type.abap` now supplies
+  `SLIS_FIELDCAT_ALV` / `SLIS_T_FIELDCAT_ALV`, `SLIS_LAYOUT_ALV`,
+  `SLIS_SORTINFO_ALV` / `SLIS_T_SORTINFO_ALV`, `SLIS_ALV_EVENT` /
+  `SLIS_T_EVENT`, `SLIS_KEYINFO_ALV`, `SLIS_SELFIELD`, `SLIS_EXTAB` /
+  `SLIS_T_EXTAB`, and the underlying `SLIS_FIELDNAME`, `SLIS_TABNAME`,
+  `SLIS_FORMNAME`, `SLIS_EDIT_MASK`, and `SLIS_SEL_TAB_FIELD` types alongside
+  the pre-existing `SLIS_LISTHEADER` types, so every SLIS-typed declaration
+  resolves. `SLIS_LAYOUT_ALV` reproduces the native component list except
+  `DTC_LAYOUT`, which is omitted because its type `DTC_S_LAYO` is not part of
+  the dependency surface. Function group `SLVC` itself is absent. Unknown
+  function modules are not reported at all, so the `REUSE_ALV_*` calls pass the
+  lint run with no runtime behavior behind them.
+- Reproduction: Search the dependency surface for `REUSE_ALV_GRID_DISPLAY`; no
+  function group provides it, yet `npm test` reports no issue for the call.
 - Workaround: All SLIS-typed declarations, the `REUSE_ALV_*` calls, and the
   callback form routines are isolated in the static include
-  `ZGG_NATIVE_ALV_CLASSIC`. Lint issue reporting is disabled only for that
-  include; activation, the five display flavors, and the callbacks remain
-  native-SAP checks.
+  `ZGG_NATIVE_ALV_CLASSIC`. The include is lint checked without exclusions.
+  The `function_module_recommendations` rule is disabled in `abaplint.jsonc`
+  because this sample exists to demonstrate the `REUSE_ALV_*` family itself, so
+  its advice to replace `REUSE_ALV_GRID_DISPLAY` with `CL_SALV_TABLE=>FACTORY`
+  or `CL_GUI_ALV_GRID` does not apply. Activation, the five display flavors,
+  and the callbacks remain native-SAP checks.
 - Upstream reference: Not reported
 
-### Selection-variant types and RS_VARIANT_* function modules are missing
+### The RS_VARIANT_* function modules and variant persistence are missing
 
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_SEL_VARIANTS`
-- Component: `open-abap-core` dependency surface
-- Version or commit: `5623d54` (`open-abap-core`), resolved on 2026-08-23
+- Component: `open-abap-gui` dependency surface
+- Version or commit: `1949361` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `5623d54` (`open-abap-core`)
 - Native SAP behavior: `RSPARAMS`, `VARID`, `VARIT`, and `RSVAR` describe the
   contents and the directory entry of a selection variant.
   `RS_REFRESH_FROM_SELECTOPTIONS` reads the current selection screen,
   `RS_VARIANT_CATALOG` offers the variant value help, `RS_VARIANT_CONTENTS`
   reads a stored variant, and `RS_CREATE_VARIANT`,
   `RS_CHANGE_CREATED_VARIANT`, and `RS_VARIANT_DELETE` maintain it.
-- open-abap behavior: None of the four structures resolve, so the sample cannot
-  declare the variant contents, the variant description, or the F4 result.
-  Variant persistence itself has no open-abap equivalent.
-- Reproduction: Declare `DATA lt TYPE STANDARD TABLE OF rsparams.` in a report
-  under `src/` and run `npm test`; abaplint reports `RSPARAMS not found`.
+- open-abap behavior: All four structures are now declared under
+  `open-abap-gui/src/ddic`: `RSPARAMS` and `RSVAR` as internal structures, and
+  `VARID` and `VARIT` as transparent tables with their native key fields, so
+  the variant contents, the variant description, and the F4 result all resolve.
+  The `RS_*` function modules are absent, and variant persistence itself has no
+  open-abap equivalent. Unknown function modules are not reported, so the calls
+  pass the lint run with no runtime behavior behind them.
+- Reproduction: Call `RS_VARIANT_CONTENTS` for any report and variant.
+  `npm test` reports no issue, and nothing is read because the function module
+  does not exist in the dependency surface.
 - Workaround: All variant-typed declarations, the `RS_*` calls, and the
   `SUBMIT` statements that pass a selection table or a selection set are
-  isolated in the static include `ZGG_NATIVE_SEL_VARIANTS`. Only sample-owned
-  `GG_` variants are written, and only after an explicit confirmation.
+  isolated in the static include `ZGG_NATIVE_SEL_VARIANTS`, which is lint
+  checked without exclusions. Only sample-owned `GG_` variants are written, and
+  only after an explicit confirmation.
 - Upstream reference: Not reported
 
-### Dynamic-selection types and FREE_SELECTIONS_* function modules are missing
+### The FREE_SELECTIONS_* function modules are missing
 
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_SEL_FREE`
-- Component: `open-abap-core` dependency surface
-- Version or commit: `5623d54` (`open-abap-core`), resolved on 2026-08-23
+- Component: `open-abap-gui` dependency surface
+- Version or commit: `1949361` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `5623d54` (`open-abap-core`)
 - Native SAP behavior: `RSDSTABS`, `RSDSFIELDS`, `RSDS_TEXPR`, `RSDS_TRANGE`,
   `RSDS_TWHERE`, and `RSDYNSEL-SELID` describe the tables, fields,
   expressions, ranges, WHERE clauses, and the selection id of a dynamic
   selection. `FREE_SELECTIONS_INIT` prepares it, `FREE_SELECTIONS_DIALOG`
   displays it as a window or full screen, and `FREE_SELECTIONS_RANGE_2_WHERE`
   converts the returned ranges into a WHERE clause.
-- open-abap behavior: None of the `RSDS*` types or `RSDYNSEL` resolve, so the
-  selection id, the field list, and every returned structure are unknown types.
-  The dialog has no open-abap runtime.
-- Reproduction: Declare `DATA lt TYPE STANDARD TABLE OF rsdsfields.` in a
-  report under `src/` and run `npm test`; abaplint reports
-  `RSDSFIELDS not found`.
+- open-abap behavior: The `RSDS` type group is now declared in
+  `open-abap-gui/src/ddic/pools/rsds.type.abap` with `RSDS_TRANGE` /
+  `RSDS_RANGE` / `RSDS_FRANGE_T` / `RSDS_FRANGE` / `RSDS_SELOPT_T`,
+  `RSDS_TWHERE` / `RSDS_WHERE` / `RSDS_WHERE_TAB`, `RSDS_TEXPR` / `RSDS_EXPR` /
+  `RSDS_EXPR_TAB`, and the `RSDS_TYPE` structure used as a logical-database
+  `DYN_SEL` parameter. The DDIC structures those types are built from,
+  `RSDSTABS`, `RSDSFIELDS`, `RSDSSELOPT`, `RSDSWHERE`, `RSDSEXPR`, and
+  `RSDYNSEL`, are declared under `open-abap-gui/src/ddic`, so the selection id,
+  the field list, and every returned structure resolve. abaplint resolves the
+  `RSDS_*` names through the type group by name prefix, so no `TYPE-POOLS`
+  statement is needed in the sample. The `FREE_SELECTIONS_*` function modules
+  are absent and the dialog has no open-abap runtime; unknown function modules
+  are not reported, so the calls pass the lint run with nothing behind them.
+- Reproduction: Call `FREE_SELECTIONS_INIT` for table `T100`; `npm test`
+  reports no issue, and no selection id is returned because the function module
+  does not exist in the dependency surface.
 - Workaround: The dynamic-selection state and all `FREE_SELECTIONS_*` calls are
-  isolated in the static include `ZGG_NATIVE_SEL_FREE`. The sample displays the
-  returned ranges and WHERE clauses and reads no data, so no database access is
-  added to the repository.
+  isolated in the static include `ZGG_NATIVE_SEL_FREE`, which is lint checked
+  without exclusions. The sample displays the returned ranges and WHERE clauses
+  and reads no data, so no database access is added to the repository.
 - Upstream reference: Not reported
