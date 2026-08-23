@@ -141,7 +141,7 @@ FORM append_row USING iv_id TYPE c iv_name TYPE c iv_quantity TYPE i
 ENDFORM.
 
 FORM set_style_for_row USING is_row TYPE any.
-  FIELD-SYMBOLS <lt_styles> TYPE ANY TABLE.
+  FIELD-SYMBOLS <lt_styles> TYPE STANDARD TABLE.
   FIELD-SYMBOLS <ls_style> TYPE any.
   FIELD-SYMBOLS <lv_component> TYPE any.
 
@@ -176,7 +176,7 @@ ENDFORM.
 
 FORM change_runtime_style.
   FIELD-SYMBOLS <ls_row> TYPE any.
-  FIELD-SYMBOLS <lt_styles> TYPE ANY TABLE.
+  FIELD-SYMBOLS <lt_styles> TYPE STANDARD TABLE.
   FIELD-SYMBOLS <ls_style> TYPE any.
   FIELD-SYMBOLS <lv_style> TYPE any.
 
@@ -185,8 +185,20 @@ FORM change_runtime_style.
     RETURN.
   ENDIF.
   READ TABLE <gt_output> INDEX 1 ASSIGNING <ls_row>.
+  IF sy-subrc <> 0.
+    gv_status = 'Dynamic table holds no rows; no cell style can be toggled'.
+    RETURN.
+  ENDIF.
   ASSIGN COMPONENT gv_style_field OF STRUCTURE <ls_row> TO <lt_styles>.
+  IF sy-subrc <> 0.
+    gv_status = 'Generated style component is unavailable'.
+    RETURN.
+  ENDIF.
   READ TABLE <lt_styles> INDEX 1 ASSIGNING <ls_style>.
+  IF sy-subrc <> 0.
+    gv_status = 'Row 1 carries no generated style entry to toggle'.
+    RETURN.
+  ENDIF.
   ASSIGN COMPONENT 'STYLE' OF STRUCTURE <ls_style> TO <lv_style>.
   IF sy-subrc = 0.
     <lv_style> = COND #( WHEN <lv_style> = cl_gui_alv_grid=>mc_style_disabled

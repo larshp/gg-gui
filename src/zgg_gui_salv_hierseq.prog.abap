@@ -91,7 +91,11 @@ FORM create_controls.
   TRY.
       PERFORM create_native_hierseq.
       IF go_hierseq IS NOT BOUND.
-        PERFORM show_fallback USING 'Hierarchical-sequential SALV factory returned no object'.
+        lv_error = gv_hierseq_factory_error.
+        IF lv_error IS INITIAL.
+          lv_error = 'Hierarchical-sequential SALV factory returned no object'.
+        ENDIF.
+        PERFORM show_fallback USING lv_error.
         RETURN.
       ENDIF.
       PERFORM configure_levels.

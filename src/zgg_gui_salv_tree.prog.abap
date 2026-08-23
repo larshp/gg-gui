@@ -103,12 +103,20 @@ FORM create_controls.
 
   TRY.
       PERFORM create_native_salv_tree.
+      IF go_tree IS NOT BOUND.
+        lv_error = gv_tree_factory_error.
+        IF lv_error IS INITIAL.
+          lv_error = 'SALV tree factory returned no usable tree'.
+        ENDIF.
+        PERFORM show_fallback USING lv_error.
+        RETURN.
+      ENDIF.
       CALL METHOD go_tree->('GET_NODES') RECEIVING value = go_nodes.
       CALL METHOD go_tree->('GET_COLUMNS') RECEIVING value = go_columns.
       CALL METHOD go_tree->('GET_FUNCTIONS') RECEIVING value = go_functions.
       CALL METHOD go_tree->('GET_SELECTIONS') RECEIVING value = go_selections.
-      IF go_tree IS NOT BOUND OR go_nodes IS NOT BOUND.
-        PERFORM show_fallback USING 'SALV tree factory returned no usable tree or node collection'.
+      IF go_nodes IS NOT BOUND.
+        PERFORM show_fallback USING 'SALV tree factory returned no usable node collection'.
         RETURN.
       ENDIF.
       PERFORM populate_nodes.
