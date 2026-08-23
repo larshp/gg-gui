@@ -15,7 +15,7 @@
     },
     {
       "url": "https://github.com/open-abap/open-abap-gui",
-      "folder": "../open-abap-gui",
+      "folder": "/../open-abap-gui",
       "files": "/src/**/*.*"
     }
   ],
@@ -24,7 +24,7 @@
       "release": "open-abap",
       "language": "Normal"
     },
-    "errorNamespace": "^(ZGG_GUI_|ZCL_GG_GUI_|LCL_|LIF_|TY_)"
+    "errorNamespace": "."
   },
   "rules": {
     "7bit_ascii": true,
