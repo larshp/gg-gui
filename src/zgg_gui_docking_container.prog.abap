@@ -140,8 +140,18 @@ FORM set_extension.
 ENDFORM.
 
 FORM optional_docking_method USING iv_method TYPE c.
+* DETACH and ATTACH are release dependent and absent from the checked surface,
+* so they are called with a literal name that stays statically readable.
   TRY.
-      CALL METHOD go_docking->(iv_method).
+      CASE iv_method.
+        WHEN 'DETACH'.
+          CALL METHOD go_docking->('DETACH').
+        WHEN 'ATTACH'.
+          CALL METHOD go_docking->('ATTACH').
+        WHEN OTHERS.
+          gv_status = |{ iv_method } is not part of the sample surface|.
+          RETURN.
+      ENDCASE.
       gv_status = |Optional docking method { iv_method } executed|.
     CATCH cx_root.
       gv_status = |{ iv_method } is not exposed; use the frontend docking grip|.

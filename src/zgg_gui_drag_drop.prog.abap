@@ -447,6 +447,8 @@ FORM add_grid_item_to_tree USING iv_parent TYPE tv_nodekey iv_id TYPE c iv_name 
 ENDFORM.
 
 FORM undo_last_drop.
+  DATA lt_keys TYPE treev_nks.
+
   TRY.
       CASE gv_last_action.
         WHEN 'GRID'.
@@ -465,7 +467,6 @@ FORM undo_last_drop.
           ENDLOOP.
           lcl_log=>add( |Undo restored { lines( gt_last_nodes ) } tree nodes to their initial parents| ).
         WHEN 'ADDNODE'.
-          DATA lt_keys TYPE treev_nks.
           APPEND gv_added_node TO lt_keys.
           go_tree->delete_nodes( lt_keys ).
           lcl_log=>add( |Undo removed transferred tree node { gv_added_node }| ).

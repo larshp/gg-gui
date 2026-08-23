@@ -474,9 +474,9 @@ FORM add_log USING iv_text TYPE c.
 ENDFORM.
 
 FORM refresh_log.
-  IF go_log IS BOUND.
-    DATA lt_text TYPE ty_text_lines.
+  DATA lt_text TYPE ty_text_lines.
 
+  IF go_log IS BOUND.
     LOOP AT gt_log INTO DATA(lv_log_line).
       APPEND lv_log_line TO lt_text.
     ENDLOOP.

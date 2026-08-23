@@ -217,8 +217,19 @@ FORM show_generated USING iv_direct TYPE abap_bool.
 ENDFORM.
 
 FORM optional_navigation USING iv_method TYPE c.
+* The navigation methods are release dependent and absent from the checked
+* surface, so they are called with a literal name that stays statically
+* readable.
   TRY.
-      CALL METHOD go_viewer->(iv_method).
+      CASE iv_method.
+        WHEN 'GO_FORWARD'.
+          CALL METHOD go_viewer->('GO_FORWARD').
+        WHEN 'DO_REFRESH'.
+          CALL METHOD go_viewer->('DO_REFRESH').
+        WHEN OTHERS.
+          gv_status = |{ iv_method } is not part of the sample surface|.
+          RETURN.
+      ENDCASE.
       gv_status = |Optional navigation method { iv_method } requested|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Navigation method unavailable: { lx_error->get_text( ) }|.

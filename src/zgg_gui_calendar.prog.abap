@@ -209,8 +209,18 @@ FORM set_day_info.
 ENDFORM.
 
 FORM optional_no_parameter USING iv_method TYPE c.
+* The reset methods are release dependent and absent from the checked surface,
+* so they are called with a literal name that stays statically readable.
   TRY.
-      CALL METHOD go_calendar->(iv_method).
+      CASE iv_method.
+        WHEN 'RESET_DAY_INFO'.
+          CALL METHOD go_calendar->('RESET_DAY_INFO').
+        WHEN 'RESET_SELECTION'.
+          CALL METHOD go_calendar->('RESET_SELECTION').
+        WHEN OTHERS.
+          gv_status = |{ iv_method } is not part of the sample surface|.
+          RETURN.
+      ENDCASE.
       gv_status = |{ iv_method } completed|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |{ iv_method } failed: { lx_error->get_text( ) }|.

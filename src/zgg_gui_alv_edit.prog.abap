@@ -46,6 +46,8 @@ DATA gv_next_id TYPE i VALUE 500.
 
 CLASS lcl_events IMPLEMENTATION.
   METHOD on_data_changed.
+    DATA lv_id TYPE c LENGTH 8.
+
     go_protocol = er_data_changed.
     LOOP AT er_data_changed->mt_mod_cells INTO DATA(ls_cell).
       IF ls_cell-fieldname = 'QUANTITY' AND ls_cell-value < 0.
@@ -82,7 +84,6 @@ CLASS lcl_events IMPLEMENTATION.
           i_row_id    = ls_cell-row_id ).
       ENDIF.
     ENDLOOP.
-    DATA lv_id TYPE c LENGTH 8.
     IF er_data_changed->mt_mod_cells IS NOT INITIAL.
       READ TABLE er_data_changed->mt_mod_cells INDEX 1 INTO DATA(ls_first).
       er_data_changed->get_cell_value(

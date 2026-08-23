@@ -142,12 +142,14 @@ FORM read_position.
   DATA lv_to_pos TYPE i.
 
   go_editor->get_selection_pos(
-    IMPORTING  from_line              = lv_from_line
-               from_pos               = lv_from_pos
-               to_line                = lv_to_line
-               to_pos                 = lv_to_pos
-    EXCEPTIONS error_cntl_call_method = 1
-               OTHERS                 = 2 ).
+    IMPORTING
+      from_line              = lv_from_line
+      from_pos               = lv_from_pos
+      to_line                = lv_to_line
+      to_pos                 = lv_to_pos
+    EXCEPTIONS
+      error_cntl_call_method = 1
+      OTHERS                 = 2 ).
   IF sy-subrc <> 0.
     gv_status = 'The control refused the selection-position query'.
     RETURN.

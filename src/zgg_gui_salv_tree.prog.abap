@@ -226,13 +226,13 @@ FORM configure_columns.
 ENDFORM.
 
 FORM add_runtime_leaf.
+  DATA lv_id TYPE c LENGTH 8.
+
   IF go_nodes IS NOT BOUND.
     gv_status = 'SALV tree is unavailable; no runtime leaf can be added'.
     RETURN.
   ENDIF.
   ADD 1 TO gv_sequence.
-  DATA lv_id TYPE c LENGTH 8.
-
   lv_id = |P{ gv_sequence }|.
   TRY.
       PERFORM add_leaf USING gv_root_key lv_id 'Runtime SALV tree node'
