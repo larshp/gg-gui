@@ -74,8 +74,6 @@ START-OF-SELECTION.
       title = 'Interactive move, resize, and context menu' )
     ( category = 'Frontend' program = 'ZGG_GUI_DRAG_DROP'
       title = 'Tree, grid, and cross-control drag and drop' )
-    ( category = 'Optional' program = 'ZGG_GUI_OFFICE_INTEGRATION'
-      title = 'Desktop Office spreadsheet and word processing' )
     ( category = 'Optional' program = 'ZGG_GUI_GRAPHICS'
       title = 'Installed graphics engines and color selector' )
     ( category = 'Selection' program = 'ZGG_GUI_SEL_FIELDS'

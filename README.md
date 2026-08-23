@@ -14,8 +14,8 @@ drag/drop behavior cooperate in a workbench-style screen.
 - Classic on-premise ABAP Platform 7.50 source syntax.
 - SAP GUI for Windows is the primary interactive frontend.
 - SAP GUI for Java and SAP GUI for HTML behavior is not yet certified.
-- Office Integration and optional graphics require their corresponding local
-  Windows software/control installation.
+- Optional graphics controls require their corresponding local Windows
+  software/control installation.
 - open-abap is used for syntax and API-surface checking. It does not currently
   execute most GUI controls.
 
@@ -52,7 +52,7 @@ coverage audit is pinned to the exact `open-abap-gui` commit in `PLAN.md`.
 | Individual controls | picture, TextEdit, HTML viewer, ABAP browser, toolbar, calendar, timer, Dynamic Documents |
 | Trees and drag/drop | low-level tree, Tree Models, generic cross-control drag/drop, ILI move/resize |
 | SALV and ALV | SALV table/tree/hierseq, basic/dynamic/edit/format/event/variant ALV, ALV tree |
-| Frontend and optional | Frontend Services, Desktop Office Integration, graphics/selector controls |
+| Frontend and optional | Frontend Services, graphics/selector controls |
 | Legacy | classic interactive list and spool behavior |
 
 The complete per-program feature checklist and current implementation status is
@@ -71,8 +71,7 @@ name, and title; it has no separate catalog metadata schema.
 Every optional control is created behind a runtime capability check and has a
 diagnostic fallback. File mutations in the Frontend Services sample are limited
 to a derived `ZGG_GUI_<user>` directory below the frontend temporary directory.
-The Office sample does not save documents, and ALV variant cleanup is restricted
-to sample-owned names after confirmation.
+ALV variant cleanup is restricted to sample-owned names after confirmation.
 
 ## Known Limitations
 

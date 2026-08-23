@@ -578,15 +578,6 @@ gracefully when unavailable.
 - [x] Spool and background behavior.
 - [x] Clearly label classic list processing as legacy for new development.
 
-#### `ZGG_GUI_OFFICE_INTEGRATION` - Desktop Office Integration
-
-- [x] Detect availability before creating an Office Integration control.
-- [x] Host a document viewer in a container.
-- [x] Demonstrate a small spreadsheet scenario.
-- [x] Demonstrate a small word-processing or mail-merge scenario if available.
-- [x] Close documents and release automation objects reliably.
-- [x] Label the sample as SAP GUI for Windows and installation dependent.
-
 #### `ZGG_GUI_GRAPHICS` - Graphics and selector controls
 
 - [x] Demonstrate `CL_GUI_BARCHART` where installed.
@@ -623,8 +614,8 @@ the plan. Base classes, marker interfaces, constants, exceptions, type pools,
 DDIC structures, class metadata, and tests remain supporting artifacts rather
 than receiving artificial standalone programs. Native SAP classes missing from
 open-abap, including additional containers, calendars, Tree Models, SALV tree
-variants, Office Integration, and graphics controls, are still represented by
-capability-guarded samples and recorded in `ANORMALIES.md`.
+variants, and graphics controls, are still represented by capability-guarded
+samples and recorded in `ANORMALIES.md`.
 
 ### Native verification gates
 
@@ -670,9 +661,8 @@ checking any remaining native-only box:
 5. At common compact/large window sizes and supported DPI/high-contrast
    settings, verify that controls resize, text remains visible, focus order and
    keyboard activation work, and no element overlaps another.
-6. Cancel every file/directory chooser, print prompt, popup, Office action, and
-   pending edit once, then verify that owned state and sample files remain
-   consistent.
+6. Cancel every file/directory chooser, print prompt, popup, and pending edit
+   once, then verify that owned state and sample files remain consistent.
 7. Capture one representative screenshot per sample after its distinctive
    behavior is visible. Do not check the screenshot item for startup or
    fallback-only images when the native control is available.
@@ -781,8 +771,6 @@ fixed-length toolbar quick-info arguments.
 - [x] Add frontend services with security-aware error handling.
 - [x] Add generic and ILI-specific drag-and-drop samples.
 - [x] Add classic list processing and mark it as legacy.
-- [x] Add Office Integration only behind a Windows and installation capability
-  check.
 - [x] Add installed graphics controls behind runtime capability checks.
 
 ### Phase 6 - Verification and documentation

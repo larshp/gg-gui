@@ -490,30 +490,6 @@ GUI frontend features, or local development-environment failures in this file.
   a diagnostic text fallback.
 - Upstream reference: Not reported
 
-### Desktop Office Integration class family is missing
-
-- Status: Open, confirmed
-- Sample: `ZGG_GUI_OFFICE_INTEGRATION`
-- Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
-- Native SAP behavior: `C_OI_CONTAINER_CONTROL_CREATOR` supplies a central
-  Desktop Office container. Its document proxies embed registered desktop
-  applications and expose spreadsheet and word-processing interfaces with
-  explicit document and automation-object cleanup.
-- open-abap behavior: The creator, container and document proxy interfaces,
-  spreadsheet and word-processing interfaces, Office error class, and SOI type
-  pool are absent from the tested repository tree. Static declarations cannot
-  be resolved and no Office application can be hosted.
-- Reproduction: Add `DATA control TYPE REF TO i_oi_container_control.` or a
-  static call to `C_OI_CONTAINER_CONTROL_CREATOR=>GET_CONTAINER_CONTROL` and
-  run `npm test`; abaplint reports unknown types/classes.
-- Workaround: The sample checks the creator class with RTTI, performs native
-  factory and interface calls dynamically, and shows a diagnostic text control
-  when unavailable. It never assumes that Windows or Microsoft Office is
-  installed.
-- Upstream reference: Not reported
-
 ### Optional graphics and selector classes are missing
 
 - Status: Open, confirmed
