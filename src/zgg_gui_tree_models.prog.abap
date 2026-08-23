@@ -141,7 +141,8 @@ FORM show_list_model.
     ( node_key = 'P200' item_name = 'NAME' class = 1 text = '27 Inch Display' ) ).
   TRY.
       CREATE OBJECT lo_list
-        EXPORTING node_selection_mode = 1
+        EXPORTING with_headers        = abap_true
+                  node_selection_mode = 1
                   hide_selection      = abap_false
                   item_selection      = abap_true
                   hierarchy_header    = ls_header.
@@ -268,7 +269,6 @@ ENDFORM.
 
 FORM release_model.
   IF go_model IS BOUND.
-    go_model->destroy_tree_control( ).
     FREE go_model.
   ENDIF.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.

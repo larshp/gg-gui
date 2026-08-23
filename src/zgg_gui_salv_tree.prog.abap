@@ -122,7 +122,6 @@ FORM create_controls.
       PERFORM populate_nodes.
       PERFORM configure_columns.
       go_functions->set_all( abap_true ).
-      go_selections->set_selection_mode( 2 ).
       PERFORM register_salv_tree_events.
       go_tree->display( ).
       IF gv_native_events_registered = abap_true.
@@ -260,7 +259,7 @@ FORM read_selection.
   ENDIF.
   TRY.
       lt_selected = go_selections->get_selected_nodes( ).
-      gv_status = |SALV multiple-selection returned { lines( lt_selected ) } node keys|.
+      gv_status = |SALV tree selection returned { lines( lt_selected ) } nodes|.
       gv_detail = |Leaf keys created by the sample: { lines( gt_leaf_keys ) }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SALV tree selection read failed: { lx_error->get_text( ) }|.

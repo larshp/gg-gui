@@ -434,8 +434,8 @@ GUI frontend features, or local development-environment failures in this file.
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_FRONTEND_SERVICES`
 - Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `fbf93db` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: `CL_GUI_FRONTEND_SERVICES` provides security-mediated
   dialogs, text/binary transfer, file and directory operations, clipboard,
   frontend capability and path queries, read-only registry access, and opening
@@ -445,20 +445,24 @@ GUI frontend features, or local development-environment failures in this file.
   existence/deletion, directory creation/listing/existence, path separator,
   SAP GUI work directory, and system-directory methods fail assertions. Many
   other methods return empty results. `GET_PLATFORM` always reports Windows XP
-  and `GET_GUI_VERSION` returns dummy `9999/1/20` values. `GUI_IS_AVAILABLE`,
-  `GET_GUI_TYPE`, `GET_SAPGUI_DIRECTORY`, and `DIRECTORY_SET_CURRENT` are now
-  declared but return without querying the frontend, so `GUI_IS_AVAILABLE`
-  always reports false and the directory getters return empty strings.
-  `CLIPBOARD_EXPORT` declares `DATA` as an `EXPORTING` parameter typed `any`,
-  matching a long-standing quirk of the native class, so callers must pass the
-  outgoing table with `IMPORTING`.
+  and `GET_GUI_VERSION` returns dummy `9999/1/20` values. `GET_SAPGUI_DIRECTORY`
+  and `DIRECTORY_SET_CURRENT` are now declared but return without querying the
+  frontend, so the directory getters yield empty strings and the set call
+  reports no return code. `CLIPBOARD_EXPORT` declares `DATA` as an `EXPORTING`
+  parameter typed `any`, matching a long-standing quirk of the native class, so
+  callers must pass the outgoing table with `IMPORTING`. There is no
+  availability predicate and no GUI-type getter on the class; the sample's
+  earlier `GUI_IS_AVAILABLE` and `GET_GUI_TYPE` calls named methods that the
+  native class does not define.
 - Reproduction: Call `FILE_EXIST` with any path; execution reaches
   `ASSERT 1 = 'file_exist not supported'` in
-  `src/cl_gui_frontend_services.clas.abap`. Call `GUI_IS_AVAILABLE` and inspect
-  the result; it is always initial.
+  `src/cl_gui_frontend_services.clas.abap`. Call `GET_SAPGUI_DIRECTORY` and
+  inspect the changed parameter; it stays initial.
 - Workaround: The sample calls every method statically, guards all calls,
   performs destructive actions only under a derived `ZGG_GUI_<user>` temporary
   directory, and treats capability outputs from open-abap as non-authoritative.
+  Frontend availability is probed with `SY-BATCH` plus the `GET_GUI_VERSION`
+  return code instead of a non-existent predicate.
 - Upstream reference: Not reported
 
 ### Interactive drag/resize control is a runtime stub

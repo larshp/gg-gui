@@ -250,15 +250,15 @@ CLASS lcl_events IMPLEMENTATION.
           ENDIF.
           IF lo_payload->node_keys IS INITIAL.
             go_tree->move_node(
-              node_key          = lo_payload->node_key
-              relative_node_key = node_key
-              relationship      = cl_gui_column_tree=>relat_last_child ).
+              node_key  = lo_payload->node_key
+              relatkey  = node_key
+              relatship = cl_gui_column_tree=>relat_last_child ).
           ELSE.
             LOOP AT lo_payload->node_keys INTO DATA(lv_key).
               go_tree->move_node(
-                node_key          = lv_key
-                relative_node_key = node_key
-                relationship      = cl_gui_column_tree=>relat_last_child ).
+                node_key  = lv_key
+                relatkey  = node_key
+                relatship = cl_gui_column_tree=>relat_last_child ).
             ENDLOOP.
           ENDIF.
           gv_last_action = 'TREE'.
@@ -459,9 +459,9 @@ FORM undo_last_drop.
             DATA(lv_parent) = COND tv_nodekey(
               WHEN lv_key = 'P100' OR lv_key = 'P110' THEN 'INPUT' ELSE 'DISPLAY' ).
             go_tree->move_node(
-              node_key          = lv_key
-              relative_node_key = lv_parent
-              relationship      = cl_gui_column_tree=>relat_last_child ).
+              node_key  = lv_key
+              relatkey  = lv_parent
+              relatship = cl_gui_column_tree=>relat_last_child ).
           ENDLOOP.
           lcl_log=>add( |Undo restored { lines( gt_last_nodes ) } tree nodes to their initial parents| ).
         WHEN 'ADDNODE'.

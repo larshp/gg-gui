@@ -154,9 +154,8 @@ FORM show_graphics_proxy.
     RETURN.
   ENDIF.
   TRY.
-      CREATE OBJECT lo_proxy
-        EXPORTING parent  = go_host
-                  prod_id = 1.
+* CL_GUI_GP_PRES declares no constructor parameters in the dependency surface.
+      CREATE OBJECT lo_proxy.
       lo_proxy->set_dc_names(
         EXPORTING objid  = 'OBJID'
                   grpid  = 'GRPID'

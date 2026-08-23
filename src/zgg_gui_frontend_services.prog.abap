@@ -121,17 +121,22 @@ FORM initialize_paths.
 ENDFORM.
 
 FORM inspect_gui_available.
-  TRY.
-      gv_gui_available = cl_gui_frontend_services=>gui_is_available( ).
-      zcl_gg_gui_demo_helper=>add_log(
-        EXPORTING event = |GUI_IS_AVAILABLE returned { gv_gui_available }|
-        CHANGING log    = gt_log ).
-    CATCH cx_root INTO DATA(lx_error).
-      gv_gui_available = abap_false.
-      zcl_gg_gui_demo_helper=>add_log(
-        EXPORTING event = |GUI availability method missing or failed: { lx_error->get_text( ) }|
-        CHANGING log    = gt_log ).
-  ENDTRY.
+  DATA lt_version TYPE filetable.
+  DATA lv_rc TYPE i.
+
+* CL_GUI_FRONTEND_SERVICES exposes no availability predicate. A frontend round
+* trip that reports a return code is the supported probe.
+  IF sy-batch = abap_true.
+    gv_gui_available = abap_false.
+  ELSE.
+    cl_gui_frontend_services=>get_gui_version(
+      CHANGING version_table = lt_version
+               rc            = lv_rc ).
+    gv_gui_available = xsdbool( lv_rc = 0 ).
+  ENDIF.
+  zcl_gg_gui_demo_helper=>add_log(
+    EXPORTING event = |Frontend availability probe returned { gv_gui_available }|
+    CHANGING log    = gt_log ).
   gv_status = COND #( WHEN gv_gui_available = abap_true
     THEN 'Interactive frontend detected; operations still require explicit buttons and may trigger security prompts'
     ELSE 'Frontend unavailable or capability check unsupported; operations will fail without terminating the report' ).
@@ -305,7 +310,6 @@ FORM clipboard_roundtrip.
 ENDFORM.
 
 FORM inspect_capabilities.
-  DATA lv_gui_type TYPE i.
   DATA lv_platform TYPE i.
   DATA lv_computer TYPE string.
   DATA lv_drive TYPE string.
@@ -322,8 +326,7 @@ FORM inspect_capabilities.
         cl_gui_frontend_services=>get_drive_type(
           EXPORTING drive = lv_drive CHANGING drive_type = lv_drive_type ).
       ENDIF.
-      lv_gui_type = cl_gui_frontend_services=>get_gui_type( ).
-      gv_status = |GUI type { lv_gui_type }; platform { lv_platform }; computer { lv_computer }; drive { lv_drive_type }|.
+      gv_status = |Platform { lv_platform }; computer { lv_computer }; drive { lv_drive_type }|.
       gv_detail = |GUI version rows { lines( lt_version ) }, rc { lv_rc }, path separator { gv_separator }, GUI available { gv_gui_available }|.
       PERFORM add_log USING gv_status.
       PERFORM add_log USING gv_detail.
@@ -334,6 +337,7 @@ FORM inspect_capabilities.
 ENDFORM.
 
 FORM inspect_directories.
+  DATA lv_set_rc TYPE i.
   DATA lv_desktop TYPE string.
   DATA lv_system TYPE string.
   DATA lv_work TYPE string.
@@ -361,7 +365,9 @@ FORM inspect_directories.
         EXPORTING event = |Upload { lv_upload }; Download { lv_download }; Current { lv_current }|
         CHANGING log    = gt_log ).
 
-      cl_gui_frontend_services=>directory_set_current( gv_sample_dir ).
+      cl_gui_frontend_services=>directory_set_current(
+        EXPORTING current_directory = gv_sample_dir
+        CHANGING  rc                = lv_set_rc ).
       gv_status = 'Frontend directories queried; current directory change was limited to the sample-owned path'.
       gv_detail = 'Use Create files first if the sample-owned directory does not yet exist'.
     CATCH cx_root INTO DATA(lx_error).
