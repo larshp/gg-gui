@@ -31,9 +31,8 @@ INITIALIZATION.
   ls_assignment-kind = 'S'.
   ls_assignment-name = 'S_NUMBER'.
   ls_assignment-sg_main = 'I'.
-  ls_assignment-sg_addy = 'E'.
+  ls_assignment-sg_addy = space.
   ls_assignment-op_main = 'NUMBERS'.
-  ls_assignment-op_addy = 'NUMBERS'.
   APPEND ls_assignment TO ls_restriction-ass_tab.
 
   CALL FUNCTION 'SELECT_OPTIONS_RESTRICT'

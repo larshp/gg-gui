@@ -9,6 +9,23 @@ ENDCLASS.
 DATA go_native_hierseq TYPE REF TO cl_salv_hierseq_table.
 DATA go_native_hierseq_events TYPE REF TO cl_salv_events_hierseq.
 DATA go_hierseq_events TYPE REF TO lcl_hierseq_events.
+DATA gv_hierseq_factory_error TYPE string.
+
+FORM create_native_hierseq.
+  CLEAR gv_hierseq_factory_error.
+  TRY.
+      cl_salv_hierseq_table=>factory(
+        EXPORTING t_binding_level1_level2 = gt_bindings
+        IMPORTING r_hierseq               = go_native_hierseq
+        CHANGING  t_table_level1          = gt_headers
+                  t_table_level2          = gt_items ).
+      go_hierseq = go_native_hierseq.
+    CATCH cx_root INTO DATA(lx_factory_error).
+      FREE go_native_hierseq.
+      CLEAR go_hierseq.
+      gv_hierseq_factory_error = lx_factory_error->get_text( ).
+  ENDTRY.
+ENDFORM.
 
 CLASS lcl_hierseq_events IMPLEMENTATION.
   METHOD on_link.

@@ -136,38 +136,41 @@ FORM read_as_stream.
 ENDFORM.
 
 FORM read_position.
-  DATA lv_line TYPE i.
-  DATA lv_pos TYPE i.
   DATA lv_from_line TYPE i.
   DATA lv_from_pos TYPE i.
   DATA lv_to_line TYPE i.
   DATA lv_to_pos TYPE i.
 
-  TRY.
-      CALL METHOD go_editor->('GET_CURRENT_LINE')
-        IMPORTING current_line = lv_line.
-      CALL METHOD go_editor->('GET_CURRENT_POS')
-        IMPORTING current_pos = lv_pos.
-      CALL METHOD go_editor->('GET_SELECTION_POS')
-        IMPORTING
-          from_line = lv_from_line from_pos = lv_from_pos
-          to_line = lv_to_line to_pos = lv_to_pos.
-      gv_status = |Cursor { lv_line }:{ lv_pos }; selection { lv_from_line }:{ lv_from_pos }-{ lv_to_line }:{ lv_to_pos }|.
-    CATCH cx_root INTO DATA(lx_error).
-      gv_status = |Position API unavailable: { lx_error->get_text( ) }|.
-  ENDTRY.
+  go_editor->get_selection_pos(
+    IMPORTING
+      from_line              = lv_from_line
+      from_pos               = lv_from_pos
+      to_line                = lv_to_line
+      to_pos                 = lv_to_pos
+    EXCEPTIONS
+      error_cntl_call_method = 1
+      OTHERS                 = 2 ).
+  IF sy-subrc <> 0.
+    gv_status = 'The control refused the selection-position query'.
+    RETURN.
+  ENDIF.
+  cl_gui_cfw=>flush( ).
+  gv_status = |Cursor { lv_from_line }:{ lv_from_pos }; | &&
+    |selection { lv_from_line }:{ lv_from_pos }-{ lv_to_line }:{ lv_to_pos }|.
 ENDFORM.
 
 FORM protect_first_line.
-  TRY.
-      CALL METHOD go_editor->('PROTECT_LINES')
-        EXPORTING from_line = 1
-                  to_line = 1
-                  protect_mode = 1.
-      gv_status = 'The first line is protected from editing'.
-    CATCH cx_root INTO DATA(lx_error).
-      gv_status = |Protected-line API unavailable: { lx_error->get_text( ) }|.
-  ENDTRY.
+  go_editor->protect_lines(
+    EXPORTING  from_line              = 1
+               to_line                = 1
+               protect_mode           = 1
+    EXCEPTIONS error_cntl_call_method = 1
+               OTHERS                 = 2 ).
+  IF sy-subrc <> 0.
+    gv_status = 'The control refused the protected-line request'.
+    RETURN.
+  ENDIF.
+  gv_status = 'The first line is protected from editing'.
 ENDFORM.
 
 FORM load_file.

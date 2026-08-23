@@ -1,17 +1,6 @@
 REPORT zgg_gui_alv_edit.
 
 TYPES:
-  BEGIN OF ty_style,
-    fieldname TYPE lvc_fname,
-    style     TYPE x LENGTH 4,
-    style2    TYPE x LENGTH 4,
-    style3    TYPE x LENGTH 4,
-    style4    TYPE x LENGTH 4,
-    maxlen    TYPE i,
-  END OF ty_style,
-  ty_styles TYPE STANDARD TABLE OF ty_style WITH EMPTY KEY.
-
-TYPES:
   BEGIN OF ty_row,
     id       TYPE c LENGTH 8,
     name     TYPE c LENGTH 30,
@@ -22,7 +11,7 @@ TYPES:
     active   TYPE abap_bool,
     choice   TYPE c LENGTH 12,
     action   TYPE c LENGTH 12,
-    styles   TYPE ty_styles,
+    styles   TYPE lvc_t_styl,
   END OF ty_row,
   ty_rows TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY,
   ty_f4_value TYPE c LENGTH 30,
@@ -57,6 +46,8 @@ DATA gv_next_id TYPE i VALUE 500.
 
 CLASS lcl_events IMPLEMENTATION.
   METHOD on_data_changed.
+    DATA lv_id TYPE c LENGTH 8.
+
     go_protocol = er_data_changed.
     LOOP AT er_data_changed->mt_mod_cells INTO DATA(ls_cell).
       IF ls_cell-fieldname = 'QUANTITY' AND ls_cell-value < 0.
@@ -93,7 +84,6 @@ CLASS lcl_events IMPLEMENTATION.
           i_row_id    = ls_cell-row_id ).
       ENDIF.
     ENDLOOP.
-    DATA lv_id TYPE c LENGTH 8.
     IF er_data_changed->mt_mod_cells IS NOT INITIAL.
       READ TABLE er_data_changed->mt_mod_cells INDEX 1 INTO DATA(ls_first).
       er_data_changed->get_cell_value(

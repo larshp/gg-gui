@@ -290,7 +290,7 @@ FORM create_controls.
       ls_header = VALUE #( heading = 'Navigation' width = 28 tooltip = 'Select a category or drag products' ).
       CREATE OBJECT go_tree EXPORTING parent                = go_nav_host
         node_selection_mode                                 = cl_gui_column_tree=>node_sel_mode_single
-        item_selection                                      = abap_true
+        item_selection                                      = abap_false
                                       hierarchy_column_name = 'NODE'
         hierarchy_header                                    = ls_header.
       go_tree->add_column( name        = 'NAME'
@@ -308,7 +308,7 @@ FORM create_controls.
       SET HANDLER go_events->on_tree_drop FOR go_tree.
       SET HANDLER go_events->on_grid_drag FOR go_grid.
       SET HANDLER go_events->on_grid_drop FOR go_grid.
-      lt_events = VALUE #( ( eventid = cl_gui_column_tree=>eventid_selection_changed appl_event = abap_true ) ).
+      lt_events = VALUE #( ( eventid = cl_gui_column_tree=>eventid_selection_changed appl_event = abap_false ) ).
       go_tree->set_registered_events( lt_events ).
       lt_events = VALUE #( ( eventid = cl_gui_toolbar=>m_id_function_selected appl_event = abap_true ) ).
       go_toolbar->set_registered_events( lt_events ).
@@ -515,8 +515,8 @@ ENDFORM.
 
 FORM save_layout.
   TRY.
-      CALL METHOD go_root_splitter->('GET_COLUMN_WIDTH')
-        EXPORTING id = 1 IMPORTING result = gv_saved_nav_width.
+      go_root_splitter->get_column_width(
+        EXPORTING id = 1 IMPORTING result = gv_saved_nav_width ).
       go_right_splitter->get_row_height( EXPORTING id = 2 IMPORTING result = gv_saved_grid_height ).
       go_right_splitter->get_row_height( EXPORTING id = 3 IMPORTING result = gv_saved_detail_height ).
       gv_layout_saved = abap_true.

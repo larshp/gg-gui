@@ -1,12 +1,6 @@
 REPORT zgg_gui_calendar.
 
-TYPES:
-  BEGIN OF ty_day_info,
-    date  TYPE d,
-    color TYPE i,
-    text  TYPE c LENGTH 80,
-  END OF ty_day_info,
-  ty_day_info_table TYPE STANDARD TABLE OF ty_day_info WITH EMPTY KEY.
+TYPE-POOLS cnca.
 
 CONSTANTS c_style_vertical TYPE i VALUE 4.
 CONSTANTS c_select_day TYPE i VALUE 1.
@@ -15,7 +9,7 @@ CONSTANTS c_select_month TYPE i VALUE 4.
 CONSTANTS c_select_interval TYPE i VALUE 8.
 
 DATA go_host TYPE REF TO cl_gui_custom_container.
-DATA go_calendar TYPE REF TO object.
+DATA go_calendar TYPE REF TO cl_gui_calendar.
 DATA go_control TYPE REF TO cl_gui_control.
 DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_focus TYPE d.
@@ -90,9 +84,9 @@ MODULE user_command_0100 INPUT.
     WHEN 'MARK'.
       PERFORM set_day_info.
     WHEN 'RESET_INFO'.
-      PERFORM optional_no_parameter USING 'RESET_DAY_INFO'.
+      PERFORM reset_day_info.
     WHEN 'RESET_SEL'.
-      PERFORM optional_no_parameter USING 'RESET_SELECTION'.
+      PERFORM reset_selection.
     WHEN 'RECREATE'.
       PERFORM free_calendar.
       PERFORM create_calendar.
@@ -118,18 +112,20 @@ FORM create_controls.
 ENDFORM.
 
 FORM create_calendar.
-  DATA lv_class_name TYPE string VALUE 'CL_GUI_CALENDAR'.
+* The control expects CNCA_UTC_DATE character dates, not the ABAP date type.
+  DATA lv_focus TYPE cnca_utc_date.
 
   IF go_calendar IS BOUND.
     RETURN.
   ENDIF.
+  lv_focus = gv_focus.
   TRY.
-      CREATE OBJECT go_calendar TYPE (lv_class_name)
+      CREATE OBJECT go_calendar
         EXPORTING
           parent          = go_host
           view_style      = c_style_vertical
           selection_style = gv_selection_style
-          focus_date      = gv_focus
+          focus_date      = lv_focus
           display_months  = 3
           stand_alone     = abap_false
           week_begin_day  = '1'
@@ -151,9 +147,11 @@ ENDFORM.
 
 
 FORM go_to_focus.
+  DATA lv_focus TYPE cnca_utc_date.
+
+  lv_focus = gv_focus.
   TRY.
-      CALL METHOD go_calendar->('GO_TO_DATE')
-        EXPORTING focus_date = gv_focus.
+      go_calendar->go_to_date( lv_focus ).
       gv_status = |Calendar navigated to { gv_focus DATE = USER }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |GO_TO_DATE failed: { lx_error->get_text( ) }|.
@@ -162,14 +160,17 @@ ENDFORM.
 
 FORM set_selection.
   DATA lv_end TYPE d.
+  DATA lv_begin_utc TYPE cnca_utc_date.
+  DATA lv_end_utc TYPE cnca_utc_date.
 
   lv_end = COND #( WHEN gv_selection_style = c_select_day
     THEN gv_focus ELSE gv_focus + 7 ).
+  lv_begin_utc = gv_focus.
+  lv_end_utc = lv_end.
   TRY.
-      CALL METHOD go_calendar->('SET_SELECTION')
-        EXPORTING date_begin = gv_focus
-                  date_end = lv_end
-                  no_scroll = abap_false.
+      go_calendar->set_selection( date_begin = lv_begin_utc
+                                  date_end   = lv_end_utc
+                                  no_scroll  = abap_false ).
       gv_status = |Selection set from { gv_focus DATE = USER } to { lv_end DATE = USER }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SET_SELECTION failed: { lx_error->get_text( ) }|.
@@ -179,10 +180,14 @@ ENDFORM.
 FORM read_selection.
   DATA lv_begin TYPE d.
   DATA lv_end TYPE d.
+  DATA lv_begin_utc TYPE cnca_utc_date.
+  DATA lv_end_utc TYPE cnca_utc_date.
 
   TRY.
-      CALL METHOD go_calendar->('GET_SELECTION')
-        IMPORTING date_begin = lv_begin date_end = lv_end.
+      go_calendar->get_selection( IMPORTING date_begin = lv_begin_utc
+                                            date_end   = lv_end_utc ).
+      lv_begin = lv_begin_utc.
+      lv_end = lv_end_utc.
       gv_status = |Selected { lv_begin DATE = USER } through { lv_end DATE = USER }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |GET_SELECTION failed: { lx_error->get_text( ) }|.
@@ -190,26 +195,34 @@ FORM read_selection.
 ENDFORM.
 
 FORM set_day_info.
-  DATA lt_day_info TYPE ty_day_info_table.
+  DATA lt_day_info TYPE cnca_itab_day_info.
 
   lt_day_info = VALUE #(
     ( date = gv_focus color = 1 text = 'Focused sample day' )
     ( date = gv_focus + 1 color = 4 text = 'Follow-up sample day' ) ).
   TRY.
-      CALL METHOD go_calendar->('SET_DAY_INFO')
-        EXPORTING day_info = lt_day_info.
+      go_calendar->set_day_info( lt_day_info ).
       gv_status = 'Two dates marked with color and tooltip day information'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SET_DAY_INFO failed: { lx_error->get_text( ) }|.
   ENDTRY.
 ENDFORM.
 
-FORM optional_no_parameter USING iv_method TYPE c.
+FORM reset_day_info.
   TRY.
-      CALL METHOD go_calendar->(iv_method).
-      gv_status = |{ iv_method } completed|.
+      go_calendar->reset_day_info( ).
+      gv_status = 'RESET_DAY_INFO removed the color and tooltip day information'.
     CATCH cx_root INTO DATA(lx_error).
-      gv_status = |{ iv_method } failed: { lx_error->get_text( ) }|.
+      gv_status = |RESET_DAY_INFO failed: { lx_error->get_text( ) }|.
+  ENDTRY.
+ENDFORM.
+
+FORM reset_selection.
+  TRY.
+      go_calendar->reset_selection( ).
+      gv_status = 'RESET_SELECTION cleared the marked days'.
+    CATCH cx_root INTO DATA(lx_error).
+      gv_status = |RESET_SELECTION failed: { lx_error->get_text( ) }|.
   ENDTRY.
 ENDFORM.
 

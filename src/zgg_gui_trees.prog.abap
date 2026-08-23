@@ -247,7 +247,6 @@ FORM register_events.
   DATA lt_events TYPE cntl_simple_events.
 
   lt_events = VALUE #(
-    ( eventid = cl_gui_column_tree=>eventid_selection_changed appl_event = abap_true )
     ( eventid = cl_gui_column_tree=>eventid_node_double_click appl_event = abap_true )
     ( eventid = cl_gui_column_tree=>eventid_item_double_click appl_event = abap_true )
     ( eventid = cl_gui_column_tree=>eventid_expand_no_children appl_event = abap_true )
@@ -367,10 +366,10 @@ FORM move_node.
   gv_moved = xsdbool( gv_moved = abap_false ).
   lv_parent = COND #( WHEN gv_moved = abap_true THEN 'LAZY' ELSE 'ROOT' ).
   TRY.
-      CALL METHOD go_tree->('MOVE_NODE')
-        EXPORTING node_key = 'EVENTS'
-                  relative_node_key = lv_parent
-          relationship = cl_gui_column_tree=>relat_last_child.
+      go_tree->move_node(
+        node_key  = 'EVENTS'
+        relatkey  = lv_parent
+        relatship = cl_gui_column_tree=>relat_last_child ).
       gv_status = |EVENTS moved under { lv_parent }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |MOVE_NODE unavailable: { lx_error->get_text( ) }|.
@@ -433,6 +432,7 @@ FORM change_header.
   go_tree->hierarchy_header_set_width(
     COND #( WHEN gv_header_alt = abap_true THEN 40 ELSE 30 ) ).
   go_tree->hierarchy_header_get_width( IMPORTING width = lv_width ).
+  cl_gui_cfw=>flush( ).
   gv_status = |Hierarchy heading changed; reported width { lv_width }|.
 ENDFORM.
 

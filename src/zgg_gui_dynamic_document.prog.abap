@@ -1,24 +1,20 @@
 REPORT zgg_gui_dynamic_document.
 
-TYPES:
-  BEGIN OF ty_option,
-    value TYPE c LENGTH 250,
-    text  TYPE string,
-  END OF ty_option,
-  ty_options TYPE STANDARD TABLE OF ty_option WITH EMPTY KEY.
+TYPE-POOLS sdydo.
+
 TYPES ty_html_line TYPE c LENGTH 255.
 TYPES ty_html TYPE STANDARD TABLE OF ty_html_line WITH EMPTY KEY.
 
 DATA go_host TYPE REF TO cl_gui_custom_container.
-DATA go_document TYPE REF TO object.
-DATA go_right_area TYPE REF TO object.
-DATA go_table TYPE REF TO object.
-DATA go_table_area TYPE REF TO object.
-DATA go_form TYPE REF TO object.
-DATA go_link TYPE REF TO object.
-DATA go_input TYPE REF TO object.
-DATA go_select TYPE REF TO object.
-DATA go_button TYPE REF TO object.
+DATA go_document TYPE REF TO cl_dd_document.
+DATA go_right_area TYPE REF TO cl_dd_area.
+DATA go_table TYPE REF TO cl_dd_table_element.
+DATA go_table_area TYPE REF TO cl_dd_table_area.
+DATA go_form TYPE REF TO cl_dd_form_area.
+DATA go_link TYPE REF TO cl_dd_link_element.
+DATA go_input TYPE REF TO cl_dd_input_element.
+DATA go_select TYPE REF TO cl_dd_select_element.
+DATA go_button TYPE REF TO cl_dd_button_element.
 DATA go_fallback TYPE REF TO cl_gui_html_viewer.
 DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_status TYPE c LENGTH 108.
@@ -98,11 +94,10 @@ FORM create_controls.
 ENDFORM.
 
 FORM create_document.
-  DATA lv_class_name TYPE string VALUE 'CL_DD_DOCUMENT'.
   DATA lv_error_text TYPE string.
 
   TRY.
-      CREATE OBJECT go_document TYPE (lv_class_name).
+      CREATE OBJECT go_document.
       PERFORM populate_document USING abap_false.
       IF gv_native_events_registered = abap_true.
         gv_status = 'Native Dynamic Document created; five element events registered'.
@@ -119,109 +114,101 @@ FORM create_document.
 ENDFORM.
 
 FORM populate_document USING iv_reuse TYPE abap_bool.
-  DATA lt_options TYPE ty_options.
+  DATA lt_options TYPE sdydo_option_tab.
 
   lt_options = VALUE #(
     ( value = 'BASIC' text = 'Basic sample' )
     ( value = 'TABLE' text = 'Table-focused sample' )
     ( value = 'FORM' text = 'Form-focused sample' ) ).
 
-  CALL METHOD go_document->('VERTICAL_SPLIT')
-    EXPORTING split_area = go_document
+  go_document->vertical_split(
+    EXPORTING split_area  = go_document
               split_width = '72%'
-    IMPORTING right_area = go_right_area.
+    IMPORTING right_area  = go_right_area ).
 
-  CALL METHOD go_document->('ADD_TEXT')
-    EXPORTING text = 'SAP GUI Dynamic Documents'
-      sap_style = 'HEADING'
-              sap_emphasis = 'STRONG'.
-  CALL METHOD go_document->('NEW_LINE').
-  CALL METHOD go_document->('ADD_ICON')
-    EXPORTING sap_icon = 'ICON_DISPLAY'
-              sap_color = 'LIST_HEADING'.
-  CALL METHOD go_document->('ADD_TEXT')
-    EXPORTING text = ' Formatted text, icons, links, tables, and forms share one document.'
-      sap_style = 'KEY'.
-  CALL METHOD go_document->('NEW_LINE').
-  CALL METHOD go_document->('ADD_LINK')
-    EXPORTING name = 'SAP_HELP'
-              url = 'https://help.sap.com'
-      tooltip = 'Open SAP Help in the configured browser'
-              text = 'Open SAP Help'
-    IMPORTING link = go_link.
-  CALL METHOD go_document->('UNDERLINE').
+  go_document->add_text( text         = 'SAP GUI Dynamic Documents'
+                         sap_style    = 'HEADING'
+                         sap_emphasis = 'STRONG' ).
+  go_document->new_line( ).
+  go_document->add_icon( sap_icon  = 'ICON_DISPLAY'
+                         sap_color = 'LIST_HEADING' ).
+  go_document->add_text(
+    text      = ' Formatted text, icons, links, tables, and forms share one document.'
+    sap_style = 'KEY' ).
+  go_document->new_line( ).
+  go_document->add_link(
+    EXPORTING name    = 'SAP_HELP'
+              url     = 'https://help.sap.com'
+              tooltip = 'Open SAP Help in the configured browser'
+              text    = 'Open SAP Help'
+    IMPORTING link    = go_link ).
+  go_document->underline( ).
 
-  CALL METHOD go_right_area->('ADD_TEXT')
-    EXPORTING text = 'Document area'
-              sap_style = 'GROUP_HEADING'
-      sap_emphasis = 'STRONG'.
-  CALL METHOD go_right_area->('NEW_LINE').
-  CALL METHOD go_right_area->('ADD_TEXT')
-    EXPORTING text = |User { sy-uname }|
-              sap_style = 'KEY'.
-  CALL METHOD go_right_area->('NEW_LINE').
-  CALL METHOD go_right_area->('ADD_TEXT')
-    EXPORTING text = |Date { sy-datum DATE = USER }|.
+  go_right_area->add_text( text         = 'Document area'
+                           sap_style    = 'GROUP_HEADING'
+                           sap_emphasis = 'STRONG' ).
+  go_right_area->new_line( ).
+  go_right_area->add_text( text      = |User { sy-uname }|
+                           sap_style = 'KEY' ).
+  go_right_area->new_line( ).
+  go_right_area->add_text( text = |Date { sy-datum DATE = USER }| ).
 
-  CALL METHOD go_document->('ADD_TABLE')
-    EXPORTING no_of_columns = 3
-              with_heading = abap_true
-      cell_background_transparent = abap_false
-              border = '1'
-              width = '100%'
-    IMPORTING table = go_table tablearea = go_table_area.
-  CALL METHOD go_table->('SET_COLUMN_STYLE')
-    EXPORTING col_no = 1
-              sap_style = 'KEY'
-              sap_emphasis = 'STRONG'.
-  CALL METHOD go_table->('SET_COLUMN_STYLE')
-    EXPORTING col_no = 3
-              sap_align = 'RIGHT'.
-  CALL METHOD go_table->('SET_ROW_STYLE')
-    EXPORTING row_no = 2
-              sap_color = 'LIST_POSITIVE'.
-  CALL METHOD go_table_area->('ADD_HEADING') EXPORTING text = 'Control'.
-  CALL METHOD go_table_area->('ADD_HEADING') EXPORTING text = 'Purpose'.
-  CALL METHOD go_table_area->('ADD_HEADING') EXPORTING text = 'State'.
-  CALL METHOD go_table_area->('ADD_TEXT') EXPORTING text = 'Text'.
-  CALL METHOD go_table_area->('ADD_TEXT') EXPORTING text = 'Formatted content'.
-  CALL METHOD go_table_area->('ADD_TEXT') EXPORTING text = 'Ready'.
-  CALL METHOD go_table_area->('NEW_ROW') EXPORTING sap_color = 'LIST_POSITIVE'.
-  CALL METHOD go_table_area->('ADD_TEXT') EXPORTING text = 'Form'.
-  CALL METHOD go_table_area->('ADD_TEXT') EXPORTING text = 'Interactive elements'.
-  CALL METHOD go_table_area->('ADD_ICON') EXPORTING sap_icon = 'ICON_OKAY'.
-  CALL METHOD go_table_area->('NEW_ROW').
+  go_document->add_table(
+    EXPORTING no_of_columns               = 3
+              with_heading                = abap_true
+              cell_background_transparent = abap_false
+              border                      = '1'
+              width                       = '100%'
+    IMPORTING table                       = go_table
+              tablearea                   = go_table_area ).
+  go_table->set_column_style( col_no       = 1
+                              sap_style    = 'KEY'
+                              sap_emphasis = 'STRONG' ).
+  go_table->set_column_style( col_no    = 3
+                              sap_align = 'RIGHT' ).
+  go_table->set_row_style( row_no    = 2
+                           sap_color = 'LIST_POSITIVE' ).
+  go_table_area->add_heading( 'Control' ).
+  go_table_area->add_heading( 'Purpose' ).
+  go_table_area->add_heading( 'State' ).
+  go_table_area->add_text( text = 'Text' ).
+  go_table_area->add_text( text = 'Formatted content' ).
+  go_table_area->add_text( text = 'Ready' ).
+  go_table_area->new_row( sap_color = 'LIST_POSITIVE' ).
+  go_table_area->add_text( text = 'Form' ).
+  go_table_area->add_text( text = 'Interactive elements' ).
+  go_table_area->add_icon( 'ICON_OKAY' ).
+  go_table_area->new_row( ).
 
-  CALL METHOD go_document->('ADD_FORM') IMPORTING formarea = go_form.
-  CALL METHOD go_form->('ADD_TEXT')
-    EXPORTING text = 'Interactive form area: '
-              sap_emphasis = 'STRONG'.
-  CALL METHOD go_form->('ADD_INPUT_ELEMENT')
-    EXPORTING value = gv_value
-              name = 'SAMPLE_INPUT'
-              size = 24
-              maxlength = 60
-    IMPORTING input_element = go_input.
-  CALL METHOD go_form->('ADD_SELECT_ELEMENT')
-    EXPORTING name = 'SAMPLE_SELECT'
-              value = 'BASIC'
-              options = lt_options
-      tooltip = 'Choose a Dynamic Documents subject'
-    IMPORTING select_element = go_select.
-  CALL METHOD go_form->('ADD_BUTTON')
-    EXPORTING label = 'Document button'
+  go_document->add_form( IMPORTING formarea = go_form ).
+  go_form->add_text( text         = 'Interactive form area: '
+                     sap_emphasis = 'STRONG' ).
+  go_form->add_input_element(
+    EXPORTING value         = gv_value
+              name          = 'SAMPLE_INPUT'
+              size          = 24
+              maxlength     = 60
+    IMPORTING input_element = go_input ).
+  go_form->add_select_element(
+    EXPORTING name           = 'SAMPLE_SELECT'
+              value          = 'BASIC'
+              options        = lt_options
+              tooltip        = 'Choose a Dynamic Documents subject'
+    IMPORTING select_element = go_select ).
+  go_form->add_button(
+    EXPORTING label    = 'Document button'
               sap_icon = 'ICON_EXECUTE_OBJECT'
-      tooltip = 'Native CL_DD_BUTTON_ELEMENT clicked event'
-              name = 'SAMPLE_BUTTON'
-    IMPORTING button = go_button.
+              tooltip  = 'Native CL_DD_BUTTON_ELEMENT clicked event'
+              name     = 'SAMPLE_BUTTON'
+    IMPORTING button   = go_button ).
 
   PERFORM register_document_events.
 
-  CALL METHOD go_document->('MERGE_DOCUMENT').
-  CALL METHOD go_document->('DISPLAY_DOCUMENT')
-    EXPORTING parent = go_host
-              reuse_control = iv_reuse
-      reuse_registration = iv_reuse.
+  go_document->merge_document( ).
+  go_document->display_document(
+    parent             = go_host
+    reuse_control      = iv_reuse
+    reuse_registration = iv_reuse ).
 ENDFORM.
 
 
@@ -233,12 +220,12 @@ FORM refresh_input.
   ADD 1 TO gv_refresh_count.
   gv_value = |Updated form value { gv_refresh_count } at { sy-uzeit TIME = USER }|.
   TRY.
-      CALL METHOD go_input->('SET_VALUE') EXPORTING value = gv_value.
-      CALL METHOD go_document->('MERGE_DOCUMENT').
-      CALL METHOD go_document->('DISPLAY_DOCUMENT')
-        EXPORTING parent = go_host
-                  reuse_control = abap_true
-          reuse_registration = abap_true.
+      go_input->set_value( gv_value ).
+      go_document->merge_document( ).
+      go_document->display_document(
+        parent             = go_host
+        reuse_control      = abap_true
+        reuse_registration = abap_true ).
       gv_status = 'Only the retained input element value changed; table and split areas were not rebuilt'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Element refresh failed: { lx_error->get_text( ) }|.
@@ -251,13 +238,12 @@ FORM set_background.
     RETURN.
   ENDIF.
   TRY.
-      CALL METHOD go_document->('SET_DOCUMENT_BACKGROUND')
-        EXPORTING picture_id = 'ENJOYSAP_LOGO'.
-      CALL METHOD go_document->('MERGE_DOCUMENT').
-      CALL METHOD go_document->('DISPLAY_DOCUMENT')
-        EXPORTING parent = go_host
-                  reuse_control = abap_true
-          reuse_registration = abap_true.
+      go_document->set_document_background( 'ENJOYSAP_LOGO' ).
+      go_document->merge_document( ).
+      go_document->display_document(
+        parent             = go_host
+        reuse_control      = abap_true
+        reuse_registration = abap_true ).
       gv_status = 'BDS background ENJOYSAP_LOGO requested; availability depends on system content'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Background picture unavailable: { lx_error->get_text( ) }|.
@@ -270,8 +256,14 @@ FORM print_document.
     RETURN.
   ENDIF.
   TRY.
-      CALL METHOD go_document->('PRINT_DOCUMENT')
-        EXPORTING reuse_control = abap_true.
+      go_document->print_document(
+        EXPORTING  reuse_control    = abap_true
+        EXCEPTIONS html_print_error = 1
+                   OTHERS           = 2 ).
+      IF sy-subrc <> 0.
+        gv_status = 'The browser control rejected the print request'.
+        RETURN.
+      ENDIF.
       gv_status = 'The browser control print dialog was requested'.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |Print failed or was canceled: { lx_error->get_text( ) }|.
@@ -287,7 +279,7 @@ FORM reset_document.
   ENDIF.
   TRY.
       PERFORM unregister_document_events.
-      CALL METHOD go_document->('INITIALIZE_DOCUMENT').
+      go_document->initialize_document( ).
       FREE: go_right_area, go_table, go_table_area, go_form, go_link,
         go_input, go_select, go_button.
       PERFORM populate_document USING abap_true.

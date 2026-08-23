@@ -7,6 +7,7 @@ partially implemented in open-abap.
 Do not record ordinary sample defects, SAP release differences, unsupported SAP
 GUI frontend features, or local development-environment failures in this file.
 
+
 ## Entry Template
 
 ### Short title
@@ -78,58 +79,61 @@ GUI frontend features, or local development-environment failures in this file.
   named constants with their native values `0`, `1`, and `2`.
 - Upstream reference: Not reported
 
-### Native container classes are missing
+### Native container classes are declared but have no runtime behavior
 
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_DOCKING_CONTAINER`, `ZGG_GUI_SPLITTER_CONTAINER`, and
   `ZGG_GUI_DIALOG_CONTAINER`
 - Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `08bd747` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: `CL_GUI_DOCKING_CONTAINER` docks a child control on any
   screen edge and can float it; `CL_GUI_EASY_SPLITTER_CONTAINER` divides a
   parent into two cells; and `CL_GUI_DIALOGBOX_CONTAINER` creates a modeless
   dialog with close and resize events.
-- open-abap behavior: No class definitions for
-  `CL_GUI_DOCKING_CONTAINER`, `CL_GUI_EASY_SPLITTER_CONTAINER`, or
-  `CL_GUI_DIALOGBOX_CONTAINER` exist under `src` at the commit above. Static
-  references therefore fail abaplint type resolution and the classes cannot be
-  instantiated by the runtime.
-- Reproduction: Add `DATA go_docking TYPE REF TO cl_gui_docking_container.` to
-  a checked report and run `npm test`; abaplint reports the type as unknown.
-  Fetching the corresponding `src/cl_gui_*_container.clas.abap` paths at the
-  tested commit returns `404`.
-- Workaround: The affected reports create optional native classes by runtime
-  class name, catch creation failures, and operate through
-  `CL_GUI_CONTAINER` where possible. This retains native SAP behavior and keeps
-  the catalog syntax-checkable without declaring replacement global classes.
+- open-abap behavior: `CL_GUI_DOCKING_CONTAINER`, `CL_GUI_DIALOGBOX_CONTAINER`,
+  and `CL_GUI_EASY_SPLITTER_CONTAINER` are now declared with their native
+  constructor, `DOCK_AT`, `SET_EXTENSION`, `FLOAT`, `SET_CAPTION`, `CLOSE`
+  event, and inner-container attributes, so static code resolves. Every
+  method body
+  returns without creating a frontend control, and the easy-splitter
+  `TOP_LEFT_CONTAINER` / `BOTTOM_RIGHT_CONTAINER` attributes stay unbound.
+  `CL_GUI_SPLITTER_CONTAINER` still has no minimum-size API in native SAP
+  either, so no such call can be written statically at all.
+- Reproduction: Construct `CL_GUI_EASY_SPLITTER_CONTAINER` with a valid parent
+  and inspect `TOP_LEFT_CONTAINER`; it remains initial because the constructor
+  returns immediately.
+- Workaround: The reports declare the containers statically and guard
+  construction, so all three remain syntax checked. Interactive docking,
+  dialog-box, and easy-splitter behavior cannot run under open-abap.
 - Upstream reference: Not reported
 
-### `CL_GUI_CALENDAR` is missing
+### `CL_GUI_CALENDAR` event-ID constants are missing and its runtime is stubbed
 
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_CALENDAR`
 - Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `08bd747` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: `CL_GUI_CALENDAR` displays localized calendar views,
   selects single dates or ranges, supplies date-selection and information
   events, and attaches colors and tooltip text to dates.
-- open-abap behavior: The repository has no `CL_GUI_CALENDAR` class definition
-  or associated `CNCA` calendar type surface, so static calendar code cannot be
-  linted and the runtime cannot instantiate the control.
-- Reproduction: Add `DATA go_calendar TYPE REF TO cl_gui_calendar.` to a checked
-  report and run `npm test`; abaplint reports the type as unknown. No calendar
-  class or `CNCA` artifact is present in the tested repository tree.
-- Workaround: `ZGG_GUI_CALENDAR` creates the native class by runtime name,
-  catches unavailable-control failures, and calls release-dependent methods
-  dynamically. Static include `ZGG_NATIVE_CALENDAR` declares handlers for
+- open-abap behavior: `CL_GUI_CALENDAR` and the `CNCA` type pool are now
+  declared, covering the native constructor, `GO_TO_DATE`, `SET_SELECTION`,
+  `GET_SELECTION`, `SET_DAY_INFO`, `RESET_DAY_INFO`, `RESET_SELECTION`, and the
+  `DATE_SELECTED` / `INFO_REQUEST` events, so the sample is statically checked. All method bodies return without
+  frontend state. The `M_ID_DATE_SELECTED` and `M_ID_INFO_REQUEST` event-ID
+  constants required by `SET_REGISTERED_EVENTS` are still absent.
+- Reproduction: Reference `cl_gui_calendar=>m_id_date_selected` in a checked
+  report and run `npm test`; abaplint reports the constant as not found. Calling
+  `GET_SELECTION` returns initial dates because the body returns immediately.
+- Workaround: `ZGG_GUI_CALENDAR` declares the control statically and guards
+  construction. Static include `ZGG_NATIVE_CALENDAR` declares handlers for
   `DATE_SELECTED` and `INFO_REQUEST`, registers the native event IDs, returns
   event ranges through ABAP memory, and deregisters before recreation or exit.
-  Local structurally compatible date-info types keep the owner report
-  importable without declaring replacement SAP globals. Because open-abap lacks
-  the calendar type surface, lint issue reporting is disabled only for this
-  native include; activation and event behavior remain native-SAP checks.
+  Day-info fixtures use the native `CNCA_ITAB_DAY_INFO` type. Because the
+  event-ID constants are still missing, lint issue reporting stays disabled for
+  this native include; activation and event behavior remain native-SAP checks.
 - Upstream reference: Not reported
 
 ### The Dynamic Documents API is partial and its runtime behavior is stubbed
@@ -143,26 +147,26 @@ GUI frontend features, or local development-environment failures in this file.
   link, button, input, and select element classes build an HTML-backed Dynamic
   Document. Native applications can display the document in a GUI container,
   register element events, refresh retained elements, and print it.
-- open-abap behavior: `src/dd` declares `CL_DD_DOCUMENT`, area, table, form,
-  button, and input classes plus core `SDYDO` types, but their methods return
-  without constructing HTML or element objects. The link and select element
-  classes, `ADD_LINK`, `ADD_SELECT_ELEMENT`, and native element events are
-  absent. A call to `VERTICAL_SPLIT`, for example, leaves `RIGHT_AREA` unbound.
+- open-abap behavior: `src/dd` now declares the full element family used by the
+  sample, including `CL_DD_LINK_ELEMENT`, `CL_DD_SELECT_ELEMENT`, `ADD_LINK`,
+  `ADD_SELECT_ELEMENT`, the `SDYDO_OPTION_TAB` option type, and the `CLICKED`,
+  `ENTERED`, `HELP_F1`, and `SELECTED` element events. Every method body still
+  returns without constructing HTML or element objects, so `VERTICAL_SPLIT`
+  leaves `RIGHT_AREA` unbound and `ADD_FORM` leaves `FORMAREA` unbound. The
+  `NAME` attribute of `CL_DD_INPUT_ELEMENT` and the `VALUE` attribute of
+  `CL_DD_SELECT_ELEMENT`, both read by the event handlers, are still absent.
 - Reproduction: Create `CL_DD_DOCUMENT`, call `VERTICAL_SPLIT`, and inspect the
   exported `RIGHT_AREA`; it remains initial because the implementation returns
-  immediately. Alternatively, add a static `document->add_link( )` call and run
-  `npm test`; abaplint reports the missing method. The no-op implementations are
-  under `src/dd` at the tested commit.
-- Workaround: `ZGG_GUI_DYNAMIC_DOCUMENT` creates `CL_DD_DOCUMENT` by runtime
-  class name, calls the native API dynamically, and uses local structurally
-  compatible option types. If the class is unavailable or returns no child
-  areas, it displays a clear HTML fallback through `CL_GUI_HTML_VIEWER`. Static
-  include `ZGG_NATIVE_DOCUMENT` declares typed handlers for link/button
-  `CLICKED`, input `ENTERED`/`HELP_F1`, and select `SELECTED`. It returns the
-  sender name and current value through ABAP memory and deregisters before reset
-  or exit. Because open-abap lacks the element classes and events, lint issue
-  reporting is disabled only for this native include; activation and event
-  behavior remain native-SAP checks.
+  immediately. Reference `input_element->name` in a checked report and run
+  `npm test`; abaplint reports the attribute as not found.
+- Workaround: `ZGG_GUI_DYNAMIC_DOCUMENT` declares every element statically and,
+  if the document returns no child areas, displays an HTML fallback through
+  `CL_GUI_HTML_VIEWER`. Static include `ZGG_NATIVE_DOCUMENT` declares typed
+  handlers for link/button `CLICKED`, input `ENTERED`/`HELP_F1`, and select
+  `SELECTED`, returns the sender name and current value through ABAP memory, and
+  deregisters before reset or exit. Because the two element attributes are still
+  missing, lint issue reporting stays disabled for this native include;
+  activation and event behavior remain native-SAP checks.
 - Upstream reference: Not reported
 
 ### Tree control coverage is partial and runtime methods are stubbed
@@ -179,26 +183,30 @@ GUI frontend features, or local development-environment failures in this file.
 - open-abap behavior: The repository declares `CL_GUI_COLUMN_TREE`,
   `CL_TREE_CONTROL_BASE`, `CL_ITEM_TREE_CONTROL`, and ALV tree classes. The
   column-tree constructor and core transfer methods fail assertions, while
-  most inherited state methods return without behavior. `CL_GUI_SIMPLE_TREE`,
-  `CL_GUI_LIST_TREE`, and the simple, list, and column tree-model classes are
-  absent from the tested tree. Several native column-tree methods, including
-  individual item mutation and node movement, are also missing from the type
-  surface. The ALV tree constructor and core display/node/state methods are
-  assertion stubs or no-ops, and its native context-menu request event is not
+  most inherited state methods return without behavior. `MOVE_NODE` and the
+  backend model classes `CL_TREE_MODEL`, `CL_ITEM_TREE_MODEL`,
+  `CL_SIMPLE_TREE_MODEL`, `CL_LIST_TREE_MODEL`, and `CL_COLUMN_TREE_MODEL` are
+  now declared, together with the `MTREE*` node/item structures and the
+  `TREEMSNOTA` / `TREEMLNOTA` / `TREEMCNOTA` / `TREEMLITAC` / `TREEMCITAC`
+  table types; every model method body returns without behavior.
+  `CL_GUI_SIMPLE_TREE` and `CL_GUI_LIST_TREE` remain absent. The ALV tree
+  constructor and core display/node/state methods are assertion stubs or
+  no-ops, and its native `NODE_CONTEXT_MENU_REQUEST` event is still not
   declared even though context-menu selection is present.
 - Reproduction: Create `CL_GUI_COLUMN_TREE` with a valid parent and hierarchy
   header; the constructor reaches `ASSERT 1 = 'todo'` in
   `src/cl_gui_column_tree.clas.abap`. A static reference to
-  `CL_SIMPLE_TREE_MODEL` fails abaplint type resolution.
+  `CL_GUI_SIMPLE_TREE` still fails abaplint type resolution.
 - Workaround: `ZGG_GUI_TREES` catches construction failures and shows a text
-  fallback. It uses the statically available tree surface where possible and
-  invokes missing but native node-movement APIs dynamically. The class-audit
+  fallback; `ZGG_GUI_TREE_MODELS` declares each model class statically and keeps
+  a shared `CL_TREE_MODEL` reference for the lifecycle calls. The class-audit
   action reports which GUI and model variants exist on the current system.
   Static include `ZGG_NATIVE_ALV_TREE` declares a typed handler for the missing
   native `NODE_CONTEXT_MENU_REQUEST`, preserves the tree's existing frontend
   event registrations, adds two menu commands, and deregisters the handler on
-  exit. Lint issue reporting is disabled only for this native include;
-  activation and event behavior remain native-SAP checks.
+  exit. Because that event and two `CL_CTMENU` methods are still missing, lint
+  issue reporting stays disabled for this native include; activation and event
+  behavior remain native-SAP checks.
 - Upstream reference: Not reported
 
 ### SALV table API is declared but core runtime behavior is stubbed
@@ -217,17 +225,17 @@ GUI frontend features, or local development-environment failures in this file.
   `GET_FUNCTIONS`, selection, layout, sorting, aggregation, offline, refresh,
   popup, and `TO_XML` methods fail unconditional assertions. Other methods,
   including filters, hyperlinks, display settings, and individual function
-  toggles, return without retaining state. Concrete SALV form-layout classes
-  are absent from the tested source tree.
+  toggles, return without retaining state. `CL_SALV_FORM_LAYOUT_GRID` and its
+  `CL_SALV_FORM_HEADER_INFO` / `CL_SALV_FORM_LABEL` results are now declared,
+  but their bodies return without building a form element.
 - Reproduction: Call `CL_SALV_TABLE=>FACTORY` with any internal table; the
   implementation reaches `ASSERT 1 = 'todo'` in
   `src/salv/cl_salv_table.clas.abap`. The other placeholder implementations are
   in `src/salv` at the commit above.
 - Workaround: `ZGG_GUI_SALV_TABLE` catches construction failures and displays a
-  read-only text fallback. Native form objects are instantiated by runtime
-  class name so the report remains lintable against the partial open-abap type
-  surface. There is no workaround for executing an interactive SALV table in
-  the current runtime.
+  read-only text fallback. Every column, function, and form call is declared
+  statically and syntax checked. There is no workaround for executing an
+  interactive SALV table in the current runtime.
 - Upstream reference: Not reported
 
 ### ALV Grid API is mostly nonfunctional at runtime
@@ -274,7 +282,8 @@ GUI frontend features, or local development-environment failures in this file.
 - open-abap behavior: The class and method signature exist under `src/alv`, but
   the implementation consists only of `ASSERT 1 = 2`. It cannot return a table
   reference or style-field name. The generated `LVC_S_STYL` and `LVC_T_STYL`
-  DDIC artifacts are also absent from the tested repository tree.
+  DDIC artifacts are now present, so the style component can be typed
+  statically even though the factory cannot produce one.
 - Reproduction: Call `CL_ALV_TABLE_CREATE=>CREATE_DYNAMIC_TABLE` with a valid
   `LVC_T_FCAT`; execution reaches the failed assertion in
   `src/alv/cl_alv_table_create.clas.abap`.
@@ -289,8 +298,8 @@ GUI frontend features, or local development-environment failures in this file.
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_ALV_VARIANTS`
 - Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `08bd747` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: `CL_ALV_VARIANT` binds an output table, LVC field
   catalog, layout, and `DISVARIANT` key; it reads stored field catalogs and can
   delete a supplied set of layout variants. The owning grid applies, saves, and
@@ -298,7 +307,9 @@ GUI frontend features, or local development-environment failures in this file.
 - open-abap behavior: `CL_ALV_VARIANT` is declared under `src/alv`, but its
   constructor, `GET_VARIANT_INFO_FROM_DB`, and `DELETE_VARIANTS` all return
   without retaining state, reading storage, or deleting anything. The related
-  `CL_GUI_ALV_GRID` variant methods are also no-ops.
+  `CL_GUI_ALV_GRID` variant methods are also no-ops. `DELETE_VARIANTS` takes
+  `LTVARIANTS`, the full LTDX layout record, rather than a table of the
+  `DISVARIANT` key structure the grid and the sample otherwise work with.
 - Reproduction: Construct `CL_ALV_VARIANT`, call
   `GET_VARIANT_INFO_FROM_DB`, and inspect `ET_FCAT`; it remains initial because
   the implementation immediately returns in
@@ -306,7 +317,7 @@ GUI frontend features, or local development-environment failures in this file.
 - Workaround: The sample remains native-SAP-only for persistence. It tracks
   only successfully saved `GG_` keys for its own report and `GGV1` handle,
   requires explicit confirmation, and supplies only those tracked keys to
-  dynamic `DELETE_VARIANTS` calls.
+  `DELETE_VARIANTS`, mapping them onto `LTVARIANTS` rows first.
 - Upstream reference: Not reported
 
 ### Editable ALV and changed-data protocol behavior is stubbed
@@ -326,13 +337,13 @@ GUI frontend features, or local development-environment failures in this file.
   nonfunctional. Protocol `ADD_PROTOCOL_ENTRY`, `GET_CELL_VALUE`,
   `MODIFY_CELL`, and `DISPLAY_PROTOCOL` fail assertions; construction,
   `MODIFY_STYLE`, and `REFRESH_PROTOCOL` return without state changes. The
-  `LVC_S_STYL` and `LVC_T_STYL` DDIC artifacts are absent.
+  `LVC_S_STYL` and `LVC_T_STYL` DDIC artifacts are now present.
 - Reproduction: Construct `CL_ALV_CHANGED_DATA_PROTOCOL` and call
   `ADD_PROTOCOL_ENTRY`; execution reaches `ASSERT 1 = 'todo'` in
   `src/alv/cl_alv_changed_data_protocol.clas.abap`.
-- Workaround: The report is native-SAP-only for editing and validation. It uses
-  a local structurally compatible style component for the output row and
-  catches grid construction failure before any interactive edit path runs.
+- Workaround: The report is native-SAP-only for editing and validation. Its
+  output row now carries a real `LVC_T_STYL` style component, and it catches
+  grid construction failure before any interactive edit path runs.
 - Upstream reference: Not reported
 
 ### ALV delayed-selection callback is missing and event helpers are no-ops
@@ -364,56 +375,70 @@ GUI frontend features, or local development-environment failures in this file.
   construction stays guarded with a text fallback under open-abap.
 - Upstream reference: Not reported
 
-### SALV tree class family is missing
+### SALV tree class family is declared but has no runtime behavior
 
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_SALV_TREE`
 - Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `08bd747` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: `CL_SALV_TREE` and its node, column, function,
   selection, item, and event helper classes provide high-level read-only tree
   output with link-click and double-click events.
-- open-abap behavior: No `CL_SALV_TREE`, node collection/node, tree column,
-  tree selection, function, item, or tree event class definitions exist in the
-  tested repository tree. Static references fail type resolution and no SALV
-  tree can be created at runtime.
-- Reproduction: Add `DATA tree TYPE REF TO cl_salv_tree.` to a checked report
-  and run `npm test`; abaplint reports the unknown type. Repository searches for
-  the SALV tree class family at the tested commit return no files.
-- Workaround: `ZGG_GUI_SALV_TREE` invokes the native factory and helper methods
-  dynamically and displays a text fallback when unavailable. Static include
-  `ZGG_NATIVE_SALV_TREE` declares typed native `LINK_CLICK` and `DOUBLE_CLICK`
-  handlers, returns node and column payloads through ABAP memory, and
-  deregisters on exit. Lint issue reporting is disabled only for this native
-  include; activation and event behavior remain native-SAP checks.
+- open-abap behavior: `CL_SALV_TREE`, `CL_SALV_NODES`, `CL_SALV_NODE`,
+  `CL_SALV_ITEM`, `CL_SALV_COLUMNS_TREE`, `CL_SALV_COLUMN_TREE`,
+  `CL_SALV_SELECTIONS_TREE`, `CL_SALV_FUNCTIONS_TREE`, and
+  `CL_SALV_EVENTS_TREE` are now declared, along with `SALV_DE_NODE_KEY` and
+  `SALV_T_NODES`. Every method body returns without behavior, so `FACTORY`
+  yields an unbound tree, `ADD_NODE` returns no node reference, and
+  `GET_SELECTED_NODES` returns an empty table. Only the confirmed part of the
+  surface is declared: `CL_SALV_COLUMN_TREE` extends `CL_SALV_COLUMN` directly,
+  so list-column extras such as `SET_KEY` are not available on a tree column;
+  `CL_SALV_SELECTIONS_TREE` exposes no selection-mode setter;
+  `CL_SALV_COLUMNS_TREE` offers only the exception-column accessors and no
+  hierarchy-column getter; and `CL_SALV_TREE` has `DISPLAY` but no `REFRESH`.
+- Reproduction: Call `CL_SALV_TREE=>FACTORY` with any internal table and inspect
+  `R_SALV_TREE`; it remains initial because the body returns immediately.
+- Workaround: `ZGG_GUI_SALV_TREE` declares the whole family statically, guards
+  the factory, and displays a text fallback when the tree is unbound. Runtime
+  node changes redraw with `DISPLAY` because no refresh entry point exists, and
+  the sample no longer marks a key column or renames the hierarchy column.
+  Static
+  include `ZGG_NATIVE_SALV_TREE` declares typed native `LINK_CLICK` and
+  `DOUBLE_CLICK` handlers, returns node and column payloads through ABAP memory,
+  and deregisters on exit. That include now has no unresolved type references;
+  lint issue reporting stays disabled for it only because of repository style
+  rules such as the ban on `EXPORT TO MEMORY`.
 - Upstream reference: Not reported
 
-### Hierarchical-sequential SALV class family is missing
+### Hierarchical-sequential SALV family is declared but has no runtime behavior
 
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_SALV_HIERSEQ`
 - Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `08bd747` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: `CL_SALV_HIERSEQ_TABLE` binds separate level-one and
   level-two tables through master/slave fields, then supplies per-level columns,
   sorting, filtering, aggregation, functions, refresh, and interaction events.
-- open-abap behavior: The hierarchical-sequential SALV table, its level helper
-  classes, binding type, and its event class are absent from the tested
-  repository tree. Static references fail type resolution and the runtime
-  cannot create this SALV variant.
-- Reproduction: Add `DATA output TYPE REF TO cl_salv_hierseq_table.` to a
-  checked report and run `npm test`; abaplint reports the unknown type.
-  Repository searches at the tested commit return no hierarchical-sequential
-  SALV classes.
-- Workaround: `ZGG_GUI_SALV_HIERSEQ` uses a local structurally compatible
-  master/slave binding table and invokes the native factory and level methods
-  dynamically with the native `T_BINDING_LEVEL1_LEVEL2` contract. Static include
-  `ZGG_NATIVE_SALV_HSEQ` declares typed `LINK_CLICK` and `DOUBLE_CLICK` handlers,
-  records level, row, and column payloads, and deregisters on exit. Lint issue
-  reporting is disabled only for this native include; activation and event
-  behavior remain native-SAP checks.
+- open-abap behavior: `CL_SALV_HIERSEQ_TABLE`, `CL_SALV_COLUMNS_HIERSEQ`,
+  `CL_SALV_COLUMN_HIERSEQ`, and `CL_SALV_EVENTS_HIERSEQ` are now declared, as
+  are the `SALV_S_HIERSEQ_BINDING` structure and `SALV_T_HIERSEQ_BINDING` table
+  type. Per-level sorting, filtering, and aggregation reuse the existing
+  `CL_SALV_SORTS`, `CL_SALV_FILTERS`, and `CL_SALV_AGGREGATIONS` classes. Every
+  method body returns without behavior, so `FACTORY` yields an unbound object
+  and the per-level getters return unbound helpers.
+- Reproduction: Call `CL_SALV_HIERSEQ_TABLE=>FACTORY` with two internal tables
+  and a binding table, then inspect `R_HIERSEQ`; it remains initial because the
+  body returns immediately.
+- Workaround: `ZGG_GUI_SALV_HIERSEQ` declares the family statically, builds the
+  binding through the native `SALV_T_HIERSEQ_BINDING` type and the
+  `T_BINDING_LEVEL1_LEVEL2` contract, and shows a text fallback when the factory
+  returns nothing. Static include `ZGG_NATIVE_SALV_HSEQ` declares typed
+  `LINK_CLICK` and `DOUBLE_CLICK` handlers, records level, row, and column
+  payloads, and deregisters on exit. That include now has no unresolved type
+  references; lint issue reporting stays disabled for it only because of
+  repository style rules such as the ban on `EXPORT TO MEMORY`.
 - Upstream reference: Not reported
 
 ### Frontend Services is partial, stubbed, and has signature differences
@@ -421,8 +446,8 @@ GUI frontend features, or local development-environment failures in this file.
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_FRONTEND_SERVICES`
 - Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `fbf93db` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: `CL_GUI_FRONTEND_SERVICES` provides security-mediated
   dialogs, text/binary transfer, file and directory operations, clipboard,
   frontend capability and path queries, read-only registry access, and opening
@@ -432,18 +457,24 @@ GUI frontend features, or local development-environment failures in this file.
   existence/deletion, directory creation/listing/existence, path separator,
   SAP GUI work directory, and system-directory methods fail assertions. Many
   other methods return empty results. `GET_PLATFORM` always reports Windows XP
-  and `GET_GUI_VERSION` returns dummy `9999/1/20` values. Native methods such as
-  `GUI_IS_AVAILABLE`, `GET_GUI_TYPE`, `GET_SAPGUI_DIRECTORY`, and
-  `DIRECTORY_SET_CURRENT` are absent; clipboard parameter directions also
-  differ from native SAP.
+  and `GET_GUI_VERSION` returns dummy `9999/1/20` values. `GET_SAPGUI_DIRECTORY`
+  and `DIRECTORY_SET_CURRENT` are now declared but return without querying the
+  frontend, so the directory getters yield empty strings and the set call
+  reports no return code. `CLIPBOARD_EXPORT` declares `DATA` as an `EXPORTING`
+  parameter typed `any`, matching a long-standing quirk of the native class, so
+  callers must pass the outgoing table with `IMPORTING`. There is no
+  availability predicate and no GUI-type getter on the class; the sample's
+  earlier `GUI_IS_AVAILABLE` and `GET_GUI_TYPE` calls named methods that the
+  native class does not define.
 - Reproduction: Call `FILE_EXIST` with any path; execution reaches
   `ASSERT 1 = 'file_exist not supported'` in
-  `src/cl_gui_frontend_services.clas.abap`. A static call to
-  `GUI_IS_AVAILABLE` fails abaplint method lookup at the tested commit.
-- Workaround: The sample dynamically invokes absent or signature-incompatible
-  native methods, guards all calls, performs destructive actions only under a
-  derived `ZGG_GUI_<user>` temporary directory, and treats capability outputs
-  from open-abap as non-authoritative.
+  `src/cl_gui_frontend_services.clas.abap`. Call `GET_SAPGUI_DIRECTORY` and
+  inspect the changed parameter; it stays initial.
+- Workaround: The sample calls every method statically, guards all calls,
+  performs destructive actions only under a derived `ZGG_GUI_<user>` temporary
+  directory, and treats capability outputs from open-abap as non-authoritative.
+  Frontend availability is probed with `SY-BATCH` plus the `GET_GUI_VERSION`
+  return code instead of a non-existent predicate.
 - Upstream reference: Not reported
 
 ### Interactive drag/resize control is a runtime stub
@@ -490,52 +521,61 @@ GUI frontend features, or local development-environment failures in this file.
   a diagnostic text fallback.
 - Upstream reference: Not reported
 
-### Desktop Office Integration class family is missing
-
-- Status: Open, confirmed
-- Sample: `ZGG_GUI_OFFICE_INTEGRATION`
-- Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
-- Native SAP behavior: `C_OI_CONTAINER_CONTROL_CREATOR` supplies a central
-  Desktop Office container. Its document proxies embed registered desktop
-  applications and expose spreadsheet and word-processing interfaces with
-  explicit document and automation-object cleanup.
-- open-abap behavior: The creator, container and document proxy interfaces,
-  spreadsheet and word-processing interfaces, Office error class, and SOI type
-  pool are absent from the tested repository tree. Static declarations cannot
-  be resolved and no Office application can be hosted.
-- Reproduction: Add `DATA control TYPE REF TO i_oi_container_control.` or a
-  static call to `C_OI_CONTAINER_CONTROL_CREATOR=>GET_CONTAINER_CONTROL` and
-  run `npm test`; abaplint reports unknown types/classes.
-- Workaround: The sample checks the creator class with RTTI, performs native
-  factory and interface calls dynamically, and shows a diagnostic text control
-  when unavailable. It never assumes that Windows or Microsoft Office is
-  installed.
-- Upstream reference: Not reported
-
-### Optional graphics and selector classes are missing
+### Optional graphics and selector classes have no runtime behavior
 
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_GRAPHICS`
 - Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
+- Version or commit: `08bd747` (`open-abap-gui` local checkout, 2026-08-23);
+  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
 - Native SAP behavior: Depending on release and frontend installation,
   `CL_GUI_BARCHART`, `CL_GUI_CHART_ENGINE`, `CL_GUI_GP_PRES`, and
   `CL_GUI_SELECTOR` host legacy bar charts, Chart Engine output, Graphical
   Framework business graphics, and a color selector. Chart Engine may fall
   back from the Windows ActiveX control to IGS.
-- open-abap behavior: None of these four classes, the Graphical Framework
-  multiplexer/data-container family, or their required types are present in the
-  tested repository tree. Static declarations fail type resolution and no
-  optional graphic can be hosted.
-- Reproduction: Add `DATA chart TYPE REF TO cl_gui_chart_engine.` to a checked
-  report and run `npm test`; abaplint reports the unknown type. The same occurs
-  for the bar chart, business-graphics proxy, and selector classes.
-- Workaround: The sample audits each class with RTTI, creates only installed
-  variants through dynamic calls, and keeps a diagnostic text control visible
-  when a class or frontend capability is unavailable.
+- open-abap behavior: `CL_GUI_BARCHART`, `CL_GUI_CHART_ENGINE`,
+  `CL_GUI_GP_PRES`, and `CL_GUI_SELECTOR` are now declared, together with the
+  `IF_GRAPHIC_PROXY` interface used to activate the business-graphics proxy.
+  Every method body returns without hosting a control. Only the release-stable
+  part of each surface is declared: the bar chart offers `DISPLAY`, the Chart
+  Engine `SET_DATA` and `RENDER`, and the selector nothing beyond its
+  constructor. The data- and colour-transfer entry points of the bar chart and
+  selector, and any constructor parameters for `CL_GUI_GP_PRES`, are release
+  dependent and therefore not part of the checked surface. The wider Graphical
+  Framework multiplexer and data-container family is still absent, so a native
+  application cannot connect a data container before activating the proxy.
+- Reproduction: Construct `CL_GUI_CHART_ENGINE` with a container and call
+  `RENDER`; nothing is drawn because the body returns immediately. A static
+  reference to a Graphical Framework data-container class still fails type
+  resolution.
+- Workaround: The sample audits each class with RTTI, declares each control
+  statically behind its capability flag, and keeps a diagnostic text control
+  visible when a class or frontend capability is unavailable.
+- Upstream reference: Not reported
+
+### Graphics dependency declarations deviate from the native SAP surface
+
+- Status: Open, confirmed
+- Sample: `ZGG_GUI_GRAPHICS`
+- Component: `open-abap-gui` dependency surface
+- Version or commit: `dc251c0` (`open-abap-gui` local checkout, 2026-08-23)
+- Native SAP behavior: `CL_GUI_CHART_ENGINE` is a standalone class that drives
+  either the frontend ActiveX engine or the IGS renderer; it does not inherit
+  from `CL_GUI_CONTROL` and therefore has no control lifetime methods.
+  `CL_GUI_GP_PRES->SET_DC_NAMES` requires the dimension parameters, so `DIM2`
+  cannot be omitted.
+- open-abap behavior: `CL_GUI_CHART_ENGINE` is declared as
+  `INHERITING FROM cl_gui_control`, and every `SET_DC_NAMES` parameter is
+  declared `OPTIONAL`. Both deviations are accepted by the lint run while a
+  native syntax check rejects the same source, so the dependency surface is
+  more permissive than the system it models.
+- Reproduction: Assign a `CL_GUI_CHART_ENGINE` reference to a
+  `CL_GUI_CONTROL` variable, or call `SET_DC_NAMES` without `DIM2`. The lint
+  run reports no issue; the native syntax check reports a type conversion
+  error and a missing mandatory parameter.
+- Workaround: The sample keeps the chart engine in its own reference instead of
+  the shared control variable, releases it by dropping that reference, and
+  passes the dimension parameters explicitly.
 - Upstream reference: Not reported
 
 ### Picture event surface and Data Provider lifetime constant are missing

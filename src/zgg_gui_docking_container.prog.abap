@@ -8,8 +8,12 @@ CONSTANTS c_dock_right TYPE i VALUE 2.
 CONSTANTS c_dock_top TYPE i VALUE 4.
 CONSTANTS c_dock_bottom TYPE i VALUE 8.
 CONSTANTS c_lifetime_dynpro TYPE i VALUE 1.
+* FLOAT takes a single DO_FLOAT flag: a set value floats the container, a
+* cleared one docks it again at the configured side.
+CONSTANTS c_do_float TYPE i VALUE 1.
+CONSTANTS c_do_dock TYPE i VALUE 0.
 
-DATA go_docking TYPE REF TO object.
+DATA go_docking TYPE REF TO cl_gui_docking_container.
 DATA go_container TYPE REF TO cl_gui_container.
 DATA go_editor TYPE REF TO cl_gui_textedit.
 DATA gv_ok_code TYPE sy-ucomm.
@@ -71,9 +75,9 @@ MODULE user_command_0100 INPUT.
                            val2 = gv_extension - 40 ).
       PERFORM set_extension.
     WHEN 'FLOAT'.
-      PERFORM optional_docking_method USING 'DETACH'.
+      PERFORM float_docking USING c_do_float.
     WHEN 'ATTACH'.
-      PERFORM optional_docking_method USING 'ATTACH'.
+      PERFORM float_docking USING c_do_dock.
       PERFORM dock_at_side.
     WHEN 'RELINK'.
       go_container->link(
@@ -89,7 +93,6 @@ MODULE user_command_0100 INPUT.
 ENDMODULE.
 
 FORM create_controls.
-  DATA lv_class_name TYPE string VALUE 'CL_GUI_DOCKING_CONTAINER'.
   DATA lt_text TYPE ty_text_lines.
 
   IF go_docking IS BOUND.
@@ -97,7 +100,7 @@ FORM create_controls.
   ENDIF.
 
   TRY.
-      CREATE OBJECT go_docking TYPE (lv_class_name)
+      CREATE OBJECT go_docking
         EXPORTING
           repid                   = sy-repid
           dynnr                   = sy-dynnr
@@ -123,8 +126,7 @@ ENDFORM.
 
 FORM dock_at_side.
   TRY.
-      CALL METHOD go_docking->('DOCK_AT')
-        EXPORTING side = gv_side.
+      go_docking->dock_at( gv_side ).
       PERFORM describe_side.
       gv_status = |Docked at { gv_side_text }|.
     CATCH cx_root INTO DATA(lx_error).
@@ -134,21 +136,24 @@ ENDFORM.
 
 FORM set_extension.
   TRY.
-      CALL METHOD go_docking->('SET_EXTENSION')
-        EXPORTING extension = gv_extension.
+      go_docking->set_extension( gv_extension ).
       gv_status = |Docking extension set to { gv_extension }|.
     CATCH cx_root INTO DATA(lx_error).
       gv_status = |SET_EXTENSION failed: { lx_error->get_text( ) }|.
   ENDTRY.
 ENDFORM.
 
-FORM optional_docking_method USING iv_method TYPE c.
-  TRY.
-      CALL METHOD go_docking->(iv_method).
-      gv_status = |Optional docking method { iv_method } executed|.
-    CATCH cx_root.
-      gv_status = |{ iv_method } is not exposed; use the frontend docking grip|.
-  ENDTRY.
+FORM float_docking USING iv_do_float TYPE i.
+  go_docking->float( EXPORTING do_float = iv_do_float
+                     EXCEPTIONS cntl_error = 1 cntl_system_error = 2
+                                OTHERS = 3 ).
+  IF sy-subrc <> 0.
+    gv_status = |FLOAT refused with rc { sy-subrc }; use the frontend docking grip|.
+    RETURN.
+  ENDIF.
+  gv_status = COND #( WHEN iv_do_float = c_do_dock
+    THEN 'Container docked again at the configured side'
+    ELSE 'Container floated away from the docking side' ).
 ENDFORM.
 
 FORM observe_geometry.
@@ -161,6 +166,7 @@ FORM observe_geometry.
   ENDIF.
   go_container->get_width( IMPORTING width = lv_width ).
   go_container->get_height( IMPORTING height = lv_height ).
+  cl_gui_cfw=>flush( ).
   gv_geometry = |Measured { lv_width } x { lv_height }; extension { gv_extension }|.
   IF gv_last_width <> 0
       AND ( gv_last_width <> lv_width OR gv_last_height <> lv_height ).
@@ -174,6 +180,7 @@ FORM detect_close.
   DATA lv_valid TYPE i.
 
   go_container->is_valid( IMPORTING result = lv_valid ).
+  cl_gui_cfw=>flush( ).
   IF lv_valid = 0.
     FREE go_editor.
     FREE go_container.

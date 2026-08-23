@@ -1,55 +1,11 @@
 REPORT zgg_gui_tree_models.
 
-TYPES:
-  BEGIN OF ty_node,
-    node_key  TYPE tv_nodekey,
-    relatkey  TYPE tv_nodekey,
-    relatship TYPE i,
-    hidden    TYPE abap_bool,
-    disabled  TYPE abap_bool,
-    isfolder  TYPE abap_bool,
-    n_image   TYPE tv_image,
-    exp_image TYPE tv_image,
-    style     TYPE i,
-    no_branch TYPE abap_bool,
-    expander  TYPE abap_bool,
-    text      TYPE c LENGTH 80,
-  END OF ty_node,
-  ty_nodes TYPE STANDARD TABLE OF ty_node WITH EMPTY KEY.
-TYPES:
-  BEGIN OF ty_item,
-    node_key   TYPE tv_nodekey,
-    item_name  TYPE tv_itmname,
-    class      TYPE i,
-    font       TYPE i,
-    disabled   TYPE abap_bool,
-    editable   TYPE abap_bool,
-    hidden     TYPE abap_bool,
-    alignment  TYPE i,
-    t_image    TYPE tv_image,
-    chosen     TYPE abap_bool,
-    togg_right TYPE abap_bool,
-    style      TYPE i,
-    length     TYPE i,
-    length_pix TYPE abap_bool,
-    ignoreimag TYPE abap_bool,
-    usebgcolor TYPE abap_bool,
-    txtisqinfo TYPE abap_bool,
-    text       TYPE c LENGTH 80,
-  END OF ty_item,
-  ty_items TYPE STANDARD TABLE OF ty_item WITH EMPTY KEY.
-TYPES:
-  BEGIN OF ty_header,
-    heading TYPE c LENGTH 40,
-    tooltip TYPE c LENGTH 80,
-    width   TYPE i,
-  END OF ty_header.
 TYPES ty_class_names TYPE STANDARD TABLE OF string WITH EMPTY KEY.
 TYPES ty_text_line TYPE c LENGTH 255.
 TYPES ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
 
 DATA go_host TYPE REF TO cl_gui_custom_container.
-DATA go_model TYPE REF TO object.
+DATA go_model TYPE REF TO cl_tree_model.
 DATA go_fallback TYPE REF TO cl_gui_textedit.
 DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_status TYPE c LENGTH 108.
@@ -124,9 +80,10 @@ ENDFORM.
 
 FORM show_simple_model.
   DATA lv_class TYPE string VALUE 'CL_SIMPLE_TREE_MODEL'.
+  DATA lo_simple TYPE REF TO cl_simple_tree_model.
   DATA lv_available TYPE abap_bool.
   DATA lv_reason TYPE string.
-  DATA lt_nodes TYPE ty_nodes.
+  DATA lt_nodes TYPE treemsnota.
 
   PERFORM prepare_host.
   PERFORM class_exists USING lv_class CHANGING lv_available.
@@ -136,16 +93,17 @@ FORM show_simple_model.
   ENDIF.
   lt_nodes = VALUE #(
     ( node_key = 'ROOT' isfolder = abap_true text = 'Simple Tree Model' n_image = '@04@' exp_image = '@05@' )
-    ( node_key = 'INPUT' relatkey = 'ROOT' relatship = 6 isfolder = abap_true text = 'Input devices' )
-    ( node_key = 'P100' relatkey = 'INPUT' relatship = 6 text = 'Mechanical Keyboard' )
-    ( node_key = 'P110' relatkey = 'INPUT' relatship = 6 text = 'Ergonomic Mouse' ) ).
+    ( node_key = 'INPUT' relatkey = 'ROOT' relatship = 2 isfolder = abap_true text = 'Input devices' )
+    ( node_key = 'P100' relatkey = 'INPUT' relatship = 2 text = 'Mechanical Keyboard' )
+    ( node_key = 'P110' relatkey = 'INPUT' relatship = 2 text = 'Ergonomic Mouse' ) ).
   TRY.
-      CREATE OBJECT go_model TYPE (lv_class)
+      CREATE OBJECT lo_simple
         EXPORTING node_selection_mode = 1
                   hide_selection      = abap_false.
-      CALL METHOD go_model->('ADD_NODES') EXPORTING nodes_table = lt_nodes.
-      CALL METHOD go_model->('CREATE_TREE_CONTROL') EXPORTING parent = go_host.
-      CALL METHOD go_model->('EXPAND_NODE') EXPORTING node_key = 'ROOT'.
+      lo_simple->add_nodes( lt_nodes ).
+      lo_simple->create_tree_control( parent = go_host ).
+      lo_simple->expand_node( 'ROOT' ).
+      go_model = lo_simple.
       gv_active_model = lv_class.
       gv_status = 'Simple Tree Model created with folder/leaf nodes and one text value per node'.
       gv_detail = 'Backend CL_SIMPLE_TREE_MODEL owns data; CREATE_TREE_CONTROL supplies the frontend view'.
@@ -157,11 +115,12 @@ ENDFORM.
 
 FORM show_list_model.
   DATA lv_class TYPE string VALUE 'CL_LIST_TREE_MODEL'.
+  DATA lo_list TYPE REF TO cl_list_tree_model.
   DATA lv_available TYPE abap_bool.
   DATA lv_reason TYPE string.
-  DATA ls_header TYPE ty_header.
-  DATA lt_nodes TYPE ty_nodes.
-  DATA lt_items TYPE ty_items.
+  DATA ls_header TYPE treemhhdr.
+  DATA lt_nodes TYPE treemlnota.
+  DATA lt_items TYPE treemlitac.
 
   PERFORM prepare_host.
   PERFORM class_exists USING lv_class CHANGING lv_available.
@@ -172,8 +131,8 @@ FORM show_list_model.
   ls_header = VALUE #( heading = 'List Tree Model' tooltip = 'Multiple items arranged as a list' width = 32 ).
   lt_nodes = VALUE #(
     ( node_key = 'ROOT' isfolder = abap_true n_image = '@04@' exp_image = '@05@' )
-    ( node_key = 'P100' relatkey = 'ROOT' relatship = 6 )
-    ( node_key = 'P200' relatkey = 'ROOT' relatship = 6 ) ).
+    ( node_key = 'P100' relatkey = 'ROOT' relatship = 2 )
+    ( node_key = 'P200' relatkey = 'ROOT' relatship = 2 ) ).
   lt_items = VALUE #(
     ( node_key = 'ROOT' item_name = 'NODE' class = 1 text = 'List Tree Model' )
     ( node_key = 'P100' item_name = 'NODE' class = 1 text = 'P100' )
@@ -181,15 +140,17 @@ FORM show_list_model.
     ( node_key = 'P200' item_name = 'NODE' class = 1 text = 'P200' )
     ( node_key = 'P200' item_name = 'NAME' class = 1 text = '27 Inch Display' ) ).
   TRY.
-      CREATE OBJECT go_model TYPE (lv_class)
-        EXPORTING node_selection_mode = 1
+      CREATE OBJECT lo_list
+        EXPORTING with_headers        = abap_true
+                  node_selection_mode = 1
                   hide_selection      = abap_false
-          item_selection              = abap_true
+                  item_selection      = abap_true
                   hierarchy_header    = ls_header.
-      CALL METHOD go_model->('ADD_NODES') EXPORTING node_table = lt_nodes.
-      CALL METHOD go_model->('ADD_ITEMS') EXPORTING item_table = lt_items.
-      CALL METHOD go_model->('CREATE_TREE_CONTROL') EXPORTING parent = go_host.
-      CALL METHOD go_model->('EXPAND_NODE') EXPORTING node_key = 'ROOT'.
+      lo_list->add_nodes( lt_nodes ).
+      lo_list->add_items( lt_items ).
+      lo_list->create_tree_control( parent = go_host ).
+      lo_list->expand_node( 'ROOT' ).
+      go_model = lo_list.
       gv_active_model = lv_class.
       gv_status = 'List Tree Model created with multiple ordered items per node'.
       gv_detail = 'List layout adds item classes and item selection while retaining a backend model lifecycle'.
@@ -201,11 +162,12 @@ ENDFORM.
 
 FORM show_column_model.
   DATA lv_class TYPE string VALUE 'CL_COLUMN_TREE_MODEL'.
+  DATA lo_column TYPE REF TO cl_column_tree_model.
   DATA lv_available TYPE abap_bool.
   DATA lv_reason TYPE string.
-  DATA ls_header TYPE ty_header.
-  DATA lt_nodes TYPE ty_nodes.
-  DATA lt_items TYPE ty_items.
+  DATA ls_header TYPE treemhhdr.
+  DATA lt_nodes TYPE treemcnota.
+  DATA lt_items TYPE treemcitac.
 
   PERFORM prepare_host.
   PERFORM class_exists USING lv_class CHANGING lv_available.
@@ -216,8 +178,8 @@ FORM show_column_model.
   ls_header = VALUE #( heading = 'Product hierarchy' tooltip = 'Column Tree Model hierarchy' width = 28 ).
   lt_nodes = VALUE #(
     ( node_key = 'ROOT' isfolder = abap_true n_image = '@04@' exp_image = '@05@' )
-    ( node_key = 'P100' relatkey = 'ROOT' relatship = 6 )
-    ( node_key = 'P200' relatkey = 'ROOT' relatship = 6 ) ).
+    ( node_key = 'P100' relatkey = 'ROOT' relatship = 2 )
+    ( node_key = 'P200' relatkey = 'ROOT' relatship = 2 ) ).
   lt_items = VALUE #(
     ( node_key = 'ROOT' item_name = 'NODE' class = 1 text = 'Column Tree Model' )
     ( node_key = 'ROOT' item_name = 'NAME' class = 1 text = 'Backend model' )
@@ -229,24 +191,23 @@ FORM show_column_model.
     ( node_key = 'P200' item_name = 'NAME' class = 1 text = '27 Inch Display' )
     ( node_key = 'P200' item_name = 'STATE' class = 1 text = 'Ready' ) ).
   TRY.
-      CREATE OBJECT go_model TYPE (lv_class)
+      CREATE OBJECT lo_column
         EXPORTING node_selection_mode   = 1
                   hide_selection        = abap_false
-          item_selection                = abap_true
+                  item_selection        = abap_true
                   hierarchy_column_name = 'NODE'
-          hierarchy_header              = ls_header.
-      CALL METHOD go_model->('ADD_COLUMN')
-        EXPORTING name = 'NAME'
-                  width = 28
-                  header_text = 'Product'.
-      CALL METHOD go_model->('ADD_COLUMN')
-        EXPORTING name = 'STATE'
-                  width = 14
-                  header_text = 'State'.
-      CALL METHOD go_model->('ADD_NODES') EXPORTING node_table = lt_nodes.
-      CALL METHOD go_model->('ADD_ITEMS') EXPORTING item_table = lt_items.
-      CALL METHOD go_model->('CREATE_TREE_CONTROL') EXPORTING parent = go_host.
-      CALL METHOD go_model->('EXPAND_NODE') EXPORTING node_key = 'ROOT'.
+                  hierarchy_header      = ls_header.
+      lo_column->add_column( name        = 'NAME'
+                             width       = 28
+                             header_text = 'Product' ).
+      lo_column->add_column( name        = 'STATE'
+                             width       = 14
+                             header_text = 'State' ).
+      lo_column->add_nodes( lt_nodes ).
+      lo_column->add_items( lt_items ).
+      lo_column->create_tree_control( parent = go_host ).
+      lo_column->expand_node( 'ROOT' ).
+      go_model = lo_column.
       gv_active_model = lv_class.
       gv_status = 'Column Tree Model created with hierarchy, data columns, text, and checkbox items'.
       gv_detail = 'Column model offers the richest item/column layout while the backend model owns node state'.
@@ -308,10 +269,6 @@ ENDFORM.
 
 FORM release_model.
   IF go_model IS BOUND.
-    TRY.
-        CALL METHOD go_model->('DESTROY_TREE_CONTROL').
-      CATCH cx_root.
-    ENDTRY.
     FREE go_model.
   ENDIF.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.

@@ -9,6 +9,7 @@ ENDCLASS.
 DATA go_native_salv_tree TYPE REF TO cl_salv_tree.
 DATA go_native_salv_events TYPE REF TO cl_salv_events_tree.
 DATA go_salv_tree_events TYPE REF TO lcl_salv_tree_events.
+DATA gv_tree_factory_error TYPE string.
 
 CLASS lcl_salv_tree_events IMPLEMENTATION.
   METHOD on_link.
@@ -27,6 +28,21 @@ CLASS lcl_salv_tree_events IMPLEMENTATION.
     cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'SALV_EVT' ).
   ENDMETHOD.
 ENDCLASS.
+
+FORM create_native_salv_tree.
+  CLEAR gv_tree_factory_error.
+  TRY.
+      cl_salv_tree=>factory(
+        EXPORTING r_container  = go_host
+        IMPORTING r_salv_tree  = go_native_salv_tree
+        CHANGING  t_table      = gt_rows ).
+      go_tree = go_native_salv_tree.
+    CATCH cx_root INTO DATA(lx_factory_error).
+      FREE go_native_salv_tree.
+      CLEAR go_tree.
+      gv_tree_factory_error = lx_factory_error->get_text( ).
+  ENDTRY.
+ENDFORM.
 
 FORM register_salv_tree_events.
   IF gv_native_events_registered = abap_true OR go_tree IS NOT BOUND.

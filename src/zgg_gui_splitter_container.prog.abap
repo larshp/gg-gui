@@ -10,7 +10,7 @@ DATA go_editor TYPE REF TO cl_gui_textedit.
 DATA go_html TYPE REF TO cl_gui_html_viewer.
 DATA go_nested_left TYPE REF TO cl_gui_textedit.
 DATA go_nested_right TYPE REF TO cl_gui_textedit.
-DATA go_easy TYPE REF TO object.
+DATA go_easy TYPE REF TO cl_gui_easy_splitter_container.
 DATA go_easy_left TYPE REF TO cl_gui_textedit.
 DATA go_easy_right TYPE REF TO cl_gui_textedit.
 DATA go_fallback TYPE REF TO cl_gui_textedit.
@@ -67,6 +67,7 @@ MODULE user_command_0100 INPUT.
           IMPORTING result = lv_col_rc ).
       ENDIF.
       PERFORM set_minimum_sizes.
+      cl_gui_cfw=>flush( ).
       gv_status = |Sizes changed; row rc { lv_row_rc }, column rc { lv_col_rc }|.
     WHEN 'SASH'.
       gv_sashes = xsdbool( gv_sashes = abap_false ).
@@ -78,6 +79,7 @@ MODULE user_command_0100 INPUT.
           EXPORTING id     = 2
                     height = 0
           IMPORTING result = lv_hide_rc ).
+        cl_gui_cfw=>flush( ).
         gv_status = |Lower row hidden; rc { lv_hide_rc }|.
       ELSE.
         PERFORM apply_sizes.
@@ -187,23 +189,19 @@ FORM create_nested_editors.
 ENDFORM.
 
 FORM create_easy_splitter USING io_parent TYPE REF TO cl_gui_container.
-  DATA lv_class_name TYPE string VALUE 'CL_GUI_EASY_SPLITTER_CONTAINER'.
-  FIELD-SYMBOLS <lo_cell> TYPE REF TO cl_gui_container.
   DATA lt_text TYPE ty_text_lines.
 
   TRY.
-      CREATE OBJECT go_easy TYPE (lv_class_name)
+      CREATE OBJECT go_easy
         EXPORTING parent      = io_parent
-                  orientation = 1.
-      ASSIGN go_easy->('TOP_LEFT_CONTAINER') TO <lo_cell>.
-      IF sy-subrc = 0 AND <lo_cell> IS BOUND.
-        CREATE OBJECT go_easy_left EXPORTING parent = <lo_cell>.
+                  orientation = cl_gui_easy_splitter_container=>orientation_horizontal.
+      IF go_easy->top_left_container IS BOUND.
+        CREATE OBJECT go_easy_left EXPORTING parent = go_easy->top_left_container.
         lt_text = VALUE #( ( 'Easy splitter: top/left' ) ).
         go_easy_left->set_text_as_r3table( lt_text ).
       ENDIF.
-      ASSIGN go_easy->('BOTTOM_RIGHT_CONTAINER') TO <lo_cell>.
-      IF sy-subrc = 0 AND <lo_cell> IS BOUND.
-        CREATE OBJECT go_easy_right EXPORTING parent = <lo_cell>.
+      IF go_easy->bottom_right_container IS BOUND.
+        CREATE OBJECT go_easy_right EXPORTING parent = go_easy->bottom_right_container.
         lt_text = VALUE #( ( 'Easy splitter: bottom/right' ) ).
         go_easy_right->set_text_as_r3table( lt_text ).
       ENDIF.
@@ -253,20 +251,25 @@ FORM apply_sizes.
       IMPORTING result = lv_col_rc ).
     gv_status = 'Absolute mode: first row 220 pixels, first column 420 pixels'.
   ENDIF.
+  cl_gui_cfw=>flush( ).
   gv_hidden = abap_false.
 ENDFORM.
 
 FORM set_minimum_sizes.
-  TRY.
-      CALL METHOD go_splitter->('SET_ROW_MIN_HEIGHT')
-        EXPORTING id = 1
-                  height = 80.
-      CALL METHOD go_splitter->('SET_COLUMN_MIN_WIDTH')
-        EXPORTING id = 1
-                  width = 120.
-    CATCH cx_root.
-      gv_status = 'Minimum-size methods are not available on this release'.
-  ENDTRY.
+* CL_GUI_SPLITTER_CONTAINER exposes no minimum-size API. The sash mode is
+* the supported way to stop a row or column from being dragged shut.
+  DATA lv_result TYPE i.
+
+  go_splitter->set_row_sash(
+    EXPORTING id     = 1
+              type   = cl_gui_splitter_container=>type_movable
+              value  = cl_gui_splitter_container=>false
+    IMPORTING result = lv_result ).
+  IF lv_result <> 0.
+    gv_status = 'The splitter refused the sash setting'.
+    RETURN.
+  ENDIF.
+  gv_status = 'Row 1 sash fixed; the splitter has no minimum-size API'.
 ENDFORM.
 
 FORM apply_sashes.
@@ -286,6 +289,7 @@ FORM apply_sashes.
               type   = cl_gui_splitter_container=>type_sashvisible
               value  = lv_value
     IMPORTING result = lv_rc ).
+  cl_gui_cfw=>flush( ).
   gv_status = |Movable and visible splitter sashes enabled: { gv_sashes }|.
 ENDFORM.
 
@@ -301,17 +305,12 @@ FORM read_sizes.
   go_splitter->get_row_height(
     EXPORTING id     = 2
     IMPORTING result = lv_row_2 ).
-  TRY.
-      CALL METHOD go_splitter->('GET_COLUMN_WIDTH')
-        EXPORTING id = 1
-        IMPORTING result = lv_col_1.
-      CALL METHOD go_splitter->('GET_COLUMN_WIDTH')
-        EXPORTING id = 2
-        IMPORTING result = lv_col_2.
-      gv_status = |Rows { lv_row_1 }/{ lv_row_2 }; columns { lv_col_1 }/{ lv_col_2 }|.
-    CATCH cx_root.
-      gv_status = |Rows { lv_row_1 }/{ lv_row_2 }; column-width query unavailable|.
-  ENDTRY.
+  go_splitter->get_column_width( EXPORTING id     = 1
+                                 IMPORTING result = lv_col_1 ).
+  go_splitter->get_column_width( EXPORTING id     = 2
+                                 IMPORTING result = lv_col_2 ).
+  cl_gui_cfw=>flush( ).
+  gv_status = |Rows { lv_row_1 }/{ lv_row_2 }; columns { lv_col_1 }/{ lv_col_2 }|.
 ENDFORM.
 
 FORM free_controls.

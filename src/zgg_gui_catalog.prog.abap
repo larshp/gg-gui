@@ -74,8 +74,6 @@ START-OF-SELECTION.
       title = 'Interactive move, resize, and context menu' )
     ( category = 'Frontend' program = 'ZGG_GUI_DRAG_DROP'
       title = 'Tree, grid, and cross-control drag and drop' )
-    ( category = 'Optional' program = 'ZGG_GUI_OFFICE_INTEGRATION'
-      title = 'Desktop Office spreadsheet and word processing' )
     ( category = 'Optional' program = 'ZGG_GUI_GRAPHICS'
       title = 'Installed graphics engines and color selector' )
     ( category = 'Selection' program = 'ZGG_GUI_SEL_FIELDS'
@@ -122,4 +120,95 @@ AT LINE-SELECTION.
     RETURN.
   ENDIF.
 
-  SUBMIT (gv_program) AND RETURN.
+* Every sample is submitted statically so the launcher stays free of dynamic
+* program names; the branches mirror the catalog rows above.
+  CASE gv_program.
+    WHEN 'ZGG_GUI_CFW_BASICS'.
+      SUBMIT zgg_gui_cfw_basics AND RETURN.
+    WHEN 'ZGG_GUI_CUSTOM_CONTAINER'.
+      SUBMIT zgg_gui_custom_container AND RETURN.
+    WHEN 'ZGG_GUI_DOCKING_CONTAINER'.
+      SUBMIT zgg_gui_docking_container AND RETURN.
+    WHEN 'ZGG_GUI_SPLITTER_CONTAINER'.
+      SUBMIT zgg_gui_splitter_container AND RETURN.
+    WHEN 'ZGG_GUI_DIALOG_CONTAINER'.
+      SUBMIT zgg_gui_dialog_container AND RETURN.
+    WHEN 'ZGG_GUI_COMPOSITE'.
+      SUBMIT zgg_gui_composite AND RETURN.
+    WHEN 'ZGG_GUI_PICTURE'.
+      SUBMIT zgg_gui_picture AND RETURN.
+    WHEN 'ZGG_GUI_TEXTEDIT'.
+      SUBMIT zgg_gui_textedit AND RETURN.
+    WHEN 'ZGG_GUI_HTML_VIEWER'.
+      SUBMIT zgg_gui_html_viewer AND RETURN.
+    WHEN 'ZGG_GUI_ABAP_BROWSER'.
+      SUBMIT zgg_gui_abap_browser AND RETURN.
+    WHEN 'ZGG_GUI_TOOLBAR'.
+      SUBMIT zgg_gui_toolbar AND RETURN.
+    WHEN 'ZGG_GUI_CALENDAR'.
+      SUBMIT zgg_gui_calendar AND RETURN.
+    WHEN 'ZGG_GUI_TREES'.
+      SUBMIT zgg_gui_trees AND RETURN.
+    WHEN 'ZGG_GUI_TREE_MODELS'.
+      SUBMIT zgg_gui_tree_models AND RETURN.
+    WHEN 'ZGG_GUI_DYNAMIC_DOCUMENT'.
+      SUBMIT zgg_gui_dynamic_document AND RETURN.
+    WHEN 'ZGG_GUI_TIMER'.
+      SUBMIT zgg_gui_timer AND RETURN.
+    WHEN 'ZGG_GUI_SALV_TABLE'.
+      SUBMIT zgg_gui_salv_table AND RETURN.
+    WHEN 'ZGG_GUI_ALV_GRID'.
+      SUBMIT zgg_gui_alv_grid AND RETURN.
+    WHEN 'ZGG_GUI_ALV_DYNAMIC'.
+      SUBMIT zgg_gui_alv_dynamic AND RETURN.
+    WHEN 'ZGG_GUI_ALV_VARIANTS'.
+      SUBMIT zgg_gui_alv_variants AND RETURN.
+    WHEN 'ZGG_GUI_ALV_EDIT'.
+      SUBMIT zgg_gui_alv_edit AND RETURN.
+    WHEN 'ZGG_GUI_ALV_FORMAT'.
+      SUBMIT zgg_gui_alv_format AND RETURN.
+    WHEN 'ZGG_GUI_ALV_EVENTS'.
+      SUBMIT zgg_gui_alv_events AND RETURN.
+    WHEN 'ZGG_GUI_ALV_TREE'.
+      SUBMIT zgg_gui_alv_tree AND RETURN.
+    WHEN 'ZGG_GUI_SALV_TREE'.
+      SUBMIT zgg_gui_salv_tree AND RETURN.
+    WHEN 'ZGG_GUI_SALV_HIERSEQ'.
+      SUBMIT zgg_gui_salv_hierseq AND RETURN.
+    WHEN 'ZGG_GUI_FRONTEND_SERVICES'.
+      SUBMIT zgg_gui_frontend_services AND RETURN.
+    WHEN 'ZGG_GUI_CLASSIC_LIST'.
+      SUBMIT zgg_gui_classic_list AND RETURN.
+    WHEN 'ZGG_GUI_ILI_DRAGDROP'.
+      SUBMIT zgg_gui_ili_dragdrop AND RETURN.
+    WHEN 'ZGG_GUI_DRAG_DROP'.
+      SUBMIT zgg_gui_drag_drop AND RETURN.
+    WHEN 'ZGG_GUI_GRAPHICS'.
+      SUBMIT zgg_gui_graphics AND RETURN.
+    WHEN 'ZGG_GUI_SEL_FIELDS'.
+      SUBMIT zgg_gui_sel_fields AND RETURN.
+    WHEN 'ZGG_GUI_SEL_RANGES'.
+      SUBMIT zgg_gui_sel_ranges AND RETURN.
+    WHEN 'ZGG_GUI_SEL_LAYOUT'.
+      SUBMIT zgg_gui_sel_layout AND RETURN.
+    WHEN 'ZGG_GUI_SEL_DYNAMIC'.
+      SUBMIT zgg_gui_sel_dynamic AND RETURN.
+    WHEN 'ZGG_GUI_SEL_TABS'.
+      SUBMIT zgg_gui_sel_tabs AND RETURN.
+    WHEN 'ZGG_GUI_DYNPRO_ELEMENTS'.
+      SUBMIT zgg_gui_dynpro_elements AND RETURN.
+    WHEN 'ZGG_GUI_DYNPRO_FLOW'.
+      SUBMIT zgg_gui_dynpro_flow AND RETURN.
+    WHEN 'ZGG_GUI_TABLE_CONTROL'.
+      SUBMIT zgg_gui_table_control AND RETURN.
+    WHEN 'ZGG_GUI_TABSTRIP'.
+      SUBMIT zgg_gui_tabstrip AND RETURN.
+    WHEN 'ZGG_GUI_SUBSCREENS'.
+      SUBMIT zgg_gui_subscreens AND RETURN.
+    WHEN 'ZGG_GUI_DIALOGS_HELP'.
+      SUBMIT zgg_gui_dialogs_help AND RETURN.
+    WHEN 'ZGG_GUI_GUI_STATUS'.
+      SUBMIT zgg_gui_gui_status AND RETURN.
+    WHEN OTHERS.
+      MESSAGE 'The selected program is not part of the catalog' TYPE 'S'.
+  ENDCASE.

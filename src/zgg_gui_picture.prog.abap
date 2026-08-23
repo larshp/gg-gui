@@ -15,7 +15,7 @@ DATA gv_last_url TYPE ty_url.
 DATA gv_mode TYPE i VALUE cl_gui_picture=>display_mode_fit_center.
 DATA gv_mode_text TYPE c LENGTH 26.
 DATA gv_border TYPE abap_bool VALUE abap_true.
-DATA gv_status TYPE c LENGTH 100.
+DATA: gv_status TYPE c LENGTH 100, gv_load_result TYPE i.
 DATA gv_native_events_registered TYPE abap_bool.
 DATA gv_picture_event TYPE c LENGTH 24.
 DATA gv_mouse_x TYPE i.
@@ -75,7 +75,8 @@ MODULE user_command_0100 INPUT.
       gv_status = |Display mode changed to { gv_mode_text }|.
     WHEN 'BORDER'.
       gv_border = xsdbool( gv_border = abap_false ).
-      go_picture->set_3d_border( CONV #( gv_border ) ).
+      go_picture->set_3d_border(
+        COND i( WHEN gv_border = abap_true THEN 1 ELSE 0 ) ).
       gv_status = |3D border enabled: { gv_border }|.
     WHEN 'CLEAR'.
       go_picture->clear_picture( ).
@@ -112,7 +113,8 @@ FORM create_controls.
   CREATE OBJECT go_host EXPORTING container_name = 'CC_MAIN'.
   CREATE OBJECT go_picture EXPORTING parent = go_host.
   go_picture->set_display_mode( gv_mode ).
-  go_picture->set_3d_border( CONV #( gv_border ) ).
+  go_picture->set_3d_border(
+    COND i( WHEN gv_border = abap_true THEN 1 ELSE 0 ) ).
   PERFORM register_native_picture_events.
   IF gv_native_events_registered = abap_true.
     gv_status = 'Picture click and double-click events registered; choose an image source'.
@@ -130,6 +132,7 @@ FORM publish_format_fixture USING iv_format TYPE sy-ucomm.
   DATA lv_blob TYPE xstring.
   DATA lv_size TYPE i.
   DATA lv_subtype TYPE string.
+  DATA lv_provider_url TYPE c LENGTH 255.
   DATA lt_data TYPE STANDARD TABLE OF ty_blob_line WITH EMPTY KEY.
 
   CASE iv_format.
@@ -177,7 +180,7 @@ FORM publish_format_fixture USING iv_format TYPE sy-ucomm.
     IMPORTING output_length = lv_size
     TABLES binary_tab       = lt_data.
 
-  CLEAR gv_url.
+  CLEAR: gv_url, lv_provider_url.
   CALL FUNCTION 'DP_CREATE_URL'
     EXPORTING
       type            = 'image'
@@ -185,24 +188,28 @@ FORM publish_format_fixture USING iv_format TYPE sy-ucomm.
       size            = lv_size
       lifetime        = 'T'
     TABLES data       = lt_data
-    CHANGING url      = gv_url
+    CHANGING url      = lv_provider_url
     EXCEPTIONS OTHERS = 1.
-  IF sy-subrc <> 0 OR gv_url IS INITIAL.
+  IF sy-subrc <> 0 OR lv_provider_url IS INITIAL.
     gv_status = |Data Provider could not publish the { iv_format } fixture|.
     RETURN.
   ENDIF.
+  gv_url = lv_provider_url.
 
   PERFORM load_picture.
   gv_status = |Bundled { iv_format } fixture published and loaded ({ lv_size } bytes)|.
 ENDFORM.
 
 FORM publish_demo_mime.
-  CLEAR gv_url.
+  DATA lv_provider_url TYPE c LENGTH 256.
+
+  CLEAR: gv_url, lv_provider_url.
   CALL FUNCTION 'DP_PUBLISH_WWW_URL'
     EXPORTING
       objid                 = 'HTMLCNTL_TESTHTM2_SAPLOGO'
+      lifetime              = 'T'
     IMPORTING
-      url                   = gv_url
+      url                   = lv_provider_url
     EXCEPTIONS
       dp_invalid_parameters = 1
       no_object             = 2
@@ -210,12 +217,13 @@ FORM publish_demo_mime.
       OTHERS                = 4.
   IF sy-subrc <> 0.
     gv_status = |Standard MIME object could not be published; rc { sy-subrc }|.
+    RETURN.
   ENDIF.
+  gv_url = lv_provider_url.
 ENDFORM.
 
 FORM load_picture.
-  DATA lv_result TYPE i.
-
+  " Persistent result buffer is declared globally.
   IF gv_url IS INITIAL.
     gv_status = 'No image URL was supplied'.
     RETURN.
@@ -227,8 +235,8 @@ FORM load_picture.
   ELSE.
     go_picture->load_picture_from_url(
       EXPORTING url    = gv_url
-      IMPORTING result = lv_result ).
-    IF lv_result = 0.
+      IMPORTING result = gv_load_result ).
+    IF gv_load_result <> 0.
       gv_status = |Synchronous load failed or source was rejected: { gv_url }|.
     ELSE.
       gv_status = |Synchronous image loaded: { gv_url }|.

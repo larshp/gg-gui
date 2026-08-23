@@ -73,11 +73,13 @@ MODULE user_command_0100 INPUT.
       go_viewer->go_back( ).
       gv_status = 'Back navigation requested'.
     WHEN 'FORWARD'.
-      PERFORM optional_navigation USING 'GO_FORWARD'.
+      go_viewer->go_forward( ).
+      gv_status = 'Forward navigation requested'.
     WHEN 'HOME'.
       PERFORM show_generated USING abap_false.
     WHEN 'REFRESH'.
-      PERFORM optional_navigation USING 'DO_REFRESH'.
+      go_viewer->do_refresh( ).
+      gv_status = 'Document refresh requested'.
     WHEN 'CURRENT'.
       DATA lv_current TYPE ty_url.
       go_viewer->get_current_url( IMPORTING url = lv_current ).
@@ -158,12 +160,18 @@ FORM detect_frontend.
 ENDFORM.
 
 FORM publish_image.
-  CLEAR gv_image_url.
+  DATA lv_provider_url TYPE c LENGTH 256.
+
+  CLEAR: gv_image_url, lv_provider_url.
   CALL FUNCTION 'DP_PUBLISH_WWW_URL'
-    EXPORTING objid = 'HTMLCNTL_TESTHTM2_SAPLOGO'
-    IMPORTING url = gv_image_url
+    EXPORTING objid    = 'HTMLCNTL_TESTHTM2_SAPLOGO'
+              lifetime = 'T'
+    IMPORTING url = lv_provider_url
     EXCEPTIONS dp_invalid_parameters = 1 no_object = 2
       dp_error_publish = 3 OTHERS = 4.
+  IF sy-subrc = 0.
+    gv_image_url = lv_provider_url.
+  ENDIF.
 ENDFORM.
 
 FORM build_html CHANGING ct_html TYPE ty_html.
@@ -208,15 +216,6 @@ FORM show_generated USING iv_direct TYPE abap_bool.
                          in_place = abap_true ).
     gv_status = 'Generated document loaded with LOAD_DATA and displayed with SHOW_URL'.
   ENDIF.
-ENDFORM.
-
-FORM optional_navigation USING iv_method TYPE c.
-  TRY.
-      CALL METHOD go_viewer->(iv_method).
-      gv_status = |Optional navigation method { iv_method } requested|.
-    CATCH cx_root INTO DATA(lx_error).
-      gv_status = |Navigation method unavailable: { lx_error->get_text( ) }|.
-  ENDTRY.
 ENDFORM.
 
 FORM free_controls.

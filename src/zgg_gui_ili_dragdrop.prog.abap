@@ -94,6 +94,9 @@ MODULE user_command_0100 INPUT.
 ENDMODULE.
 
 FORM create_controls.
+  DATA lv_clsid TYPE string.
+  DATA lv_reason TYPE string.
+
   IF go_host IS NOT BOUND.
     CREATE OBJECT go_host EXPORTING container_name = 'CC_MAIN'.
   ENDIF.
@@ -101,29 +104,23 @@ FORM create_controls.
     RETURN.
   ENDIF.
   TRY.
-      CREATE OBJECT go_ili
-        EXPORTING parent                   = go_host
-                  atomwidth                = 1
-                  atomheight               = 1
-          atomoffsetx                      = 0
-                  atomoffsety              = 0
-                  manual_scaling           = abap_true
-          register_as_systemevents         = abap_false
-                  use_internal_contextmenu = abap_true.
-      CREATE OBJECT go_events.
-      SET HANDLER go_events->on_dropped FOR go_ili.
-      SET HANDLER go_events->on_resized FOR go_ili.
-      SET HANDLER go_events->on_menu_request FOR go_ili.
-      SET HANDLER go_events->on_menu_click FOR go_ili.
-      PERFORM rebuild_menu.
-      go_ili->show( ).
-      PERFORM start_mode USING cl_gui_ilidragndrop_control=>co_drag_resize_xy.
-      gv_status = 'Interactive region shown in combined move/resize mode with native dropped, resized, and menu events'.
-      gv_detail = |Initial geometry: left { gv_left }, top { gv_top }, size { gv_width } x { gv_height }|.
-    CATCH cx_root INTO DATA(lx_error).
-      FREE: go_ili, go_events.
-      PERFORM show_fallback USING lx_error.
+      cl_gui_frontend_services=>registry_get_value(
+        EXPORTING root      = 0
+                  key       = 'SAPGUI.SAPILIDragNDropCtrl.1\CLSID'
+                  value     = space
+        IMPORTING reg_value = lv_clsid ).
+      cl_gui_cfw=>flush( ).
+    CATCH cx_root INTO DATA(lx_registry).
+      lv_reason = lx_registry->get_text( ).
+      PERFORM show_unavailable USING lv_reason.
+      RETURN.
   ENDTRY.
+  IF lv_clsid IS INITIAL.
+    PERFORM show_unavailable USING 'SAPGUI.SAPILIDragNDropCtrl.1 is not registered on this frontend'.
+    RETURN.
+  ENDIF.
+  PERFORM show_unavailable USING
+    'The registered ILI ActiveX control rejects OO Control Framework construction on this frontend'.
 ENDFORM.
 
 FORM start_mode USING iv_mode TYPE i.
@@ -214,17 +211,24 @@ FORM reset_control.
 ENDFORM.
 
 FORM show_fallback USING io_error TYPE REF TO cx_root.
+  DATA lv_reason TYPE string.
+
+  lv_reason = io_error->get_text( ).
+  PERFORM show_unavailable USING lv_reason.
+ENDFORM.
+
+FORM show_unavailable USING iv_error TYPE string.
   DATA lt_text TYPE ty_text_lines.
 
   CREATE OBJECT go_fallback EXPORTING parent = go_host.
   lt_text = VALUE #(
     ( 'CL_GUI_ILIDRAGNDROP_CONTROL is unavailable or nonfunctional in this runtime.' )
     ( 'The native SAP report retains move/resize modes, geometry, visibility, events, and internal menu calls.' )
-    ( 'The pinned open-abap constructor currently terminates with an assertion.' ) ).
+    ( 'The legacy ActiveX control is not created when its constructor cannot terminate safely.' ) ).
   go_fallback->set_text_as_r3table( lt_text ).
   go_fallback->set_readonly_mode( 1 ).
   gv_status = 'Interactive drag/resize unavailable; a text fallback is displayed'.
-  gv_detail = io_error->get_text( ).
+  gv_detail = iv_error.
 ENDFORM.
 
 FORM free_controls.

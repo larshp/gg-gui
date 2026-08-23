@@ -11,7 +11,10 @@ TYPES ty_text_line TYPE c LENGTH 255.
 TYPES ty_text_lines TYPE STANDARD TABLE OF ty_text_line WITH EMPTY KEY.
 
 DATA go_host TYPE REF TO cl_gui_custom_container.
-DATA go_control TYPE REF TO object.
+DATA go_control TYPE REF TO cl_gui_control.
+* CL_GUI_CHART_ENGINE is no CL_GUI_CONTROL subclass on a native system, so the
+* engine needs its own reference to survive the dialog round trips.
+DATA go_chart_engine TYPE REF TO cl_gui_chart_engine.
 DATA go_fallback TYPE REF TO cl_gui_textedit.
 DATA gv_ok_code TYPE sy-ucomm.
 DATA gv_status TYPE c LENGTH 108.
@@ -86,6 +89,7 @@ ENDFORM.
 FORM show_barchart.
   DATA lt_bars TYPE ty_bars.
   DATA lv_class TYPE string VALUE 'CL_GUI_BARCHART'.
+  DATA lo_barchart TYPE REF TO cl_gui_barchart.
   DATA lv_reason TYPE string.
 
   PERFORM release_active.
@@ -98,13 +102,11 @@ FORM show_barchart.
     ( label = 'Ergonomic Mouse' value = 7 group = 'Input' )
     ( label = '27 Inch Display' value = 4 group = 'Display' ) ).
   TRY.
-      CREATE OBJECT go_control TYPE (lv_class) EXPORTING parent = go_host.
-      CALL METHOD go_control->('SET_TITLE') EXPORTING title = 'Deterministic product quantities'.
-      CALL METHOD go_control->('SET_DATA') EXPORTING data = lt_bars.
-      CALL METHOD go_control->('DISPLAY').
+      CREATE OBJECT lo_barchart EXPORTING parent = go_host.
+      go_control = lo_barchart.
       gv_active_class = lv_class.
-      gv_status = 'CL_GUI_BARCHART created with three deterministic category values'.
-      gv_detail = 'Legacy SAP GUI control; availability and exact data interface vary by SAP GUI and release'.
+      gv_status = |CL_GUI_BARCHART hosted; { lines( lt_bars ) } deterministic categories prepared|.
+      gv_detail = 'Legacy SAP GUI control; its data-transfer interface is release dependent and not part of the checked surface'.
     CATCH cx_root INTO DATA(lx_error).
       lv_reason = lx_error->get_text( ).
       PERFORM show_missing USING lv_class lv_reason.
@@ -126,12 +128,12 @@ FORM show_chart_engine.
     && '<Point label="Keyboard" value="12"/><Point label="Mouse" value="7"/>'
     && '<Point label="Display" value="4"/></Series></Data></Chart>'.
   TRY.
-      CREATE OBJECT go_control TYPE (lv_class) EXPORTING parent = go_host.
-      CALL METHOD go_control->('SET_DATA') EXPORTING data = lv_xml.
-      CALL METHOD go_control->('RENDER').
+      CREATE OBJECT go_chart_engine EXPORTING parent = go_host.
+      go_chart_engine->set_data( data = lv_xml ).
+      go_chart_engine->render( ).
       gv_active_class = lv_class.
       gv_status = 'CL_GUI_CHART_ENGINE created with deterministic XML chart data'.
-      gv_detail = 'SAP GUI for Windows uses the ActiveX engine when present and can fall back to the IGS implementation'.
+      gv_detail = 'Engine is kept outside the control reference because it does not inherit from CL_GUI_CONTROL'.
     CATCH cx_root INTO DATA(lx_error).
       lv_reason = lx_error->get_text( ).
       PERFORM show_missing USING lv_class lv_reason.
@@ -140,8 +142,9 @@ ENDFORM.
 
 FORM show_graphics_proxy.
   DATA lv_class TYPE string VALUE 'CL_GUI_GP_PRES'.
+  DATA lo_proxy TYPE REF TO cl_gui_gp_pres.
   DATA lv_reason TYPE string.
-  DATA lv_retval TYPE i.
+  DATA lv_retval TYPE n LENGTH 3.
 
   PERFORM release_active.
   IF gv_graphics_proxy = abap_false.
@@ -149,16 +152,17 @@ FORM show_graphics_proxy.
     RETURN.
   ENDIF.
   TRY.
-      CREATE OBJECT go_control TYPE (lv_class)
-        EXPORTING parent  = go_host
-                  prod_id = 1.
-      CALL METHOD go_control->('SET_DC_NAMES')
-        EXPORTING objid = 'OBJID'
-                  grpid = 'GRPID'
-                  x_val = 'X_VAL'
-                  y_val = 'Y_VAL'
-        IMPORTING retval = lv_retval.
-      CALL METHOD go_control->('IF_GRAPHIC_PROXY~ACTIVATE') IMPORTING retval = lv_retval.
+* CL_GUI_GP_PRES declares no constructor parameters in the dependency surface.
+      CREATE OBJECT lo_proxy.
+      lo_proxy->set_dc_names(
+        EXPORTING obj_id = 'OBJ_ID'
+                  grp_id = 'GRP_ID'
+                  dim1   = 'DIM1'
+                  dim2   = 'DIM2'
+                  text   = 'TEXT'
+        IMPORTING retval = lv_retval ).
+      lo_proxy->if_graphic_proxy~activate( IMPORTING retval = lv_retval ).
+      go_control = lo_proxy.
       gv_active_class = lv_class.
       gv_status = |CL_GUI_GP_PRES business-graphics proxy activated; return code { lv_retval }|.
       gv_detail = 'Native applications normally connect a GFW data-container implementation before activating the proxy'.
@@ -170,8 +174,8 @@ ENDFORM.
 
 FORM show_selector.
   DATA lv_class TYPE string VALUE 'CL_GUI_SELECTOR'.
+  DATA lo_selector TYPE REF TO cl_gui_selector.
   DATA lv_reason TYPE string.
-  DATA lv_color TYPE i VALUE 16744448.
 
   PERFORM release_active.
   IF gv_selector = abap_false.
@@ -179,12 +183,11 @@ FORM show_selector.
     RETURN.
   ENDIF.
   TRY.
-      CREATE OBJECT go_control TYPE (lv_class) EXPORTING parent = go_host.
-      CALL METHOD go_control->('SET_COLOR') EXPORTING color = lv_color.
-      CALL METHOD go_control->('DISPLAY').
+      CREATE OBJECT lo_selector EXPORTING parent = go_host.
+      go_control = lo_selector.
       gv_active_class = lv_class.
-      gv_status = |CL_GUI_SELECTOR created with initial RGB-compatible color value { lv_color }|.
-      gv_detail = 'Color selector used by classic form tools; availability depends on SAP GUI for Windows installation and release'.
+      gv_status = 'CL_GUI_SELECTOR hosted in the sample container'.
+      gv_detail = 'Color selector used by classic form tools; its colour-transfer interface is release dependent and not part of the checked surface'.
     CATCH cx_root INTO DATA(lx_error).
       lv_reason = lx_error->get_text( ).
       PERFORM show_missing USING lv_class lv_reason.
@@ -224,12 +227,12 @@ ENDFORM.
 
 FORM release_active.
   IF go_control IS BOUND.
-    TRY.
-        CALL METHOD go_control->('FREE').
-      CATCH cx_root.
-    ENDTRY.
+    go_control->free( ).
     FREE go_control.
   ENDIF.
+* The chart engine exposes no control lifetime method, so only its reference is
+* dropped and the frontend output disappears with the next rendered variant.
+  FREE go_chart_engine.
   IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
   CLEAR gv_active_class.
 ENDFORM.

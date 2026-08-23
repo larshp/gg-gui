@@ -8,6 +8,9 @@ CONSTANTS c_price_129 TYPE ty_price VALUE '129.90'.
 CONSTANTS c_price_389 TYPE ty_price VALUE '389.00'.
 CONSTANTS c_price_219 TYPE ty_price VALUE '219.00'.
 CONSTANTS c_price_42 TYPE ty_price VALUE '42.00'.
+* Component name the factory generates for the cell-style table; the sample
+* compares it against E_STYLE_FNAME and then reads the component statically.
+CONSTANTS c_style_component TYPE lvc_fname VALUE 'CELLSTYLES'.
 
 DATA gt_fieldcat TYPE lvc_t_fcat.
 DATA gr_table TYPE REF TO data.
@@ -145,10 +148,10 @@ FORM set_style_for_row USING is_row TYPE any.
   FIELD-SYMBOLS <ls_style> TYPE any.
   FIELD-SYMBOLS <lv_component> TYPE any.
 
-  IF gv_style_field IS INITIAL.
+  IF gv_style_field <> c_style_component.
     RETURN.
   ENDIF.
-  ASSIGN COMPONENT gv_style_field OF STRUCTURE is_row TO <lt_styles>.
+  ASSIGN COMPONENT 'CELLSTYLES' OF STRUCTURE is_row TO <lt_styles>.
   IF sy-subrc <> 0.
     RETURN.
   ENDIF.
@@ -160,13 +163,13 @@ FORM set_style_for_row USING is_row TYPE any.
 ENDFORM.
 
 FORM append_runtime_row.
+  DATA lv_id TYPE c LENGTH 8.
+
   IF <gt_output> IS NOT ASSIGNED.
     gv_status = 'Dynamic table is unavailable; no runtime row can be appended'.
     RETURN.
   ENDIF.
   ADD 1 TO gv_sequence.
-  DATA lv_id TYPE c LENGTH 8.
-
   lv_id = |D{ gv_sequence WIDTH = 3 PAD = '0' }|.
   PERFORM append_row USING lv_id 'Appended through field symbols'
     gv_sequence c_price_42 'EUR' abap_true.
@@ -180,13 +183,25 @@ FORM change_runtime_style.
   FIELD-SYMBOLS <ls_style> TYPE any.
   FIELD-SYMBOLS <lv_style> TYPE any.
 
-  IF <gt_output> IS NOT ASSIGNED OR gv_style_field IS INITIAL.
+  IF <gt_output> IS NOT ASSIGNED OR gv_style_field <> c_style_component.
     gv_status = 'Generated style component is unavailable'.
     RETURN.
   ENDIF.
   READ TABLE <gt_output> INDEX 1 ASSIGNING <ls_row>.
-  ASSIGN COMPONENT gv_style_field OF STRUCTURE <ls_row> TO <lt_styles>.
+  IF sy-subrc <> 0.
+    gv_status = 'Dynamic table holds no rows; no cell style can be toggled'.
+    RETURN.
+  ENDIF.
+  ASSIGN COMPONENT 'CELLSTYLES' OF STRUCTURE <ls_row> TO <lt_styles>.
+  IF sy-subrc <> 0.
+    gv_status = 'Generated style component is unavailable'.
+    RETURN.
+  ENDIF.
   READ TABLE <lt_styles> INDEX 1 ASSIGNING <ls_style>.
+  IF sy-subrc <> 0.
+    gv_status = 'Row 1 carries no generated style entry to toggle'.
+    RETURN.
+  ENDIF.
   ASSIGN COMPONENT 'STYLE' OF STRUCTURE <ls_style> TO <lv_style>.
   IF sy-subrc = 0.
     <lv_style> = COND #( WHEN <lv_style> = cl_gui_alv_grid=>mc_style_disabled

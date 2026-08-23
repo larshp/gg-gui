@@ -425,7 +425,7 @@ FORM delete_lazy_subtree.
     RETURN.
   ENDIF.
   TRY.
-      CALL METHOD go_tree->('DELETE_SUBTREE') EXPORTING i_node_key = gv_lazy_key.
+      go_tree->delete_subtree( gv_lazy_key ).
       DELETE gt_leaf_keys WHERE table_line = gv_lazy_key.
       CLEAR gv_lazy_loaded.
       go_tree->frontend_update( ).
