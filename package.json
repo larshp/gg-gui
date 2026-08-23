@@ -4,7 +4,7 @@
   "private": true,
   "description": "Curated ABAP samples for SAP GUI controls and screen elements",
   "scripts": {
-    "lint": "abaplint --format codeframe",
+    "lint": "abaplint",
     "verify:repo": "node scripts/verify-repo.mjs",
     "test": "npm run verify:repo && npm run lint"
   },
