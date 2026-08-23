@@ -9,10 +9,12 @@ DATA go_context_events TYPE REF TO lcl_context_events.
 CLASS lcl_context_events IMPLEMENTATION.
   METHOD on_request.
     menu->add_separator( ).
-    menu->add_function( fcode = 'ZDETAIL' text = 'Show node details' ).
-    menu->add_function( fcode = 'ZRESET' text = 'Reset sample' ).
+    menu->add_function( fcode = 'ZDETAIL'
+                        text  = 'Show node details' ).
+    menu->add_function( fcode = 'ZRESET'
+                        text  = 'Reset sample' ).
     EXPORT node_key = node_key TO MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'TREE_CTX' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'TREE_CTX' ).
   ENDMETHOD.
 ENDCLASS.
 
@@ -32,7 +34,7 @@ FORM register_native_context_event.
       ENDIF.
       DELETE lt_events WHERE eventid = cl_gui_column_tree=>eventid_node_context_menu_req.
       APPEND VALUE #(
-        eventid = cl_gui_column_tree=>eventid_node_context_menu_req
+        eventid    = cl_gui_column_tree=>eventid_node_context_menu_req
         appl_event = abap_true ) TO lt_events.
       go_tree->set_registered_events(
         EXPORTING events = lt_events

@@ -17,7 +17,7 @@ CLASS lcl_salv_tree_events IMPLEMENTATION.
 
     EXPORT event = lv_event node_key = node_key columnname = columnname
       TO MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'SALV_EVT' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'SALV_EVT' ).
   ENDMETHOD.
 
   METHOD on_double.
@@ -25,7 +25,7 @@ CLASS lcl_salv_tree_events IMPLEMENTATION.
 
     EXPORT event = lv_event node_key = node_key columnname = columnname
       TO MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'SALV_EVT' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'SALV_EVT' ).
   ENDMETHOD.
 ENDCLASS.
 
@@ -33,9 +33,9 @@ FORM create_native_salv_tree.
   CLEAR gv_tree_factory_error.
   TRY.
       cl_salv_tree=>factory(
-        EXPORTING r_container  = go_host
-        IMPORTING r_salv_tree  = go_native_salv_tree
-        CHANGING  t_table      = gt_rows ).
+        EXPORTING r_container = go_host
+        IMPORTING r_salv_tree = go_native_salv_tree
+        CHANGING  t_table     = gt_rows ).
       go_tree = go_native_salv_tree.
     CATCH cx_root INTO DATA(lx_factory_error).
       FREE go_native_salv_tree.

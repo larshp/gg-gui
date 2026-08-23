@@ -77,12 +77,12 @@ FORM open_free_selections USING iv_as_window TYPE abap_bool.
 
   CALL FUNCTION 'FREE_SELECTIONS_DIALOG'
     EXPORTING
-      selection_id    = gv_selection_id
-      title           = 'Dynamic selections'
-      as_window       = iv_as_window
-      start_row       = 4
-      start_col       = 10
-      tree_visible    = abap_true
+      selection_id            = gv_selection_id
+      title                   = 'Dynamic selections'
+      as_window               = iv_as_window
+      start_row               = 4
+      start_col               = 10
+      tree_visible            = abap_true
     IMPORTING
       where_clauses           = lt_where
       expressions             = gs_expressions

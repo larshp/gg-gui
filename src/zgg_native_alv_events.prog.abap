@@ -10,7 +10,7 @@ CLASS lcl_delayed_events IMPLEMENTATION.
     DATA lv_event TYPE c LENGTH 24 VALUE 'DELAYED_SELECTION'.
 
     EXPORT event = lv_event TO MEMORY ID 'ZGG_GUI_ALV_DELAYED'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'ALV_DELAYED' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'ALV_DELAYED' ).
   ENDMETHOD.
 ENDCLASS.
 

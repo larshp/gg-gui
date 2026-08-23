@@ -20,7 +20,7 @@ CLASS lcl_document_events IMPLEMENTATION.
 
     EXPORT event = lv_event element = sender->name value = lv_value
       TO MEMORY ID 'ZGG_GUI_DD_EVENT'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'DD_EVENT' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'DD_EVENT' ).
   ENDMETHOD.
 
   METHOD on_button.
@@ -29,7 +29,7 @@ CLASS lcl_document_events IMPLEMENTATION.
 
     EXPORT event = lv_event element = sender->name value = lv_value
       TO MEMORY ID 'ZGG_GUI_DD_EVENT'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'DD_EVENT' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'DD_EVENT' ).
   ENDMETHOD.
 
   METHOD on_entered.
@@ -37,7 +37,7 @@ CLASS lcl_document_events IMPLEMENTATION.
 
     EXPORT event = lv_event element = sender->name value = sender->value
       TO MEMORY ID 'ZGG_GUI_DD_EVENT'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'DD_EVENT' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'DD_EVENT' ).
   ENDMETHOD.
 
   METHOD on_help.
@@ -45,7 +45,7 @@ CLASS lcl_document_events IMPLEMENTATION.
 
     EXPORT event = lv_event element = sender->name value = sender->value
       TO MEMORY ID 'ZGG_GUI_DD_EVENT'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'DD_EVENT' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'DD_EVENT' ).
   ENDMETHOD.
 
   METHOD on_selected.
@@ -53,7 +53,7 @@ CLASS lcl_document_events IMPLEMENTATION.
 
     EXPORT event = lv_event element = sender->name value = sender->value
       TO MEMORY ID 'ZGG_GUI_DD_EVENT'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'DD_EVENT' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'DD_EVENT' ).
   ENDMETHOD.
 ENDCLASS.
 

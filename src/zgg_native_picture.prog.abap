@@ -14,7 +14,7 @@ CLASS lcl_picture_events IMPLEMENTATION.
 
     EXPORT event = lv_event mouse_pos_x = mouse_pos_x mouse_pos_y = mouse_pos_y
       TO MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'PIC_EVENT' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'PIC_EVENT' ).
   ENDMETHOD.
 
   METHOD on_double_click.
@@ -22,7 +22,7 @@ CLASS lcl_picture_events IMPLEMENTATION.
 
     EXPORT event = lv_event mouse_pos_x = mouse_pos_x mouse_pos_y = mouse_pos_y
       TO MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.
-    cl_gui_cfw=>set_new_ok_code( EXPORTING new_code = 'PIC_EVENT' ).
+    cl_gui_cfw=>set_new_ok_code( new_code = 'PIC_EVENT' ).
   ENDMETHOD.
 ENDCLASS.
 

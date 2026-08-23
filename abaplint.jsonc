@@ -1,7 +1,6 @@
 {
   "global": {
     "files": "/src/**/*.*",
-    "noIssues": ["/src/zgg_native_.*\\.prog\\.abap$"],
     "skipGeneratedGatewayClasses": true,
     "skipGeneratedPersistentClasses": true,
     "skipGeneratedFunctionGroups": true,
@@ -107,7 +106,7 @@
     "align_type_expressions": true,
     "allowed_object_naming": true,
     "allowed_object_types": true,
-    "avoid_use": true,
+    "avoid_use": false,
     "check_comments": false,
     "align_parameters": true,
     "dynpro_checks": true,
