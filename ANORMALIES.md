@@ -34,41 +34,25 @@ incompletely declared, or declared differently from native SAP.
 - Component: `open-abap-gui`
 - Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
   (repository `main` resolved on 2026-08-21)
-- Native SAP behavior: `CL_CTMENU` can add functions, separators, and submenus;
-  enable, disable, show, or hide functions; load a Menu Painter status; and mark
-  a default function.
-- open-abap behavior: `ADD_FUNCTION`, `ADD_SEPARATOR`, `ADD_SUBMENU`, `CLEAR`,
-  and `HIDE_FUNCTIONS` are declared. `SET_DEFAULT_FUNCTION`, `LOAD_GUI_STATUS`,
-  `DISABLE_FUNCTIONS`, `ENABLE_FUNCTIONS`, and the other public native methods
-  are absent from the class definition, so any call to them fails type
-  resolution.
-- Reproduction: Add
-  `io_menu->set_default_function( fcode = 'APPLY' ).` where `io_menu` is typed
-  as `REF TO cl_ctmenu`, then run `npm test`. abaplint reports method
-  `SET_DEFAULT_FUNCTION` as missing.
-- Workaround: Omit the default-function marker so the native SAP sample remains
-  type-compatible with the available open-abap surface.
-- Upstream reference: Not reported
-
-### `CL_GUI_CONTROL` lifetime constants are missing
-
-- Status: Open, confirmed
-- Sample: `ZGG_GUI_CFW_BASICS` and `ZGG_GUI_CUSTOM_CONTAINER`
-- Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
-- Native SAP behavior: `CL_GUI_CONTROL` publishes `LIFETIME_DEFAULT`,
-  `LIFETIME_DYNPRO`, and `LIFETIME_IMODE` with the values `0`, `1`, and `2`,
-  and container constructors take them for their `LIFETIME` parameter.
-- open-abap behavior: The class declares the alignment and window-style
-  constants but none of the three lifetime constants, so a reference to any of
-  them fails type resolution even though the `LIFETIME` parameters themselves
-  are declared.
-- Reproduction: Reference `cl_gui_control=>lifetime_dynpro` in a checked report
-  and run `npm test`; abaplint reports the constant as not found.
-- Workaround: `ZGG_GUI_CUSTOM_CONTAINER` declares the three lifetime modes as
-  local constants `C_LIFETIME_DEFAULT`, `C_LIFETIME_DYNPRO`, and
-  `C_LIFETIME_IMODE` with their native values `0`, `1`, and `2`.
+- Native SAP behavior: `CL_CTMENU` can add functions, separators, submenus, and
+  whole menus; enable, disable, show, or hide functions; modify a function text;
+  mark a default function; load a Menu Painter status; and report its own
+  functions, submenus, and menu path.
+- open-abap behavior: The construction and state surface is declared:
+  `ADD_FUNCTION` (including `INSERT_AT_THE_TOP`), `ADD_SEPARATOR`, `ADD_MENU`,
+  `ADD_SUBMENU`, `CLEAR`, `RESET`, `HIDE_FUNCTIONS`, `SHOW_FUNCTIONS`,
+  `DISABLE_FUNCTIONS`, `ENABLE_FUNCTIONS`, `MODIFY_FUNCTION_TEXT`,
+  `SET_DEFAULT_FUNCTION`, the static `LOAD_GUI_STATUS`, and the
+  `DEFAULT_FUNCTION` attribute. The four introspection and import methods
+  `GET_FUNCTIONS`, `GET_SUBMENUS`, `GET_MENU_PATH`, and
+  `INITIALIZE_FROM_SOURCE` are still absent, because their parameter types
+  `UI_FUNCATTR`, `UI_MENUS`, and `SCTX_ENTRYTAB` are not part of the dependency
+  surface and could not be confirmed.
+- Reproduction: Call `io_menu->get_submenus( IMPORTING menus = lt_menus ).`
+  where `io_menu` is typed as `REF TO cl_ctmenu`, then run `npm test`. abaplint
+  reports the method as missing.
+- Workaround: The sample builds its context menus by adding functions rather
+  than by reading them back, so none of the four absent methods is needed.
 - Upstream reference: Not reported
 
 ### `CL_GUI_SIMPLE_TREE` and `CL_GUI_LIST_TREE` are absent
@@ -119,62 +103,31 @@ incompletely declared, or declared differently from native SAP.
   should; the wrong values only matter once a runtime consumes them.
 - Upstream reference: Not reported
 
-### The ALV Grid `DELAYED_CHANGED_SEL_CALLBACK` event is missing
-
-- Status: Open, confirmed
-- Sample: `ZGG_GUI_ALV_EVENTS`
-- Component: `open-abap-gui`
-- Version or commit: `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-  (repository `main` resolved on 2026-08-21)
-- Native SAP behavior: `CL_GUI_ALV_GRID` raises
-  `DELAYED_CHANGED_SEL_CALLBACK` after `REGISTER_DELAYED_EVENT` has been called
-  with `MC_EVT_DELAYED_CHANGE_SELECT`, so an application can react to a
-  settled selection instead of to every intermediate one.
-- open-abap behavior: The grid declares most events but omits
-  `DELAYED_CHANGED_SEL_CALLBACK` while retaining `REGISTER_DELAYED_EVENT` and
-  its event ID, so the registration call resolves but the event it enables does
-  not exist.
-- Reproduction: Search `src/cl_gui_alv_grid.clas.abap` for the event;
-  `MC_EVT_DELAYED_CHANGE_SELECT` and `REGISTER_DELAYED_EVENT` are present but no
-  `DELAYED_CHANGED_SEL_CALLBACK` event is declared. A handler that imports no
-  event parameters is not reported by abaplint, so the missing event stays
-  silent in the lint run and only fails a native syntax check.
-- Workaround: Static include `ZGG_NATIVE_ALV_EVENTS` declares a typed handler
-  for the missing callback, registers `MC_EVT_DELAYED_CHANGE_SELECT`, preserves
-  the handler across application/system event-mode recreation, and deregisters
-  it before freeing the grid. The handler imports no parameters, so the include
-  is lint checked without exclusions; existence of the event, activation, and
-  event behavior remain native-SAP checks.
-- Upstream reference: Not reported
-
-### The SALV tree class API is partial
+### Four SALV tree members are absent together with their types
 
 - Status: Open, confirmed
 - Sample: `ZGG_GUI_SALV_TREE`
 - Component: `open-abap-gui`
-- Version or commit: `08bd747` (`open-abap-gui` local checkout, 2026-08-23);
+- Version or commit: `afcb7cc` (`open-abap-gui` local checkout, 2026-08-23);
   originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-- Native SAP behavior: `CL_SALV_TREE` and its node, column, function, selection,
-  item, and event helper classes provide high-level read-only tree output. A
-  tree column carries the list-column extras such as `SET_KEY`, selections
-  expose a selection-mode setter, the columns collection exposes the hierarchy
-  column, and the tree can be refreshed as well as displayed.
-- open-abap behavior: `CL_SALV_TREE`, `CL_SALV_NODES`, `CL_SALV_NODE`,
-  `CL_SALV_ITEM`, `CL_SALV_COLUMNS_TREE`, `CL_SALV_COLUMN_TREE`,
-  `CL_SALV_SELECTIONS_TREE`, `CL_SALV_FUNCTIONS_TREE`, and
-  `CL_SALV_EVENTS_TREE` are declared, along with `SALV_DE_NODE_KEY` and
-  `SALV_T_NODES`, but only part of each surface is present:
-  `CL_SALV_COLUMN_TREE` extends `CL_SALV_COLUMN` directly, so `SET_KEY` and the
-  other list-column extras are unavailable on a tree column;
-  `CL_SALV_SELECTIONS_TREE` exposes no selection-mode setter;
-  `CL_SALV_COLUMNS_TREE` offers only the exception-column accessors and no
-  hierarchy-column getter; and `CL_SALV_TREE` has `DISPLAY` but no `REFRESH`.
-- Reproduction: Call `SET_KEY` on a `CL_SALV_COLUMN_TREE` reference, or
-  `REFRESH` on a `CL_SALV_TREE` reference, and run `npm test`; abaplint reports
-  the method as missing.
-- Workaround: `ZGG_GUI_SALV_TREE` does not mark a key column or rename the
-  hierarchy column, and redraws runtime node changes with `DISPLAY` because no
-  refresh entry point exists.
+- Native SAP behavior: `CL_SALV_TREE` inherits from `CL_SALV_MODEL_BASE` and
+  offers `CONSTRUCTOR`, `FACTORY`, `DISPLAY`, `SET_DATA`, `GET_NODES`,
+  `GET_COLUMNS`, `GET_FUNCTIONS`, `GET_SELECTIONS`, `GET_EVENT`,
+  `GET_AGGREGATIONS`, `GET_LAYOUT`, `GET_METADATA`, and `GET_TREE_SETTINGS`.
+  `CL_SALV_SELECTIONS_TREE` offers the node, item, and column selection getters
+  and setters.
+- open-abap behavior: The declared surface matches native except for four
+  members whose types are not part of the dependency surface:
+  `CL_SALV_TREE->GET_TREE_SETTINGS` returns `CL_SALV_TREE_SETTINGS`,
+  `CL_SALV_TREE->GET_METADATA` returns `IF_SALV_CONTROLLER_METADATA`, and
+  `CL_SALV_SELECTIONS_TREE->GET_SELECTED_COLUMNS` / `SET_SELECTED_COLUMNS`
+  use `SALV_T_COLUMN`. None of those three types is declared, so none of the
+  four members can be declared either.
+- Reproduction: Call `GET_TREE_SETTINGS` on a `CL_SALV_TREE` reference and run
+  `npm test`; abaplint reports the method as missing.
+- Workaround: `ZGG_GUI_SALV_TREE` reads selections with `GET_SELECTED_NODES`
+  and does not use tree settings, column selections, or the metadata
+  controller, so it needs none of the absent members.
 - Upstream reference: Not reported
 
 ### The Graphical Framework data-container family is absent
@@ -230,31 +183,6 @@ incompletely declared, or declared differently from native SAP.
 - Workaround: The sample keeps the chart engine in its own reference instead of
   the shared control variable, releases it by dropping that reference, and
   passes the dimension parameters explicitly.
-- Upstream reference: Not reported
-
-### The Data Provider lifetime constants are missing
-
-- Status: Open, confirmed
-- Sample: `ZGG_GUI_PICTURE`
-- Component: `open-abap-gui` dependency surface
-- Version or commit: `1949361` (`open-abap-gui` local checkout, 2026-08-23);
-  originally recorded against `7643d3b98058b1c47509e1a42af3187b7f6fbff7`
-- Native SAP behavior: The CNDP type pool supplies `CNDP_LIFETIME_TRANSACTION`
-  and its siblings for `DP_CREATE_URL` data kept for the current transaction.
-- open-abap behavior: The CNDP type pool is absent from the dependency surface,
-  so `CNDP_LIFETIME_TRANSACTION` does not resolve and the lifetime has to be
-  passed as a literal. The picture control itself is complete for the sample:
-  `CL_GUI_PICTURE` declares the native `PICTURE_CLICK` and `PICTURE_DBLCLICK`
-  events with their `MOUSE_POS_X` / `MOUSE_POS_Y` parameters and the six
-  `EVENTID_*` constants with their native values.
-- Reproduction: Pass `CNDP_LIFETIME_TRANSACTION` to `DP_CREATE_URL` and run
-  `npm test`; abaplint reports the constant as not found.
-- Workaround: The format fixtures use the documented transaction lifetime
-  value `'T'`. Static include `ZGG_NATIVE_PICTURE` declares the
-  click/double-click handlers, registers both event IDs, returns coordinates
-  through ABAP memory, and deregisters during cleanup. The include is lint
-  checked without exclusions; activation and event behavior remain native-SAP
-  checks.
 - Upstream reference: Not reported
 
 ### The REUSE_ALV_* function modules are missing

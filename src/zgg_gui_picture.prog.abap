@@ -184,7 +184,7 @@ FORM publish_format_fixture USING iv_format TYPE sy-ucomm.
       type            = 'image'
       subtype         = lv_subtype
       size            = lv_size
-      lifetime        = 'T'
+      lifetime        = cndp_lifetime_transaction
     TABLES data       = lt_data
     CHANGING url      = lv_provider_url
     EXCEPTIONS OTHERS = 1.
@@ -205,7 +205,7 @@ FORM publish_demo_mime.
   CALL FUNCTION 'DP_PUBLISH_WWW_URL'
     EXPORTING
       objid                 = 'HTMLCNTL_TESTHTM2_SAPLOGO'
-      lifetime              = 'T'
+      lifetime              = cndp_lifetime_transaction
     IMPORTING
       url                   = lv_provider_url
     EXCEPTIONS
