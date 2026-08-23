@@ -47,13 +47,13 @@ coverage audit is pinned to the exact `open-abap-gui` commit in `PLAN.md`.
 | Area | Reports |
 | --- | --- |
 | Framework and containers | CFW lifecycle, custom/docking/splitter/dialog containers, composite workbench |
-| Selection screens | fields, ranges, layout, dynamic state, tabbed subscreens |
-| Classic dynpro | element gallery, flow logic, table control, tabstrip, subscreens, dialogs/help, GUI status |
+| Selection screens | fields, ranges, layout, dynamic state, tabbed subscreens, modal screens, variants, dynamic selections |
+| Classic dynpro | element gallery, flow logic, table control, tabstrip, subscreens, dialogs/help, GUI status, screen navigation, popup gallery |
 | Individual controls | picture, TextEdit, HTML viewer, ABAP browser, toolbar, calendar, timer, Dynamic Documents |
 | Trees and drag/drop | low-level tree, Tree Models, generic cross-control drag/drop, ILI move/resize |
 | SALV and ALV | SALV table/tree/hierseq, basic/dynamic/edit/format/event/variant ALV, ALV tree |
 | Frontend and optional | Frontend Services, graphics/selector controls |
-| Legacy | classic interactive list and spool behavior |
+| Legacy | classic interactive list and spool behavior, function-module ALV |
 
 The complete per-program feature checklist and current implementation status is
 in [PLAN.md](PLAN.md). The launcher intentionally stores only category, program
@@ -71,14 +71,19 @@ name, and title; it has no separate catalog metadata schema.
 Every optional control is created behind a runtime capability check and has a
 diagnostic fallback. File mutations in the Frontend Services sample are limited
 to a derived `ZGG_GUI_<user>` directory below the frontend temporary directory.
-ALV variant cleanup is restricted to sample-owned names after confirmation.
+ALV variant cleanup and selection-variant maintenance are restricted to
+sample-owned `GG_` names after confirmation.
 
 ## Known Limitations
 
-Observed missing classes, stubbed methods, event-surface differences, and
-runtime assertions in open-abap are recorded in [ANORMALIES.md](ANORMALIES.md).
-That filename intentionally follows the requested spelling. Local network or
-sandbox failures are not runtime anomalies.
+Observed missing classes, missing DDIC and type-pool surface, stubbed methods,
+event-surface differences, and runtime assertions in open-abap are recorded in
+[ANORMALIES.md](ANORMALIES.md). That filename intentionally follows the
+requested spelling. Local network or sandbox failures are not runtime anomalies.
+
+Code that depends on native-only surface lives in the `ZGG_NATIVE_*` static
+includes, which are excluded from lint issue reporting and therefore still have
+to be activated and exercised on a native system.
 
 Native SAP syntax/ATC, multi-frontend behavior, DPI/high-contrast layout,
 keyboard navigation, dialog cancellation, representative screenshots, and

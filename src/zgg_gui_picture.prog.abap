@@ -166,14 +166,12 @@ FORM publish_format_fixture USING iv_format TYPE sy-ucomm.
         `53P/2Q==`.
   ENDCASE.
 
-  CALL FUNCTION 'SCMS_BASE64_DECODE_STR'
-    EXPORTING input = lv_base64
-    IMPORTING output = lv_blob
-    EXCEPTIONS failed = 1 OTHERS = 2.
-  IF sy-subrc <> 0.
-    gv_status = |Could not decode the bundled { iv_format } fixture|.
-    RETURN.
-  ENDIF.
+  TRY.
+      lv_blob = cl_http_utility=>decode_x_base64( lv_base64 ).
+    CATCH cx_root.
+      gv_status = |Could not decode the bundled { iv_format } fixture|.
+      RETURN.
+  ENDTRY.
 
   CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
     EXPORTING buffer        = lv_blob

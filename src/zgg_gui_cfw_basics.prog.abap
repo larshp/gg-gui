@@ -130,11 +130,11 @@ MODULE user_command_0100 INPUT.
     WHEN 'REFRESH'.
       go_editor->is_valid( IMPORTING result = lv_valid ).
       cl_gui_cfw=>flush( ).
-      CALL METHOD cl_gui_cfw=>update_view
+      cl_gui_cfw=>update_view(
         EXCEPTIONS
           cntl_system_error = 1
           cntl_error        = 2
-          OTHERS            = 3.
+          OTHERS            = 3 ).
       lcl_log=>add( |Validity { lv_valid }; UPDATE_VIEW rc { sy-subrc }| ).
     WHEN 'RESET'.
       gv_visible = abap_true.

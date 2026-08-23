@@ -19,11 +19,11 @@ const unsupportedScreenIcons = new Set([
 ]);
 const elementValue = (block, tag) =>
   block.match(new RegExp(`<${tag}>([^<]*)</${tag}>`, "i"))?.[1].trim() ?? "";
-const topLevelScreenFields = (dynpro) =>
+const screenElements = (dynpro, keepTypes) =>
   [...dynpro.matchAll(/<RPY_DYFATC>([\s\S]*?)<\/RPY_DYFATC>/gi)]
     .map((match) => match[1])
     .filter((field) => elementValue(field, "CONT_TYPE").toUpperCase() === "SCREEN")
-    .filter((field) => !["FRAME", "OKCODE"].includes(elementValue(field, "TYPE").toUpperCase()))
+    .filter((field) => keepTypes(elementValue(field, "TYPE").toUpperCase()))
     .map((field) => {
       const line = Number.parseInt(elementValue(field, "LINE"), 10);
       const column = Number.parseInt(elementValue(field, "COLUMN"), 10);
@@ -45,12 +45,16 @@ const topLevelScreenFields = (dynpro) =>
     .filter((field) =>
       field.name && [field.top, field.bottom, field.left, field.right].every(Number.isFinite),
     );
+const topLevelScreenFields = (dynpro) =>
+  screenElements(dynpro, (type) => !["FRAME", "OKCODE"].includes(type));
+const screenFrames = (dynpro) => screenElements(dynpro, (type) => type === "FRAME");
 
 const reportFiles = files.filter((name) => /^zgg_gui_.+\.prog\.abap$/i.test(name));
 const sampleFiles = reportFiles.filter((name) => name !== "zgg_gui_catalog.prog.abap");
 const abapFiles = files.filter((name) => /\.abap$/i.test(name));
 const programFor = (name) => name.replace(/\.prog\.abap$/i, "").toUpperCase();
 const nativeIncludeOwners = new Map([
+  ["ZGG_NATIVE_ALV_CLASSIC", "zgg_gui_alv_classic.prog.abap"],
   ["ZGG_NATIVE_ALV_EVENTS", "zgg_gui_alv_events.prog.abap"],
   ["ZGG_NATIVE_ALV_TREE", "zgg_gui_alv_tree.prog.abap"],
   ["ZGG_NATIVE_CALENDAR", "zgg_gui_calendar.prog.abap"],
@@ -58,6 +62,8 @@ const nativeIncludeOwners = new Map([
   ["ZGG_NATIVE_PICTURE", "zgg_gui_picture.prog.abap"],
   ["ZGG_NATIVE_SALV_HSEQ", "zgg_gui_salv_hierseq.prog.abap"],
   ["ZGG_NATIVE_SALV_TREE", "zgg_gui_salv_tree.prog.abap"],
+  ["ZGG_NATIVE_SEL_FREE", "zgg_gui_sel_free.prog.abap"],
+  ["ZGG_NATIVE_SEL_VARIANTS", "zgg_gui_sel_variants.prog.abap"],
 ]);
 const plan = read(join(root, "PLAN.md"));
 const anomalies = read(join(root, "ANORMALIES.md"));
@@ -131,6 +137,23 @@ for (const file of reportFiles) {
           `${xmlName}: screen ${screen}, ${field.name} references ${reference.name} ` +
           `with format ${reference.format} instead of ${referenceFormat}`,
         );
+      }
+    }
+    // A frame draws its border on its own outer row and column, so an element
+    // that reaches a frame edge is rejected by the native Screen Painter.
+    for (const frame of screenFrames(dynpro)) {
+      for (const field of screenFields) {
+        const overlaps = frame.top <= field.bottom && field.top <= frame.bottom &&
+          frame.left <= field.right && field.left <= frame.right;
+        if (!overlaps) continue;
+        const inside = frame.top < field.top && field.bottom < frame.bottom &&
+          frame.left < field.left && field.right < frame.right;
+        if (!inside) {
+          fail(
+            `${xmlName}: screen ${screen}, element ${field.name} touches the border of ` +
+            `frame ${frame.name}`,
+          );
+        }
       }
     }
     for (let first = 0; first < screenFields.length; first += 1) {

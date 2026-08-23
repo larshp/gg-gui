@@ -160,6 +160,49 @@ gracefully when unavailable.
 - [x] Preserve field values while switching tabs.
 - [x] Validate active and inactive tab contents correctly.
 
+#### `ZGG_GUI_MODAL_SELSCREEN` - Additional selection screens as windows
+
+- [x] Define additional selection screens with
+  `SELECTION-SCREEN BEGIN OF SCREEN ... AS WINDOW`.
+- [x] Call a screen as a modal window with `STARTING AT` and `ENDING AT`, and
+  compare it with the fullscreen call of the same screen.
+- [x] Distinguish Execute, Cancel, and exit commands through `SY-SUBRC` and
+  `AT SELECTION-SCREEN ON EXIT-COMMAND`.
+- [x] Validate a field and a block of the called screen and place the cursor on
+  the rejected field.
+- [x] Modify only the fields of the screen currently being sent in
+  `AT SELECTION-SCREEN OUTPUT`.
+- [x] Keep the values entered on the called screens for the report execution.
+
+#### `ZGG_GUI_SEL_VARIANTS` - Selection variants and report calls
+
+- [x] Offer the variant catalog as value help for a variant parameter.
+- [x] Read the stored contents of a variant and list every selection entry.
+- [x] Create and update a sample-owned `GG_` variant from the current selection
+  values after an explicit confirmation.
+- [x] Delete only sample-owned variants, and only after confirmation.
+- [x] Start another report with `WITH SELECTION-TABLE` and with
+  `VIA SELECTION-SCREEN`.
+- [x] Start a report with `USING SELECTION-SET` so the called report applies the
+  stored variant itself.
+- [ ] Exercise variant value help, creation, update, and deletion on the
+  declared native SAP baseline.
+
+#### `ZGG_GUI_SEL_FREE` - Dynamic selections
+
+- [x] Build a dynamic selection with `FREE_SELECTIONS_INIT` from an offered
+  table and a preselected field list.
+- [x] Display `FREE_SELECTIONS_DIALOG` as a modal window and as a full screen
+  with the field tree visible.
+- [x] Return the number of active fields, the field ranges, and the WHERE
+  clauses, and display all three.
+- [x] Convert the returned ranges back into a WHERE clause with
+  `FREE_SELECTIONS_RANGE_2_WHERE`.
+- [x] Keep the dynamic selection between dialog calls and reset it on request.
+- [x] Read no data: only selection metadata and the generated selection are
+  shown, so the sample stays free of database access.
+- [ ] Exercise the dynamic-selection dialog on the declared native SAP baseline.
+
 ### 20. Classic Dynpro Elements
 
 #### `ZGG_GUI_DYNPRO_ELEMENTS` - Screen Painter element gallery
@@ -233,6 +276,38 @@ gracefully when unavailable.
 - [x] DDIC search help and custom process-on-value-request logic.
 - [x] DDIC documentation and custom process-on-help-request logic.
 - [x] Return selected values and distinguish confirm, cancel, and close.
+
+#### `ZGG_GUI_NAVIGATION` - Screen sequences and navigation statements
+
+- [x] `CALL SCREEN` stacking and continuation after the calling statement.
+- [x] `SET SCREEN` with `LEAVE SCREEN` as screen replacement, and `SET SCREEN 0`
+  compared with `LEAVE TO SCREEN 0`.
+- [x] `LEAVE TO LIST-PROCESSING AND RETURN TO SCREEN` from PAI and from PBO.
+- [x] `SUPPRESS DIALOG` for a screen that only switches to list processing.
+- [x] `SET PARAMETER ID` and `GET PARAMETER ID` through SAP memory.
+- [x] `SUBMIT ... AND RETURN` and `CALL TRANSACTION ... AND SKIP FIRST SCREEN`
+  behind a confirmation and an `S_TCODE` authority check.
+- [x] `LEAVE PROGRAM` and consistent Back, Exit, and Cancel handling on every
+  screen level.
+- [x] Display the current screen, the call level, and a navigation log.
+
+#### `ZGG_GUI_POPUPS` - Standard popup dialogs
+
+- [x] Two-button confirmation with icons, quick info, and a default button.
+- [x] Confirmation with a Cancel button and the three possible answers.
+- [x] Information popup that changes no application state.
+- [x] Typed value entry with `POPUP_GET_VALUES` for character, date, and time.
+- [x] Obligatory field, suppressed value help, and canceled value entry.
+- [x] Row selection with `POPUP_WITH_TABLE_DISPLAY` and its returned index.
+- [x] Month selection with `POPUP_TO_SELECT_MONTH`.
+- [x] Message-based dialogs of types I, W, and S next to the function-module
+  popups.
+
+Not covered: `POPUP_TO_DECIDE`, `POPUP_TO_DECIDE_LIST`, `POPUP_TO_GET_VALUE`,
+and the `POPUP_TO_CONFIRM_*` variants. SAP replaces all of them with
+`POPUP_TO_CONFIRM`, which the sample shows instead; the report names them as
+obsolete on its own list. Value help through `F4IF_INT_TABLE_VALUE_REQUEST` is
+covered by `ZGG_GUI_DIALOGS_HELP`.
 
 ### 30. Control Framework Containers
 
@@ -317,6 +392,9 @@ gracefully when unavailable.
 - [x] Provide images and related resources to generated HTML.
 - [x] Compare `LOAD_DATA` plus `SHOW_URL` with direct `SHOW_DATA`.
 - [x] Read the current URL and configure viewer UI flags.
+- [x] Display a generated PDF document by loading binary data with `LOAD_DATA`
+  and the MIME type `application/pdf`.
+- [ ] Confirm PDF rendering with the PDF component of each supported frontend.
 - [x] Navigate backward, forward, home, and refresh.
 - [x] Close the current document and release its resources.
 - [x] Document rendering and security differences between frontends.
@@ -568,6 +646,26 @@ gracefully when unavailable.
 - [x] Handle dropped and resized events.
 - [x] Add, display, clear, and handle the control's internal context menu.
 
+#### `ZGG_GUI_ALV_CLASSIC` - Function-module ALV
+
+- [x] Build a field catalog manually and merge one from the program symbol
+  table with `REUSE_ALV_FIELDCATALOG_MERGE`.
+- [x] `REUSE_ALV_GRID_DISPLAY` with layout, sort with subtotals, grid title, and
+  a layout variant.
+- [x] `REUSE_ALV_LIST_DISPLAY` driven by an event table from
+  `REUSE_ALV_EVENTS_GET`.
+- [x] `REUSE_ALV_HIERSEQ_LIST_DISPLAY` with header table, item table, and key
+  information.
+- [x] `REUSE_ALV_BLOCK_LIST_INIT`, `_APPEND`, and `_DISPLAY` for two blocks.
+- [x] `REUSE_ALV_POPUP_TO_SELECT` returning the selected row.
+- [x] PF-status, user-command, top-of-page, and end-of-list callbacks, including
+  `REUSE_ALV_COMMENTARY_WRITE` and the standard status of `SAPLKKBL`.
+- [x] Layout-variant value help with `REUSE_ALV_VARIANT_F4`.
+- [x] Clearly label the function-module ALV as legacy for new development and
+  name the SALV and ALV Grid replacements.
+- [ ] Exercise every display flavor and every callback on the declared native
+  SAP baseline.
+
 #### `ZGG_GUI_CLASSIC_LIST` - Classic and interactive lists
 
 - [x] `WRITE`, `ULINE`, `SKIP`, `FORMAT`, colors, icons, and hotspots.
@@ -609,6 +707,14 @@ test include. They map to the runnable catalog as follows:
 | SALV table plus column/filter/sort/function/layout/form/event helpers | `ZGG_GUI_SALV_TABLE` |
 | SALV constants, exceptions, interfaces, and all LVC/SALV/tree DDIC types | Consumed by SALV/ALV reports; no standalone report by scope |
 
+Three native families used by the catalog have no counterpart at all in the
+pinned dependency tree: the `SLIS` type pool with the `REUSE_ALV_*` function
+modules, the selection-variant types with the `RS_VARIANT_*` function modules,
+and the `RSDS*` dynamic-selection types with the `FREE_SELECTIONS_*` function
+modules. They are consumed by `ZGG_GUI_ALV_CLASSIC`, `ZGG_GUI_SEL_VARIANTS`,
+and `ZGG_GUI_SEL_FREE` through their static native includes and are recorded in
+`ANORMALIES.md`.
+
 No public control class family present in the pinned repository is absent from
 the plan. Base classes, marker interfaces, constants, exceptions, type pools,
 DDIC structures, class metadata, and tests remain supporting artifacts rather
@@ -619,11 +725,12 @@ samples and recorded in `ANORMALIES.md`.
 
 ### Native verification gates
 
-The following feature boxes remain unchecked because their native event type is
-absent from the pinned dependency surface or their target interaction has not
-yet been exercised. The reports keep the surrounding native behavior and CFW
-dispatch path. Native-only event declarations are isolated in static include
-programs, which still have to activate and run on the declared native baseline.
+The following feature boxes remain unchecked because their native event type,
+DDIC type, or function-module family is absent from the pinned dependency
+surface, or because their target interaction has not yet been exercised. The
+reports keep the surrounding native behavior and CFW dispatch path. Native-only
+declarations are isolated in static include programs, which still have to
+activate and run on the declared native baseline.
 
 | Feature | Implemented repository behavior | Native evidence still required |
 | --- | --- | --- |
@@ -634,6 +741,9 @@ programs, which still have to activate and run on the declared native baseline.
 | ALV Tree context-menu request | Static typed handler include preserving prior event registrations and adding two commands | Open the node menu and execute both added commands on native SAP GUI |
 | SALV Tree link/double-click | Static typed `GET_EVENT` handler include with node/column payload and cleanup | Activate a link item and double-click an item on native SAP GUI |
 | SALV hierseq events | Static typed `GET_EVENT` handler include with level/row/column payload and cleanup | Activate the `ITEM_ID` hotspot and double-click both hierarchy levels |
+| Function-module ALV | Static SLIS-typed include with five display flavors, field-catalog merge, and four callbacks | Run every flavor, trigger each callback, and use the layout-variant value help |
+| Selection variants | Static include with variant catalog, contents, create/update/delete, and the three `SUBMIT` forms | Save, read, start, and delete a `GG_` variant on native SAP GUI |
+| Dynamic selections | Static include with `FREE_SELECTIONS_INIT`, dialog as window and full screen, and range-to-WHERE conversion | Enter, extend, and reset a dynamic selection and check the generated WHERE clause |
 
 Do not check these items based only on dynamic RTTI calls or a generic dispatch
 return code. Check them after a real handler compiles against the declared
@@ -663,6 +773,10 @@ checking any remaining native-only box:
    keyboard activation work, and no element overlaps another.
 6. Cancel every file/directory chooser, print prompt, popup, and pending edit
    once, then verify that owned state and sample files remain consistent.
+   Cancel every popup of `ZGG_GUI_POPUPS`, every called selection screen of
+   `ZGG_GUI_MODAL_SELSCREEN`, and the dynamic-selection dialog as well, and
+   confirm that no `GG_` variant is written when a confirmation is answered
+   with Cancel.
 7. Capture one representative screenshot per sample after its distinctive
    behavior is visible. Do not check the screenshot item for startup or
    fallback-only images when the native control is available.
@@ -682,8 +796,9 @@ Every sample must:
 - [x] Explain its purpose in its `PLAN.md` program section and report-title text
   pool, not in a blocking popup.
 - [x] Use deterministic in-memory data and no direct database DML. The ALV
-  variant sample is the explicit exception: only a user-triggered, `GG_`-named
-  sample variant may be persisted, tracked, and offered for guarded cleanup.
+  variant and selection-variant samples are the explicit exceptions: only a
+  user-triggered, `GG_`-named sample variant may be persisted, tracked, and
+  offered for guarded cleanup, and only after an explicit confirmation.
 - [x] Provide meaningful deterministic content or a capability diagnostic
   immediately after startup.
 - [x] Provide Back, Exit, and Cancel handling consistent with SAP GUI behavior.
@@ -709,18 +824,22 @@ Every sample must:
 - [x] Exclude Screen Painter icon aliases known to fail native object import;
   repository verification rejects these values before delivery.
 - [x] Separate top-level Screen Painter elements that share rows by at least one
-  column; repository verification rejects touching or overlapping elements.
+  column, and keep every element clear of the border row and column of the
+  frame it sits in; repository verification rejects touching or overlapping
+  elements and elements that reach a frame border.
 - [x] Give top-level `QUAN` and `CURR` fields explicit unit and currency
   references; repository verification checks matching visible reference types.
 - [ ] Work at common window sizes and DPI scaling levels.
 - [x] Document any frontend, operating-system, release, or software dependency.
 - [x] Use static source for all handlers and helper routines; generated
-  subroutine pools are prohibited. Native event types missing from open-abap are
-  isolated in the seven checked `ZGG_NATIVE_*` include programs.
+  subroutine pools are prohibited. Native event types, DDIC types, and function
+  modules missing from open-abap are isolated in the ten checked
+  `ZGG_NATIVE_*` include programs, each owned by exactly one report.
 
 `npm run verify:repo` enforces the independently executable report shape,
 catalog parity and schema, screen/XML pairing, dynpro exit paths, event-receiver
-cleanup, Screen Painter icon aliases, top-level element spacing, quantity and
+cleanup, Screen Painter icon aliases, top-level element spacing, frame border
+clearance, quantity and
 currency references, PLAN coverage, anomaly record structure, the
 direct-database-DML rule, the generated-subroutine-pool ban, and exact static
 native-include ownership and metadata. Behavioral and visual requirements still
@@ -749,6 +868,9 @@ fixed-length toolbar quick-info arguments.
 - [x] Implement the classic dynpro element and flow samples.
 - [x] Implement table control, tabstrip, subscreen, GUI status, dialog, and help
   samples.
+- [x] Implement additional selection screens as windows, selection variants, and
+  dynamic selections.
+- [x] Implement screen-sequence navigation and the standard popup gallery.
 - [x] Establish the common event-log and reset patterns.
 
 ### Phase 3 - Containers and basic controls
@@ -771,6 +893,7 @@ fixed-length toolbar quick-info arguments.
 - [x] Add frontend services with security-aware error handling.
 - [x] Add generic and ILI-specific drag-and-drop samples.
 - [x] Add classic list processing and mark it as legacy.
+- [x] Add the function-module ALV and mark it as legacy.
 - [x] Add installed graphics controls behind runtime capability checks.
 
 ### Phase 6 - Verification and documentation

@@ -66,6 +66,8 @@ START-OF-SELECTION.
       title = 'High-level SALV hierarchy and comparison' )
     ( category = 'ALV' program = 'ZGG_GUI_SALV_HIERSEQ'
       title = 'Two-level hierarchical-sequential SALV' )
+    ( category = 'Legacy' program = 'ZGG_GUI_ALV_CLASSIC'
+      title = 'Function-module ALV grid, list, and blocks' )
     ( category = 'Frontend' program = 'ZGG_GUI_FRONTEND_SERVICES'
       title = 'Files, directories, clipboard, and capabilities' )
     ( category = 'Legacy' program = 'ZGG_GUI_CLASSIC_LIST'
@@ -86,6 +88,12 @@ START-OF-SELECTION.
       title = 'Dynamic selection screens' )
     ( category = 'Selection' program = 'ZGG_GUI_SEL_TABS'
       title = 'Selection-screen subscreens and tabs' )
+    ( category = 'Selection' program = 'ZGG_GUI_MODAL_SELSCREEN'
+      title = 'Additional selection screens as windows' )
+    ( category = 'Selection' program = 'ZGG_GUI_SEL_VARIANTS'
+      title = 'Selection variants and report calls' )
+    ( category = 'Selection' program = 'ZGG_GUI_SEL_FREE'
+      title = 'Dynamic selections dialog' )
     ( category = 'Dynpro' program = 'ZGG_GUI_DYNPRO_ELEMENTS'
       title = 'Screen Painter element gallery' )
     ( category = 'Dynpro' program = 'ZGG_GUI_DYNPRO_FLOW'
@@ -99,7 +107,11 @@ START-OF-SELECTION.
     ( category = 'Dynpro' program = 'ZGG_GUI_DIALOGS_HELP'
       title = 'Dialogs, messages, F1, and F4' )
     ( category = 'Dynpro' program = 'ZGG_GUI_GUI_STATUS'
-      title = 'Menus, toolbars, function keys, and titles' ) ).
+      title = 'Menus, toolbars, function keys, and titles' )
+    ( category = 'Dynpro' program = 'ZGG_GUI_NAVIGATION'
+      title = 'Screen sequences, list processing, and calls' )
+    ( category = 'Dynpro' program = 'ZGG_GUI_POPUPS'
+      title = 'Standard popup dialogs' ) ).
 
   FORMAT COLOR COL_HEADING INTENSIFIED ON.
   WRITE: / 'Category', 15 'Program', 58 'Sample'.
@@ -175,6 +187,8 @@ AT LINE-SELECTION.
       SUBMIT zgg_gui_salv_tree AND RETURN.
     WHEN 'ZGG_GUI_SALV_HIERSEQ'.
       SUBMIT zgg_gui_salv_hierseq AND RETURN.
+    WHEN 'ZGG_GUI_ALV_CLASSIC'.
+      SUBMIT zgg_gui_alv_classic AND RETURN.
     WHEN 'ZGG_GUI_FRONTEND_SERVICES'.
       SUBMIT zgg_gui_frontend_services AND RETURN.
     WHEN 'ZGG_GUI_CLASSIC_LIST'.
@@ -195,6 +209,12 @@ AT LINE-SELECTION.
       SUBMIT zgg_gui_sel_dynamic AND RETURN.
     WHEN 'ZGG_GUI_SEL_TABS'.
       SUBMIT zgg_gui_sel_tabs AND RETURN.
+    WHEN 'ZGG_GUI_MODAL_SELSCREEN'.
+      SUBMIT zgg_gui_modal_selscreen AND RETURN.
+    WHEN 'ZGG_GUI_SEL_VARIANTS'.
+      SUBMIT zgg_gui_sel_variants AND RETURN.
+    WHEN 'ZGG_GUI_SEL_FREE'.
+      SUBMIT zgg_gui_sel_free AND RETURN.
     WHEN 'ZGG_GUI_DYNPRO_ELEMENTS'.
       SUBMIT zgg_gui_dynpro_elements AND RETURN.
     WHEN 'ZGG_GUI_DYNPRO_FLOW'.
@@ -209,6 +229,10 @@ AT LINE-SELECTION.
       SUBMIT zgg_gui_dialogs_help AND RETURN.
     WHEN 'ZGG_GUI_GUI_STATUS'.
       SUBMIT zgg_gui_gui_status AND RETURN.
+    WHEN 'ZGG_GUI_NAVIGATION'.
+      SUBMIT zgg_gui_navigation AND RETURN.
+    WHEN 'ZGG_GUI_POPUPS'.
+      SUBMIT zgg_gui_popups AND RETURN.
     WHEN OTHERS.
       MESSAGE 'The selected program is not part of the catalog' TYPE 'S'.
   ENDCASE.

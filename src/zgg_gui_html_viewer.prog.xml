@@ -166,6 +166,21 @@
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>PUSH</TYPE>
+       <NAME>B_PDF</NAME>
+       <TEXT>Show_PDF____</TEXT>
+       <LINE>028</LINE>
+       <COLUMN>090</COLUMN>
+       <LENGTH>012</LENGTH>
+       <VISLENGTH>012</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <PUSH_FCODE>PDF</PUSH_FCODE>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>PUSH</TYPE>
        <NAME>B_REFRESH</NAME>
        <TEXT>Refresh_____</TEXT>
        <LINE>030</LINE>
