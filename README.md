@@ -42,6 +42,16 @@ checks ABAP 7.50 syntax, DDIC references,
 screen includes, text pools, and abapGit XML consistency. The documented API
 coverage audit is pinned to the exact `open-abap-gui` commit in `PLAN.md`.
 
+`npm run unit` then transpiles the sources to JavaScript with the abaplint
+transpiler (`abap_transpile.json`) and runs any ABAP Unit tests in `output/`.
+The open-abap-gui library is loaded from both its `src` and `scaffold` folders;
+its copies of `ZCL_GG_GUI_DEMO_DATA` and `ZCL_GG_GUI_DEMO_HELPER` are excluded
+so this repository's classes are used. `ZGG_GUI_TABLE_CONTROL` and
+`ZGG_GUI_TABSTRIP` are excluded from transpilation because the transpiler does
+not support the `CONTROLS` statement. Both abaplint and the transpiler use
+existing checkouts in `deps/open-abap-core` and `deps/open-abap-gui` when
+present, and otherwise clone from GitHub.
+
 ## Catalog Areas
 
 | Area | Reports |
