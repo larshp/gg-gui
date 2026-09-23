@@ -514,7 +514,7 @@ ENDFORM.
 FORM show_fallback USING io_error TYPE REF TO cx_root.
   DATA lt_text TYPE ty_text_lines.
 
-  FREE: go_grid, go_tree, go_events, go_dragdrop, go_splitter.
+  CLEAR: go_grid, go_tree, go_events, go_dragdrop, go_splitter.
   CREATE OBJECT go_fallback EXPORTING parent = go_host.
   lt_text = VALUE #(
     ( 'Cross-control drag-and-drop is unavailable in this runtime.' )
@@ -527,10 +527,10 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
 ENDFORM.
 
 FORM free_controls.
-  FREE: go_events, go_dragdrop.
-  IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
-  IF go_tree IS BOUND. go_tree->free( ). FREE go_tree. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_splitter IS BOUND. go_splitter->free( ). FREE go_splitter. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  CLEAR: go_events, go_dragdrop.
+  IF go_grid IS BOUND. go_grid->free( ). CLEAR go_grid. ENDIF.
+  IF go_tree IS BOUND. go_tree->free( ). CLEAR go_tree. ENDIF.
+  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
+  IF go_splitter IS BOUND. go_splitter->free( ). CLEAR go_splitter. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

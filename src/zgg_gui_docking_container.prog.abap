@@ -117,8 +117,8 @@ FORM create_controls.
       go_editor->set_text_as_r3table( lt_text ).
       gv_status = 'Docking container created and linked to the current dynpro'.
     CATCH cx_root INTO DATA(lx_error).
-      FREE go_docking.
-      FREE go_container.
+      CLEAR go_docking.
+      CLEAR go_container.
       gv_status = |CL_GUI_DOCKING_CONTAINER unavailable: { lx_error->get_text( ) }|.
   ENDTRY.
   PERFORM describe_side.
@@ -182,9 +182,9 @@ FORM detect_close.
   go_container->is_valid( IMPORTING result = lv_valid ).
   cl_gui_cfw=>flush( ).
   IF lv_valid = 0.
-    FREE go_editor.
-    FREE go_container.
-    FREE go_docking.
+    CLEAR go_editor.
+    CLEAR go_container.
+    CLEAR go_docking.
     gv_status = 'Close event observed: frontend container reference is no longer valid'.
   ENDIF.
 ENDFORM.
@@ -201,12 +201,12 @@ ENDFORM.
 FORM free_controls.
   IF go_editor IS BOUND.
     go_editor->free( ).
-    FREE go_editor.
+    CLEAR go_editor.
   ENDIF.
   IF go_container IS BOUND.
     go_container->free( ).
-    FREE go_container.
+    CLEAR go_container.
   ENDIF.
-  FREE go_docking.
+  CLEAR go_docking.
   CLEAR: gv_last_width, gv_last_height.
 ENDFORM.

@@ -140,7 +140,7 @@ FORM create_calendar.
         gv_status = 'Calendar created; native event handler is unavailable'.
       ENDIF.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_calendar, go_control.
+      CLEAR: go_calendar, go_control.
       gv_status = |CL_GUI_CALENDAR unavailable: { lx_error->get_text( ) }|.
   ENDTRY.
 ENDFORM.
@@ -240,11 +240,11 @@ ENDFORM.
 
 FORM free_calendar.
   PERFORM unregister_calendar_events.
-  IF go_control IS BOUND. go_control->free( ). FREE go_control. ENDIF.
-  FREE go_calendar.
+  IF go_control IS BOUND. go_control->free( ). CLEAR go_control. ENDIF.
+  CLEAR go_calendar.
 ENDFORM.
 
 FORM free_controls.
   PERFORM free_calendar.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

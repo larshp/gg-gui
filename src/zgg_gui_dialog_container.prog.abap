@@ -115,7 +115,7 @@ FORM create_dialog.
       go_editor->set_text_as_r3table( lt_text ).
       gv_status = 'Modeless dialog and hosted text editor created'.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_dialog, go_container, go_editor.
+      CLEAR: go_dialog, go_container, go_editor.
       gv_status = |CL_GUI_DIALOGBOX_CONTAINER unavailable: { lx_error->get_text( ) }|.
   ENDTRY.
 ENDFORM.
@@ -168,7 +168,7 @@ FORM detect_frontend_close.
   go_container->is_valid( IMPORTING result = lv_valid ).
   cl_gui_cfw=>flush( ).
   IF lv_valid = 0.
-    FREE: go_editor, go_container, go_dialog.
+    CLEAR: go_editor, go_container, go_dialog.
     gv_status = 'Frontend close detected after CFW dispatch; references were cleared'.
   ENDIF.
 ENDFORM.
@@ -176,11 +176,11 @@ ENDFORM.
 FORM free_dialog.
   IF go_editor IS BOUND.
     go_editor->free( ).
-    FREE go_editor.
+    CLEAR go_editor.
   ENDIF.
   IF go_container IS BOUND.
     go_container->free( ).
-    FREE go_container.
+    CLEAR go_container.
   ENDIF.
-  FREE go_dialog.
+  CLEAR go_dialog.
 ENDFORM.

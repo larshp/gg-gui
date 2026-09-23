@@ -568,7 +568,7 @@ ENDFORM.
 FORM show_fallback USING io_error TYPE REF TO cx_root.
   DATA lt_text TYPE ty_text_lines.
 
-  FREE: go_tree, go_toolbar, go_grid, go_details, go_events, go_dragdrop,
+  CLEAR: go_tree, go_toolbar, go_grid, go_details, go_events, go_dragdrop,
     go_right_splitter, go_root_splitter.
   CREATE OBJECT go_fallback EXPORTING parent = go_host.
   lt_text = VALUE #(
@@ -582,13 +582,13 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
 ENDFORM.
 
 FORM free_controls.
-  FREE: go_events, go_dragdrop.
-  IF go_tree IS BOUND. go_tree->free( ). FREE go_tree. ENDIF.
-  IF go_toolbar IS BOUND. go_toolbar->free( ). FREE go_toolbar. ENDIF.
-  IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
-  IF go_details IS BOUND. go_details->free( ). FREE go_details. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_right_splitter IS BOUND. go_right_splitter->free( ). FREE go_right_splitter. ENDIF.
-  IF go_root_splitter IS BOUND. go_root_splitter->free( ). FREE go_root_splitter. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  CLEAR: go_events, go_dragdrop.
+  IF go_tree IS BOUND. go_tree->free( ). CLEAR go_tree. ENDIF.
+  IF go_toolbar IS BOUND. go_toolbar->free( ). CLEAR go_toolbar. ENDIF.
+  IF go_grid IS BOUND. go_grid->free( ). CLEAR go_grid. ENDIF.
+  IF go_details IS BOUND. go_details->free( ). CLEAR go_details. ENDIF.
+  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
+  IF go_right_splitter IS BOUND. go_right_splitter->free( ). CLEAR go_right_splitter. ENDIF.
+  IF go_root_splitter IS BOUND. go_root_splitter->free( ). CLEAR go_root_splitter. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

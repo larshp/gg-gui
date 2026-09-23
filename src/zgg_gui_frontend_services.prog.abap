@@ -491,6 +491,6 @@ FORM refresh_log.
 ENDFORM.
 
 FORM free_controls.
-  IF go_log IS BOUND. go_log->free( ). FREE go_log. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_log IS BOUND. go_log->free( ). CLEAR go_log. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

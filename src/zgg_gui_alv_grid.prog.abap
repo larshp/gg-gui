@@ -103,7 +103,7 @@ FORM create_controls.
       gv_status = 'ALV Grid created with a manual catalog, layout, exclusions, sort, filter, totals, print, and variant key'.
       gv_detail = 'The standard toolbar provides sort, filter, subtotal, aggregate, print, layout, and export commands'.
     CATCH cx_root INTO DATA(lx_error).
-      FREE go_grid.
+      CLEAR go_grid.
       PERFORM show_fallback USING lx_error.
   ENDTRY.
 ENDFORM.
@@ -449,7 +449,7 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
 ENDFORM.
 
 FORM free_controls.
-  IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_grid IS BOUND. go_grid->free( ). CLEAR go_grid. ENDIF.
+  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

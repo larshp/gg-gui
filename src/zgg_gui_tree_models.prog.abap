@@ -253,8 +253,8 @@ ENDFORM.
 FORM show_failure USING iv_class TYPE string iv_reason TYPE string.
   DATA lt_text TYPE ty_text_lines.
 
-  FREE go_model.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
+  CLEAR go_model.
+  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
   lt_text = VALUE #(
     ( |{ iv_class } is unavailable or could not create its frontend tree.| )
     ( |Reason: { iv_reason }| )
@@ -269,8 +269,8 @@ ENDFORM.
 
 FORM release_model.
   IF go_model IS BOUND.
-    FREE go_model.
+    CLEAR go_model.
   ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

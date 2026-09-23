@@ -260,7 +260,7 @@ for (const file of reportFiles) {
     fail(`${file}: dynpro report has no explicit Back/Exit/Cancel exit path`);
   }
   if (/\bgo_events\s+TYPE\s+REF\s+TO\s+lcl_events\b/i.test(source) &&
-      !/\bFREE(?::)?[^.]*\bgo_events\b/is.test(source)) {
+      !/\bCLEAR(?::)?[^.]*\bgo_events\b/is.test(source)) {
     fail(`${file}: event receiver go_events is not released`);
   }
 }

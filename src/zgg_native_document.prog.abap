@@ -75,7 +75,7 @@ FORM register_document_events.
       SET HANDLER go_document_events->on_selected FOR go_native_select.
       gv_native_events_registered = abap_true.
     CATCH cx_root INTO DATA(lx_event_error).
-      FREE: go_document_events, go_native_link, go_native_button,
+      CLEAR: go_document_events, go_native_link, go_native_button,
         go_native_input, go_native_select.
       CLEAR gv_native_events_registered.
       gv_status = |Native document event registration failed: { lx_event_error->get_text( ) }|.
@@ -98,7 +98,7 @@ FORM unregister_document_events.
       SET HANDLER go_document_events->on_selected FOR go_native_select ACTIVATION space.
     ENDIF.
   ENDIF.
-  FREE: go_document_events, go_native_link, go_native_button,
+  CLEAR: go_document_events, go_native_link, go_native_button,
     go_native_input, go_native_select.
   CLEAR gv_native_events_registered.
   FREE MEMORY ID 'ZGG_GUI_DD_EVENT'.

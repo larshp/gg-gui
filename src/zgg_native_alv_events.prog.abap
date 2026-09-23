@@ -26,7 +26,7 @@ FORM register_native_delayed_event.
         i_event_id = cl_gui_alv_grid=>mc_evt_delayed_change_select ).
       gv_native_events_registered = abap_true.
     CATCH cx_root INTO DATA(lx_event_error).
-      FREE go_delayed_events.
+      CLEAR go_delayed_events.
       CLEAR gv_native_events_registered.
       gv_status = |Native delayed-event registration failed: { lx_event_error->get_text( ) }|.
   ENDTRY.
@@ -36,7 +36,7 @@ FORM unregister_delayed_event.
   IF go_delayed_events IS BOUND AND go_grid IS BOUND.
     SET HANDLER go_delayed_events->on_delayed FOR go_grid ACTIVATION space.
   ENDIF.
-  FREE go_delayed_events.
+  CLEAR go_delayed_events.
   CLEAR gv_native_events_registered.
   FREE MEMORY ID 'ZGG_GUI_ALV_DELAYED'.
 ENDFORM.

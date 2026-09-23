@@ -219,7 +219,7 @@ FORM create_controls.
       gv_status = 'Column tree created with text, checkbox, button, link, icon, and editable items'.
       gv_event = 'Select, double-click, expand Lazy children, or request a context menu'.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_tree, go_events.
+      CLEAR: go_tree, go_events.
       PERFORM show_fallback USING lx_error.
   ENDTRY.
 ENDFORM.
@@ -518,9 +518,9 @@ ENDFORM.
 FORM free_controls.
   IF go_tree IS BOUND.
     TRY. go_tree->free( ). CATCH cx_root. ENDTRY.
-    FREE go_tree.
+    CLEAR go_tree.
   ENDIF.
-  FREE go_events.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  CLEAR go_events.
+  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

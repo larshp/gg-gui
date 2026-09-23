@@ -191,15 +191,15 @@ ENDFORM.
 FORM free_controls.
   IF go_timer IS BOUND.
     go_timer->cancel( ).
-    FREE go_timer.
+    CLEAR go_timer.
   ENDIF.
   IF go_editor IS BOUND.
     go_editor->free( ).
-    FREE go_editor.
+    CLEAR go_editor.
   ENDIF.
   IF go_container IS BOUND.
     go_container->free( ).
-    FREE go_container.
+    CLEAR go_container.
   ENDIF.
-  FREE go_events.
+  CLEAR go_events.
 ENDFORM.

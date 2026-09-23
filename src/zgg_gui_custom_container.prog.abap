@@ -149,7 +149,7 @@ ENDFORM.
 FORM free_child.
   IF go_editor IS BOUND.
     go_editor->free( ).
-    FREE go_editor.
+    CLEAR go_editor.
   ENDIF.
 ENDFORM.
 
@@ -157,6 +157,6 @@ FORM free_controls.
   PERFORM free_child.
   IF go_container IS BOUND.
     go_container->free( ).
-    FREE go_container.
+    CLEAR go_container.
   ENDIF.
 ENDFORM.

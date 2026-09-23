@@ -131,7 +131,7 @@ FORM create_controls.
       ENDIF.
       gv_detail = 'Folder and leaf nodes carry one data row each; items expose per-cell types'.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_tree, go_nodes, go_columns, go_functions, go_selections.
+      CLEAR: go_tree, go_nodes, go_columns, go_functions, go_selections.
       lv_error = lx_error->get_text( ).
       PERFORM show_fallback USING lv_error.
   ENDTRY.
@@ -339,7 +339,7 @@ ENDFORM.
 
 FORM free_controls.
   PERFORM unregister_salv_tree_events.
-  FREE: go_nodes, go_columns, go_functions, go_selections, go_tree.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  CLEAR: go_nodes, go_columns, go_functions, go_selections, go_tree.
+  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

@@ -114,9 +114,9 @@ FORM free_controls.
   IF go_timer IS BOUND.
     gv_running = abap_false.
     go_timer->cancel( ).
-    FREE go_timer.
+    CLEAR go_timer.
   ENDIF.
-  FREE go_events.
-  IF go_editor IS BOUND. go_editor->free( ). FREE go_editor. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  CLEAR go_events.
+  IF go_editor IS BOUND. go_editor->free( ). CLEAR go_editor. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

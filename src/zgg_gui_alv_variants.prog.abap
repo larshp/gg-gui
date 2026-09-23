@@ -90,7 +90,7 @@ FORM create_controls.
       gv_status = 'CL_ALV_VARIANT and its owning ALV Grid were created for report-local handle GGV1'.
       gv_detail = 'Only variants explicitly saved by this run and prefixed GG_ are eligible for deletion'.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_grid, go_variant.
+      CLEAR: go_grid, go_variant.
       PERFORM show_fallback USING lx_error.
   ENDTRY.
 ENDFORM.
@@ -322,8 +322,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
 ENDFORM.
 
 FORM free_controls.
-  IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
-  FREE go_variant.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_grid IS BOUND. go_grid->free( ). CLEAR go_grid. ENDIF.
+  CLEAR go_variant.
+  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

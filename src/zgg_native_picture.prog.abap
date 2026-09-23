@@ -43,14 +43,14 @@ FORM register_native_picture_events.
         EXCEPTIONS cntl_error = 1 cntl_system_error = 2
           illegal_event_combination = 3 OTHERS = 4 ).
       IF sy-subrc <> 0.
-        FREE go_picture_events.
+        CLEAR go_picture_events.
         RETURN.
       ENDIF.
       SET HANDLER go_picture_events->on_click FOR go_picture.
       SET HANDLER go_picture_events->on_double_click FOR go_picture.
       gv_native_events_registered = abap_true.
     CATCH cx_root INTO DATA(lx_event_error).
-      FREE go_picture_events.
+      CLEAR go_picture_events.
       CLEAR gv_native_events_registered.
       gv_status = |Native picture event registration failed: { lx_event_error->get_text( ) }|.
   ENDTRY.
@@ -61,7 +61,7 @@ FORM unregister_picture_events.
     SET HANDLER go_picture_events->on_click FOR go_picture ACTIVATION space.
     SET HANDLER go_picture_events->on_double_click FOR go_picture ACTIVATION space.
   ENDIF.
-  FREE go_picture_events.
+  CLEAR go_picture_events.
   CLEAR gv_native_events_registered.
   FREE MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.
 ENDFORM.

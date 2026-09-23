@@ -262,10 +262,10 @@ FORM free_controls.
   PERFORM unregister_picture_events.
   IF go_picture IS BOUND.
     go_picture->free( ).
-    FREE go_picture.
+    CLEAR go_picture.
   ENDIF.
   IF go_host IS BOUND.
     go_host->free( ).
-    FREE go_host.
+    CLEAR go_host.
   ENDIF.
 ENDFORM.

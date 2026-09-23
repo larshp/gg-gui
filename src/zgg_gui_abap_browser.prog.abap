@@ -16,7 +16,7 @@ MODULE status_0100 OUTPUT.
 ENDMODULE.
 
 MODULE exit_0100 INPUT.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
   CLEAR gv_ok_code.
   LEAVE TO SCREEN 0.
 ENDMODULE.

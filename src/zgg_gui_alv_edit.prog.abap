@@ -212,7 +212,7 @@ FORM create_controls.
       gv_status = 'Editable ALV created with checkbox, dropdown, button, hotspot, F4, validation, and edit events'.
       gv_detail = 'Save and Discard affect only the report snapshot; this sample never updates a database table'.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_grid, go_events.
+      CLEAR: go_grid, go_events.
       PERFORM show_fallback USING lx_error.
   ENDTRY.
 ENDFORM.
@@ -377,8 +377,8 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
 ENDFORM.
 
 FORM free_controls.
-  FREE: go_protocol, go_events.
-  IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  CLEAR: go_protocol, go_events.
+  IF go_grid IS BOUND. go_grid->free( ). CLEAR go_grid. ENDIF.
+  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

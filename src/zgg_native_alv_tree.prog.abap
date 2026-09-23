@@ -47,7 +47,7 @@ FORM register_native_context_event.
       SET HANDLER go_context_events->on_request FOR go_tree.
       gv_native_events_registered = abap_true.
     CATCH cx_root INTO DATA(lx_event_error).
-      FREE go_context_events.
+      CLEAR go_context_events.
       CLEAR gv_native_events_registered.
       gv_detail = |Native tree context-event registration failed: { lx_event_error->get_text( ) }|.
   ENDTRY.
@@ -57,7 +57,7 @@ FORM unregister_context_event.
   IF go_context_events IS BOUND AND go_tree IS BOUND.
     SET HANDLER go_context_events->on_request FOR go_tree ACTIVATION space.
   ENDIF.
-  FREE go_context_events.
+  CLEAR go_context_events.
   CLEAR gv_native_events_registered.
   FREE MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.
 ENDFORM.

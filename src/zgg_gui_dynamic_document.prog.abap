@@ -106,7 +106,7 @@ FORM create_document.
       ENDIF.
       gv_detail = 'Use Refresh value to update one retained form element without reconstructing the table'.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_document, go_right_area, go_table, go_table_area, go_form,
+      CLEAR: go_document, go_right_area, go_table, go_table_area, go_form,
         go_link, go_input, go_select, go_button.
       lv_error_text = lx_error->get_text( ).
       PERFORM show_fallback USING lv_error_text.
@@ -280,7 +280,7 @@ FORM reset_document.
   TRY.
       PERFORM unregister_document_events.
       go_document->initialize_document( ).
-      FREE: go_right_area, go_table, go_table_area, go_form, go_link,
+      CLEAR: go_right_area, go_table, go_table_area, go_form, go_link,
         go_input, go_select, go_button.
       PERFORM populate_document USING abap_true.
       IF gv_native_events_registered = abap_true.
@@ -320,9 +320,9 @@ FORM free_controls.
   IF go_fallback IS BOUND.
     go_fallback->close_document( ).
     go_fallback->free( ).
-    FREE go_fallback.
+    CLEAR go_fallback.
   ENDIF.
-  FREE: go_right_area, go_table, go_table_area, go_form, go_link,
+  CLEAR: go_right_area, go_table, go_table_area, go_form, go_link,
     go_input, go_select, go_button, go_document.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.

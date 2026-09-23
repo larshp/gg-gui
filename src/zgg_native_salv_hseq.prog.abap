@@ -21,7 +21,7 @@ FORM create_native_hierseq.
                   t_table_level2          = gt_items ).
       go_hierseq = go_native_hierseq.
     CATCH cx_root INTO DATA(lx_factory_error).
-      FREE go_native_hierseq.
+      CLEAR go_native_hierseq.
       CLEAR go_hierseq.
       gv_hierseq_factory_error = lx_factory_error->get_text( ).
   ENDTRY.
@@ -62,7 +62,7 @@ FORM register_native_hierseq_events.
       SET HANDLER go_hierseq_events->on_double FOR go_native_hierseq_events.
       gv_native_events_registered = abap_true.
     CATCH cx_root INTO DATA(lx_event_error).
-      FREE: go_hierseq_events, go_native_hierseq_events, go_native_hierseq.
+      CLEAR: go_hierseq_events, go_native_hierseq_events, go_native_hierseq.
       CLEAR gv_native_events_registered.
       gv_detail = |Native hierseq event registration failed: { lx_event_error->get_text( ) }|.
   ENDTRY.
@@ -75,7 +75,7 @@ FORM unregister_hierseq_events.
     SET HANDLER go_hierseq_events->on_double
       FOR go_native_hierseq_events ACTIVATION space.
   ENDIF.
-  FREE: go_hierseq_events, go_native_hierseq_events, go_native_hierseq.
+  CLEAR: go_hierseq_events, go_native_hierseq_events, go_native_hierseq.
   CLEAR gv_native_events_registered.
   FREE MEMORY ID 'ZGG_GUI_SALV_HIERSEQ_EVENT'.
 ENDFORM.

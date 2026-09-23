@@ -45,14 +45,14 @@ FORM register_calendar_events.
         EXCEPTIONS cntl_error = 1 cntl_system_error = 2
           illegal_event_combination = 3 OTHERS = 4 ).
       IF sy-subrc <> 0.
-        FREE: go_calendar_events, go_native_calendar.
+        CLEAR: go_calendar_events, go_native_calendar.
         RETURN.
       ENDIF.
       SET HANDLER go_calendar_events->on_date FOR go_native_calendar.
       SET HANDLER go_calendar_events->on_info FOR go_native_calendar.
       gv_native_events_registered = abap_true.
     CATCH cx_root INTO DATA(lx_event_error).
-      FREE: go_calendar_events, go_native_calendar.
+      CLEAR: go_calendar_events, go_native_calendar.
       CLEAR gv_native_events_registered.
       gv_status = |Native calendar event registration failed: { lx_event_error->get_text( ) }|.
   ENDTRY.
@@ -63,7 +63,7 @@ FORM unregister_calendar_events.
     SET HANDLER go_calendar_events->on_date FOR go_native_calendar ACTIVATION space.
     SET HANDLER go_calendar_events->on_info FOR go_native_calendar ACTIVATION space.
   ENDIF.
-  FREE: go_calendar_events, go_native_calendar.
+  CLEAR: go_calendar_events, go_native_calendar.
   CLEAR gv_native_events_registered.
   FREE MEMORY ID 'ZGG_GUI_CALENDAR_EVENT'.
 ENDFORM.

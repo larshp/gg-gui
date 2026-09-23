@@ -111,7 +111,7 @@ FORM create_controls.
         gv_detail = 'GROUP_ID is the explicit master/slave binding; header and item structures remain separate'.
       ENDIF.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_hierseq, go_header_columns, go_item_columns,
+      CLEAR: go_hierseq, go_header_columns, go_item_columns,
         go_item_sorts, go_item_filters, go_item_aggregations.
       lv_error = lx_error->get_text( ).
       PERFORM show_fallback USING lv_error.
@@ -294,8 +294,8 @@ ENDFORM.
 
 FORM free_controls.
   PERFORM unregister_hierseq_events.
-  FREE: go_header_columns, go_item_columns, go_item_sorts,
+  CLEAR: go_header_columns, go_item_columns, go_item_sorts,
     go_item_filters, go_item_aggregations, go_hierseq.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
+  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
 ENDFORM.
