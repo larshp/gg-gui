@@ -62,13 +62,13 @@ MODULE user_command_0100 INPUT.
     WHEN 'SIDE'.
       CASE gv_side.
         WHEN c_dock_left.
-gv_side = c_dock_top.
+          gv_side = c_dock_top.
         WHEN c_dock_top.
-gv_side = c_dock_right.
+          gv_side = c_dock_right.
         WHEN c_dock_right.
-gv_side = c_dock_bottom.
+          gv_side = c_dock_bottom.
         WHEN OTHERS.
-gv_side = c_dock_left.
+          gv_side = c_dock_left.
       ENDCASE.
       PERFORM dock_at_side.
     WHEN 'EXTEND_UP'.
@@ -196,13 +196,13 @@ ENDFORM.
 FORM describe_side.
   CASE gv_side.
     WHEN c_dock_left.
-gv_side_text = 'LEFT (1)'.
+      gv_side_text = 'LEFT (1)'.
     WHEN c_dock_right.
-gv_side_text = 'RIGHT (2)'.
+      gv_side_text = 'RIGHT (2)'.
     WHEN c_dock_top.
-gv_side_text = 'TOP (4)'.
+      gv_side_text = 'TOP (4)'.
     WHEN c_dock_bottom.
-gv_side_text = 'BOTTOM (8)'.
+      gv_side_text = 'BOTTOM (8)'.
   ENDCASE.
 ENDFORM.
 

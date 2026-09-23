@@ -473,15 +473,15 @@ FORM free_controls.
   PERFORM unregister_context_event.
   CLEAR: go_events, go_dragdrop.
   IF go_tree IS BOUND.
-go_tree->free( ).
-CLEAR go_tree.
-ENDIF.
+    go_tree->free( ).
+    CLEAR go_tree.
+  ENDIF.
   IF go_fallback IS BOUND.
-go_fallback->free( ).
-CLEAR go_fallback.
-ENDIF.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
   IF go_host IS BOUND.
-go_host->free( ).
-CLEAR go_host.
-ENDIF.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

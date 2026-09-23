@@ -118,8 +118,8 @@ CLASS lcl_log IMPLEMENTATION.
     ADD 1 TO gv_event_count.
     gv_status = |{ gv_event_count }: { iv_event }|.
     IF strlen( gv_status ) > 108.
-gv_status = gv_status(108).
-ENDIF.
+      gv_status = gv_status(108).
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.
 
@@ -155,8 +155,8 @@ CLASS lcl_events IMPLEMENTATION.
         IF lo_payload->source = 'GRID'.
           READ TABLE gt_rows INDEX lo_payload->row_index INTO DATA(ls_row).
           IF sy-subrc <> 0.
-RAISE EXCEPTION TYPE cx_sy_itab_line_not_found.
-ENDIF.
+            RAISE EXCEPTION TYPE cx_sy_itab_line_not_found.
+          ENDIF.
           DELETE gt_rows INDEX lo_payload->row_index.
           DATA(lv_target) = COND i( WHEN es_row_no-row_id > lines( gt_rows )
             THEN lines( gt_rows ) + 1 ELSE es_row_no-row_id ).
@@ -501,8 +501,8 @@ ENDFORM.
 
 FORM reset_demo.
   IF go_tree IS BOUND.
-go_tree->delete_all_nodes( ).
-ENDIF.
+    go_tree->delete_all_nodes( ).
+  ENDIF.
   PERFORM build_data.
   IF go_tree IS BOUND.
     PERFORM transfer_tree.
@@ -535,23 +535,23 @@ ENDFORM.
 FORM free_controls.
   CLEAR: go_events, go_dragdrop.
   IF go_grid IS BOUND.
-go_grid->free( ).
-CLEAR go_grid.
-ENDIF.
+    go_grid->free( ).
+    CLEAR go_grid.
+  ENDIF.
   IF go_tree IS BOUND.
-go_tree->free( ).
-CLEAR go_tree.
-ENDIF.
+    go_tree->free( ).
+    CLEAR go_tree.
+  ENDIF.
   IF go_fallback IS BOUND.
-go_fallback->free( ).
-CLEAR go_fallback.
-ENDIF.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
   IF go_splitter IS BOUND.
-go_splitter->free( ).
-CLEAR go_splitter.
-ENDIF.
+    go_splitter->free( ).
+    CLEAR go_splitter.
+  ENDIF.
   IF go_host IS BOUND.
-go_host->free( ).
-CLEAR go_host.
-ENDIF.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

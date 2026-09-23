@@ -408,9 +408,9 @@ FORM toggle_event_mode.
   gv_application_events = xsdbool( gv_application_events = abap_false ).
   PERFORM unregister_delayed_event.
   IF go_grid IS BOUND.
-go_grid->free( ).
-CLEAR go_grid.
-ENDIF.
+    go_grid->free( ).
+    CLEAR go_grid.
+  ENDIF.
   CLEAR go_events.
   PERFORM create_grid.
   gv_status = |Grid recreated with application-event mode { gv_application_events }|.
@@ -451,15 +451,15 @@ FORM free_controls.
   PERFORM unregister_delayed_event.
   CLEAR: go_events, go_dragdrop.
   IF go_grid IS BOUND.
-go_grid->free( ).
-CLEAR go_grid.
-ENDIF.
+    go_grid->free( ).
+    CLEAR go_grid.
+  ENDIF.
   IF go_fallback IS BOUND.
-go_fallback->free( ).
-CLEAR go_fallback.
-ENDIF.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
   IF go_host IS BOUND.
-go_host->free( ).
-CLEAR go_host.
-ENDIF.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

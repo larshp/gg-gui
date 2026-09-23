@@ -43,13 +43,13 @@ MODULE user_command_0100 INPUT.
     WHEN 'RESET'.
       CASE gv_active_model.
         WHEN 'CL_SIMPLE_TREE_MODEL'.
-PERFORM show_simple_model.
+          PERFORM show_simple_model.
         WHEN 'CL_LIST_TREE_MODEL'.
-PERFORM show_list_model.
+          PERFORM show_list_model.
         WHEN 'CL_COLUMN_TREE_MODEL'.
-PERFORM show_column_model.
+          PERFORM show_column_model.
         WHEN OTHERS.
-PERFORM show_default.
+          PERFORM show_default.
       ENDCASE.
   ENDCASE.
 ENDMODULE.
@@ -259,9 +259,9 @@ FORM show_failure USING iv_class TYPE string iv_reason TYPE string.
 
   CLEAR go_model.
   IF go_fallback IS BOUND.
-go_fallback->free( ).
-CLEAR go_fallback.
-ENDIF.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
   lt_text = VALUE #(
     ( |{ iv_class } is unavailable or could not create its frontend tree.| )
     ( |Reason: { iv_reason }| )
@@ -279,11 +279,11 @@ FORM release_model.
     CLEAR go_model.
   ENDIF.
   IF go_fallback IS BOUND.
-go_fallback->free( ).
-CLEAR go_fallback.
-ENDIF.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
   IF go_host IS BOUND.
-go_host->free( ).
-CLEAR go_host.
-ENDIF.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

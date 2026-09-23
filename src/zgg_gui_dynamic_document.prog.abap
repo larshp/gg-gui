@@ -325,7 +325,7 @@ FORM free_controls.
   CLEAR: go_right_area, go_table, go_table_area, go_form, go_link,
     go_input, go_select, go_button, go_document.
   IF go_host IS BOUND.
-go_host->free( ).
-CLEAR go_host.
-ENDIF.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

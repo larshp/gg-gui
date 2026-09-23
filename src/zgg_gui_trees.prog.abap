@@ -518,18 +518,18 @@ ENDFORM.
 FORM free_controls.
   IF go_tree IS BOUND.
     TRY.
-go_tree->free( ).
-CATCH cx_root.
-ENDTRY.
+        go_tree->free( ).
+      CATCH cx_root.
+    ENDTRY.
     CLEAR go_tree.
   ENDIF.
   CLEAR go_events.
   IF go_fallback IS BOUND.
-go_fallback->free( ).
-CLEAR go_fallback.
-ENDIF.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
   IF go_host IS BOUND.
-go_host->free( ).
-CLEAR go_host.
-ENDIF.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

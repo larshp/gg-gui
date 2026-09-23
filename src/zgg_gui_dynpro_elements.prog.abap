@@ -32,8 +32,8 @@ MODULE status_0100 OUTPUT.
 
   ADD 1 TO gv_pbo_count.
   IF gv_user IS INITIAL.
-gv_user = sy-uname.
-ENDIF.
+    gv_user = sy-uname.
+  ENDIF.
   WRITE icon_green_light AS ICON QUICKINFO 'Ready: values may be edited and reset' TO gv_icon.
   lt_values = VALUE #(
     ( key = 'ONE' text = 'First entry' )

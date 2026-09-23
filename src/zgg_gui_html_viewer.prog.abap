@@ -307,7 +307,7 @@ FORM free_controls.
   ENDIF.
   CLEAR go_events.
   IF go_host IS BOUND.
-go_host->free( ).
-CLEAR go_host.
-ENDIF.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

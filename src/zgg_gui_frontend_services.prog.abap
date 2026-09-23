@@ -481,10 +481,10 @@ FORM refresh_log.
       APPEND lv_log_line TO lt_text.
     ENDLOOP.
     TRY.
-      go_log->set_text_as_r3table( lt_text ).
-      cl_gui_cfw=>flush( ).
-      go_log->go_to_line( lines( gt_log ) ).
-      cl_gui_cfw=>flush( ).
+        go_log->set_text_as_r3table( lt_text ).
+        cl_gui_cfw=>flush( ).
+        go_log->go_to_line( lines( gt_log ) ).
+        cl_gui_cfw=>flush( ).
       CATCH cx_root.
     ENDTRY.
   ENDIF.
@@ -492,11 +492,11 @@ ENDFORM.
 
 FORM free_controls.
   IF go_log IS BOUND.
-go_log->free( ).
-CLEAR go_log.
-ENDIF.
+    go_log->free( ).
+    CLEAR go_log.
+  ENDIF.
   IF go_host IS BOUND.
-go_host->free( ).
-CLEAR go_host.
-ENDIF.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.
