@@ -7,7 +7,7 @@
     "lint": "abaplint",
     "verify:repo": "node scripts/verify-repo.mjs",
     "transpile": "abap_transpile",
-    "convert": "open-abap-gui-convert ",
+    "convert": "open-abap-gui-convert",
     "unit": "npm run transpile && node output/index.mjs",
     "test": "npm run verify:repo && npm run lint && npm run unit"
   },
