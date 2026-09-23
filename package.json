@@ -7,12 +7,14 @@
     "lint": "abaplint",
     "verify:repo": "node scripts/verify-repo.mjs",
     "transpile": "abap_transpile",
+    "convert": "open-abap-gui-convert ",
     "unit": "npm run transpile && node output/index.mjs",
     "test": "npm run verify:repo && npm run lint && npm run unit"
   },
   "devDependencies": {
     "@abaplint/cli": "2.120.58",
     "@abaplint/runtime": "2.13.91",
+    "@abaplint/open-abap-gui-converter": "^0.1.2",
     "@abaplint/transpiler-cli": "2.13.91"
   }
 }
