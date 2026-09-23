@@ -29,21 +29,23 @@ ENDFORM.
 
 CLASS lcl_hierseq_events IMPLEMENTATION.
   METHOD on_link.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'LINK_CLICK'.
     DATA lv_text TYPE c LENGTH 80.
 
-    EXPORT event = lv_event level = level row = row column = column
-      TO MEMORY ID 'ZGG_GUI_SALV_HIERSEQ_EVENT'.
+    gv_hierseq_event = 'LINK_CLICK'.
+    gv_event_level = level.
+    gv_event_row = row.
+    gv_event_column = column.
     lv_text = |LINK_CLICK level { level }, row { row }, column { column }|.
     MESSAGE lv_text TYPE 'S'.
   ENDMETHOD.
 
   METHOD on_double.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'DOUBLE_CLICK'.
     DATA lv_text TYPE c LENGTH 80.
 
-    EXPORT event = lv_event level = level row = row column = column
-      TO MEMORY ID 'ZGG_GUI_SALV_HIERSEQ_EVENT'.
+    gv_hierseq_event = 'DOUBLE_CLICK'.
+    gv_event_level = level.
+    gv_event_row = row.
+    gv_event_column = column.
     lv_text = |DOUBLE_CLICK level { level }, row { row }, column { column }|.
     MESSAGE lv_text TYPE 'S'.
   ENDMETHOD.
@@ -76,6 +78,6 @@ FORM unregister_hierseq_events.
       FOR go_native_hierseq_events ACTIVATION space.
   ENDIF.
   CLEAR: go_hierseq_events, go_native_hierseq_events, go_native_hierseq.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_SALV_HIERSEQ_EVENT'.
+  CLEAR: gv_native_events_registered, gv_hierseq_event, gv_event_level,
+    gv_event_row, gv_event_column.
 ENDFORM.

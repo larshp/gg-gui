@@ -15,44 +15,37 @@ DATA go_document_events TYPE REF TO lcl_document_events.
 
 CLASS lcl_document_events IMPLEMENTATION.
   METHOD on_link.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'LINK_CLICKED'.
-    DATA lv_value TYPE c LENGTH 250.
-
-    EXPORT event = lv_event element = sender->name value = lv_value
-      TO MEMORY ID 'ZGG_GUI_DD_EVENT'.
+    gv_document_event = 'LINK_CLICKED'.
+    gv_event_element = sender->name.
+    CLEAR gv_event_value.
     cl_gui_cfw=>set_new_ok_code( new_code = 'DD_EVENT' ).
   ENDMETHOD.
 
   METHOD on_button.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'BUTTON_CLICKED'.
-    DATA lv_value TYPE c LENGTH 250.
-
-    EXPORT event = lv_event element = sender->name value = lv_value
-      TO MEMORY ID 'ZGG_GUI_DD_EVENT'.
+    gv_document_event = 'BUTTON_CLICKED'.
+    gv_event_element = sender->name.
+    CLEAR gv_event_value.
     cl_gui_cfw=>set_new_ok_code( new_code = 'DD_EVENT' ).
   ENDMETHOD.
 
   METHOD on_entered.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'INPUT_ENTERED'.
-
-    EXPORT event = lv_event element = sender->name value = sender->value
-      TO MEMORY ID 'ZGG_GUI_DD_EVENT'.
+    gv_document_event = 'INPUT_ENTERED'.
+    gv_event_element = sender->name.
+    gv_event_value = sender->value.
     cl_gui_cfw=>set_new_ok_code( new_code = 'DD_EVENT' ).
   ENDMETHOD.
 
   METHOD on_help.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'INPUT_HELP_F1'.
-
-    EXPORT event = lv_event element = sender->name value = sender->value
-      TO MEMORY ID 'ZGG_GUI_DD_EVENT'.
+    gv_document_event = 'INPUT_HELP_F1'.
+    gv_event_element = sender->name.
+    gv_event_value = sender->value.
     cl_gui_cfw=>set_new_ok_code( new_code = 'DD_EVENT' ).
   ENDMETHOD.
 
   METHOD on_selected.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'SELECT_SELECTED'.
-
-    EXPORT event = lv_event element = sender->name value = sender->value
-      TO MEMORY ID 'ZGG_GUI_DD_EVENT'.
+    gv_document_event = 'SELECT_SELECTED'.
+    gv_event_element = sender->name.
+    gv_event_value = sender->value.
     cl_gui_cfw=>set_new_ok_code( new_code = 'DD_EVENT' ).
   ENDMETHOD.
 ENDCLASS.
@@ -100,6 +93,5 @@ FORM unregister_document_events.
   ENDIF.
   CLEAR: go_document_events, go_native_link, go_native_button,
     go_native_input, go_native_select.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_DD_EVENT'.
+  CLEAR: gv_native_events_registered, gv_document_event, gv_event_element, gv_event_value.
 ENDFORM.

@@ -97,10 +97,6 @@ MODULE user_command_0100 INPUT.
       PERFORM describe_mode.
       gv_status = 'Picture source, synchronous loading, fit mode, and border reset'.
     WHEN 'PIC_EVENT'.
-      IMPORT event = gv_picture_event
-        mouse_pos_x = gv_mouse_x mouse_pos_y = gv_mouse_y
-        FROM MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.
-      FREE MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.
       gv_status = |{ gv_picture_event } at original-image coordinate { gv_mouse_x },{ gv_mouse_y }|.
   ENDCASE.
 ENDMODULE.

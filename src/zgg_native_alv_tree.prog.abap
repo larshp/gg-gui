@@ -13,7 +13,7 @@ CLASS lcl_context_events IMPLEMENTATION.
                         text  = 'Show node details' ).
     menu->add_function( fcode = 'ZRESET'
                         text  = 'Reset sample' ).
-    EXPORT node_key = node_key TO MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.
+    gv_context_node = node_key.
     cl_gui_cfw=>set_new_ok_code( new_code = 'TREE_CTX' ).
   ENDMETHOD.
 ENDCLASS.
@@ -58,6 +58,5 @@ FORM unregister_context_event.
     SET HANDLER go_context_events->on_request FOR go_tree ACTIVATION space.
   ENDIF.
   CLEAR go_context_events.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.
+  CLEAR: gv_native_events_registered, gv_context_node.
 ENDFORM.

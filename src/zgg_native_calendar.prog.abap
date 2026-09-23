@@ -11,18 +11,16 @@ DATA go_calendar_events TYPE REF TO lcl_calendar_events.
 
 CLASS lcl_calendar_events IMPLEMENTATION.
   METHOD on_date.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'DATE_SELECTED'.
-
-    EXPORT event = lv_event date_begin = date_begin date_end = date_end
-      TO MEMORY ID 'ZGG_GUI_CALENDAR_EVENT'.
+    gv_calendar_event = 'DATE_SELECTED'.
+    gv_event_begin = date_begin.
+    gv_event_end = date_end.
     cl_gui_cfw=>set_new_ok_code( new_code = 'CAL_EVENT' ).
   ENDMETHOD.
 
   METHOD on_info.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'INFO_REQUEST'.
-
-    EXPORT event = lv_event date_begin = date_begin date_end = date_end
-      TO MEMORY ID 'ZGG_GUI_CALENDAR_EVENT'.
+    gv_calendar_event = 'INFO_REQUEST'.
+    gv_event_begin = date_begin.
+    gv_event_end = date_end.
     cl_gui_cfw=>set_new_ok_code( new_code = 'CAL_EVENT' ).
   ENDMETHOD.
 ENDCLASS.
@@ -64,6 +62,5 @@ FORM unregister_calendar_events.
     SET HANDLER go_calendar_events->on_info FOR go_native_calendar ACTIVATION space.
   ENDIF.
   CLEAR: go_calendar_events, go_native_calendar.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_CALENDAR_EVENT'.
+  CLEAR: gv_native_events_registered, gv_calendar_event, gv_event_begin, gv_event_end.
 ENDFORM.

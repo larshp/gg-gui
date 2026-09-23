@@ -83,9 +83,6 @@ MODULE user_command_0100 INPUT.
     WHEN 'RESET'.
       PERFORM reset_tree.
     WHEN 'SALV_EVT'.
-      IMPORT event = gv_salv_event node_key = gv_event_node
-        columnname = gv_event_column FROM MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.
-      FREE MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.
       gv_status = |SALV Tree { gv_salv_event } on node { gv_event_node }|.
       gv_detail = |Event column: { gv_event_column }|.
   ENDCASE.

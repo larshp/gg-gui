@@ -91,9 +91,6 @@ MODULE user_command_0100 INPUT.
       PERFORM free_calendar.
       PERFORM create_calendar.
     WHEN 'CAL_EVENT'.
-      IMPORT event = gv_calendar_event date_begin = gv_event_begin
-        date_end = gv_event_end FROM MEMORY ID 'ZGG_GUI_CALENDAR_EVENT'.
-      FREE MEMORY ID 'ZGG_GUI_CALENDAR_EVENT'.
       IF gv_calendar_event = 'INFO_REQUEST'.
         gv_focus = gv_event_begin.
         PERFORM set_day_info.

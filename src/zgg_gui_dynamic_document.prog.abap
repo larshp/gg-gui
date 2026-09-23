@@ -67,9 +67,6 @@ MODULE user_command_0100 INPUT.
     WHEN 'RESET'.
       PERFORM reset_document.
     WHEN 'DD_EVENT'.
-      IMPORT event = gv_document_event element = gv_event_element
-        value = gv_event_value FROM MEMORY ID 'ZGG_GUI_DD_EVENT'.
-      FREE MEMORY ID 'ZGG_GUI_DD_EVENT'.
       IF gv_document_event = 'INPUT_ENTERED'.
         gv_value = gv_event_value.
       ENDIF.

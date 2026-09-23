@@ -149,8 +149,6 @@ MODULE user_command_0100 INPUT.
     WHEN 'RESET'.
       PERFORM reset_tree.
     WHEN 'TREE_CTX'.
-      IMPORT node_key = gv_context_node FROM MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.
-      FREE MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.
       gv_status = |NODE_CONTEXT_MENU_REQUEST extended for node { gv_context_node }|.
       gv_detail = 'The request menu contains Show node details and Reset sample entries'.
   ENDCASE.

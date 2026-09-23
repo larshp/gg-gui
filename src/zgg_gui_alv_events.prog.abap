@@ -253,7 +253,6 @@ MODULE user_command_0100 INPUT.
     WHEN 'RESET'.
       PERFORM reset_sample.
     WHEN 'ALV_DELAYED'.
-      FREE MEMORY ID 'ZGG_GUI_ALV_DELAYED'.
       ADD 1 TO gv_event_count.
       gv_status = |DELAYED_CHANGED_SEL_CALLBACK received; event sequence { gv_event_count }|.
       gv_detail = 'Selection stabilized before the delayed native callback reached the application'.
