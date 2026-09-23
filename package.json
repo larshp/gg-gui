@@ -14,7 +14,7 @@
   "devDependencies": {
     "@abaplint/cli": "2.120.58",
     "@abaplint/runtime": "2.13.91",
-    "@abaplint/open-abap-gui-converter": "^0.1.3",
+    "@abaplint/open-abap-gui-converter": "^0.1.4",
     "@abaplint/transpiler-cli": "2.13.91"
   }
 }
