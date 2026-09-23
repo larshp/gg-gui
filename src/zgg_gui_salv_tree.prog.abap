@@ -340,6 +340,12 @@ ENDFORM.
 FORM free_controls.
   PERFORM unregister_salv_tree_events.
   CLEAR: go_nodes, go_columns, go_functions, go_selections, go_tree.
-  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
+  IF go_fallback IS BOUND.
+go_fallback->free( ).
+CLEAR go_fallback.
+ENDIF.
+  IF go_host IS BOUND.
+go_host->free( ).
+CLEAR go_host.
+ENDIF.
 ENDFORM.

@@ -316,9 +316,18 @@ ENDFORM.
 FORM free_controls.
   DATA lo_easy_container TYPE REF TO cl_gui_container.
 
-  IF go_easy_right IS BOUND. go_easy_right->free( ). CLEAR go_easy_right. ENDIF.
-  IF go_easy_left IS BOUND. go_easy_left->free( ). CLEAR go_easy_left. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
+  IF go_easy_right IS BOUND.
+go_easy_right->free( ).
+CLEAR go_easy_right.
+ENDIF.
+  IF go_easy_left IS BOUND.
+go_easy_left->free( ).
+CLEAR go_easy_left.
+ENDIF.
+  IF go_fallback IS BOUND.
+go_fallback->free( ).
+CLEAR go_fallback.
+ENDIF.
   IF go_easy IS BOUND.
     TRY.
         lo_easy_container ?= go_easy.
@@ -327,11 +336,32 @@ FORM free_controls.
     ENDTRY.
     CLEAR go_easy.
   ENDIF.
-  IF go_nested_right IS BOUND. go_nested_right->free( ). CLEAR go_nested_right. ENDIF.
-  IF go_nested_left IS BOUND. go_nested_left->free( ). CLEAR go_nested_left. ENDIF.
-  IF go_nested IS BOUND. go_nested->free( ). CLEAR go_nested. ENDIF.
-  IF go_html IS BOUND. go_html->free( ). CLEAR go_html. ENDIF.
-  IF go_editor IS BOUND. go_editor->free( ). CLEAR go_editor. ENDIF.
-  IF go_splitter IS BOUND. go_splitter->free( ). CLEAR go_splitter. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
+  IF go_nested_right IS BOUND.
+go_nested_right->free( ).
+CLEAR go_nested_right.
+ENDIF.
+  IF go_nested_left IS BOUND.
+go_nested_left->free( ).
+CLEAR go_nested_left.
+ENDIF.
+  IF go_nested IS BOUND.
+go_nested->free( ).
+CLEAR go_nested.
+ENDIF.
+  IF go_html IS BOUND.
+go_html->free( ).
+CLEAR go_html.
+ENDIF.
+  IF go_editor IS BOUND.
+go_editor->free( ).
+CLEAR go_editor.
+ENDIF.
+  IF go_splitter IS BOUND.
+go_splitter->free( ).
+CLEAR go_splitter.
+ENDIF.
+  IF go_host IS BOUND.
+go_host->free( ).
+CLEAR go_host.
+ENDIF.
 ENDFORM.

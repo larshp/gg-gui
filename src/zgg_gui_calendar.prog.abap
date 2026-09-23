@@ -240,11 +240,17 @@ ENDFORM.
 
 FORM free_calendar.
   PERFORM unregister_calendar_events.
-  IF go_control IS BOUND. go_control->free( ). CLEAR go_control. ENDIF.
+  IF go_control IS BOUND.
+go_control->free( ).
+CLEAR go_control.
+ENDIF.
   CLEAR go_calendar.
 ENDFORM.
 
 FORM free_controls.
   PERFORM free_calendar.
-  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
+  IF go_host IS BOUND.
+go_host->free( ).
+CLEAR go_host.
+ENDIF.
 ENDFORM.

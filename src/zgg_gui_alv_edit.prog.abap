@@ -378,7 +378,16 @@ ENDFORM.
 
 FORM free_controls.
   CLEAR: go_protocol, go_events.
-  IF go_grid IS BOUND. go_grid->free( ). CLEAR go_grid. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
+  IF go_grid IS BOUND.
+go_grid->free( ).
+CLEAR go_grid.
+ENDIF.
+  IF go_fallback IS BOUND.
+go_fallback->free( ).
+CLEAR go_fallback.
+ENDIF.
+  IF go_host IS BOUND.
+go_host->free( ).
+CLEAR go_host.
+ENDIF.
 ENDFORM.

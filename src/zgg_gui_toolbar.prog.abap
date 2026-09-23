@@ -239,11 +239,17 @@ FORM add_button_group.
 ENDFORM.
 
 FORM free_toolbar.
-  IF go_toolbar IS BOUND. go_toolbar->free( ). CLEAR go_toolbar. ENDIF.
+  IF go_toolbar IS BOUND.
+go_toolbar->free( ).
+CLEAR go_toolbar.
+ENDIF.
 ENDFORM.
 
 FORM free_controls.
   PERFORM free_toolbar.
   CLEAR: go_menu, go_submenu, go_events.
-  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
+  IF go_host IS BOUND.
+go_host->free( ).
+CLEAR go_host.
+ENDIF.
 ENDFORM.

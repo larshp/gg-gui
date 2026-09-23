@@ -157,9 +157,13 @@ FORM set_style_for_row USING is_row TYPE any.
   ENDIF.
   APPEND INITIAL LINE TO <lt_styles> ASSIGNING <ls_style>.
   ASSIGN COMPONENT 'FIELDNAME' OF STRUCTURE <ls_style> TO <lv_component>.
-  IF sy-subrc = 0. <lv_component> = 'ACTIVE'. ENDIF.
+  IF sy-subrc = 0.
+<lv_component> = 'ACTIVE'.
+ENDIF.
   ASSIGN COMPONENT 'STYLE' OF STRUCTURE <ls_style> TO <lv_component>.
-  IF sy-subrc = 0. <lv_component> = cl_gui_alv_grid=>mc_style_enabled. ENDIF.
+  IF sy-subrc = 0.
+<lv_component> = cl_gui_alv_grid=>mc_style_enabled.
+ENDIF.
 ENDFORM.
 
 FORM append_runtime_row.
@@ -270,9 +274,18 @@ FORM show_fallback USING iv_error TYPE string.
 ENDFORM.
 
 FORM free_controls.
-  IF go_grid IS BOUND. go_grid->free( ). CLEAR go_grid. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
+  IF go_grid IS BOUND.
+go_grid->free( ).
+CLEAR go_grid.
+ENDIF.
+  IF go_fallback IS BOUND.
+go_fallback->free( ).
+CLEAR go_fallback.
+ENDIF.
+  IF go_host IS BOUND.
+go_host->free( ).
+CLEAR go_host.
+ENDIF.
   UNASSIGN <gt_output>.
   CLEAR gr_table.
 ENDFORM.

@@ -155,7 +155,9 @@ CLASS lcl_events IMPLEMENTATION.
           gv_status = 'Composite tree accepts grid product payloads only'.
         ELSE.
           READ TABLE gt_all_rows WITH KEY id = lo_payload->id ASSIGNING FIELD-SYMBOL(<row>).
-          IF sy-subrc <> 0. RAISE EXCEPTION TYPE cx_sy_itab_line_not_found. ENDIF.
+          IF sy-subrc <> 0.
+RAISE EXCEPTION TYPE cx_sy_itab_line_not_found.
+ENDIF.
           <row>-category = COND #( WHEN node_key = 'DISPLAY' THEN 'Display' ELSE 'Input' ).
           PERFORM select_navigation USING node_key.
           gv_status = |Grid product { lo_payload->id } assigned through drop to { <row>-category }|.
@@ -198,7 +200,9 @@ CLASS lcl_events IMPLEMENTATION.
           gv_status = |Tree item { lo_payload->node_key } copied into grid at row { lines( gt_rows ) }|.
         ELSE.
           READ TABLE gt_rows INDEX lo_payload->row_index INTO DATA(ls_row).
-          IF sy-subrc <> 0. RAISE EXCEPTION TYPE cx_sy_itab_line_not_found. ENDIF.
+          IF sy-subrc <> 0.
+RAISE EXCEPTION TYPE cx_sy_itab_line_not_found.
+ENDIF.
           DELETE gt_rows INDEX lo_payload->row_index.
           DATA(lv_target) = COND i( WHEN es_row_no-row_id > lines( gt_rows )
             THEN lines( gt_rows ) + 1 ELSE es_row_no-row_id ).
@@ -441,7 +445,9 @@ FORM select_navigation USING iv_node TYPE tv_nodekey.
   ENDIF.
   CLEAR gt_rows.
   LOOP AT gt_all_rows INTO DATA(ls_row).
-    IF gv_filter IS INITIAL OR ls_row-category = gv_filter. APPEND ls_row TO gt_rows. ENDIF.
+    IF gv_filter IS INITIAL OR ls_row-category = gv_filter.
+APPEND ls_row TO gt_rows.
+ENDIF.
   ENDLOOP.
   IF go_grid IS BOUND.
     go_grid->refresh_table_display(
@@ -498,13 +504,17 @@ ENDFORM.
 
 FORM add_log USING iv_text TYPE c.
   INSERT CONV ty_text_line( |{ sy-uzeit TIME = USER }  { iv_text }| ) INTO gt_log INDEX 1.
-  IF lines( gt_log ) > 12. DELETE gt_log INDEX 13. ENDIF.
+  IF lines( gt_log ) > 12.
+DELETE gt_log INDEX 13.
+ENDIF.
 ENDFORM.
 
 FORM refresh_details.
   DATA lt_text TYPE ty_text_lines.
 
-  IF go_details IS NOT BOUND. RETURN. ENDIF.
+  IF go_details IS NOT BOUND.
+RETURN.
+ENDIF.
   lt_text = VALUE #(
     ( |Active child: { gv_active }; navigation filter: { gv_filter }; visible grid rows: { lines( gt_rows ) }| )
     ( |Detail: { gv_detail }| )
@@ -583,12 +593,36 @@ ENDFORM.
 
 FORM free_controls.
   CLEAR: go_events, go_dragdrop.
-  IF go_tree IS BOUND. go_tree->free( ). CLEAR go_tree. ENDIF.
-  IF go_toolbar IS BOUND. go_toolbar->free( ). CLEAR go_toolbar. ENDIF.
-  IF go_grid IS BOUND. go_grid->free( ). CLEAR go_grid. ENDIF.
-  IF go_details IS BOUND. go_details->free( ). CLEAR go_details. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). CLEAR go_fallback. ENDIF.
-  IF go_right_splitter IS BOUND. go_right_splitter->free( ). CLEAR go_right_splitter. ENDIF.
-  IF go_root_splitter IS BOUND. go_root_splitter->free( ). CLEAR go_root_splitter. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). CLEAR go_host. ENDIF.
+  IF go_tree IS BOUND.
+go_tree->free( ).
+CLEAR go_tree.
+ENDIF.
+  IF go_toolbar IS BOUND.
+go_toolbar->free( ).
+CLEAR go_toolbar.
+ENDIF.
+  IF go_grid IS BOUND.
+go_grid->free( ).
+CLEAR go_grid.
+ENDIF.
+  IF go_details IS BOUND.
+go_details->free( ).
+CLEAR go_details.
+ENDIF.
+  IF go_fallback IS BOUND.
+go_fallback->free( ).
+CLEAR go_fallback.
+ENDIF.
+  IF go_right_splitter IS BOUND.
+go_right_splitter->free( ).
+CLEAR go_right_splitter.
+ENDIF.
+  IF go_root_splitter IS BOUND.
+go_root_splitter->free( ).
+CLEAR go_root_splitter.
+ENDIF.
+  IF go_host IS BOUND.
+go_host->free( ).
+CLEAR go_host.
+ENDIF.
 ENDFORM.

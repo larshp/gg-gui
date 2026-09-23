@@ -51,17 +51,21 @@ MODULE user_command_0100 INPUT.
     WHEN 'MOVE'.
       gv_alternate = xsdbool( gv_alternate = abap_false ).
       IF gv_alternate = abap_true.
-        gv_left = 220. gv_top = 120.
+        gv_left = 220.
+gv_top = 120.
       ELSE.
-        gv_left = 80. gv_top = 60.
+        gv_left = 80.
+gv_top = 60.
       ENDIF.
       PERFORM apply_geometry.
     WHEN 'RESIZE'.
       gv_alternate = xsdbool( gv_alternate = abap_false ).
       IF gv_alternate = abap_true.
-        gv_width = 820. gv_height = 480.
+        gv_width = 820.
+gv_height = 480.
       ELSE.
-        gv_width = 600. gv_height = 320.
+        gv_width = 600.
+gv_height = 320.
       ENDIF.
       PERFORM apply_geometry.
     WHEN 'FULL'.
@@ -70,7 +74,10 @@ MODULE user_command_0100 INPUT.
       IF gv_fullscreen = abap_true.
         CLEAR: gv_left, gv_top, gv_width, gv_height.
       ELSE.
-        gv_left = 80. gv_top = 60. gv_width = 600. gv_height = 320.
+        gv_left = 80.
+gv_top = 60.
+gv_width = 600.
+gv_height = 320.
       ENDIF.
       PERFORM create_dialog.
     WHEN 'CAPTION'.
