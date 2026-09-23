@@ -5,7 +5,7 @@
   "write_source_map": true,
   "options": {
     "ignoreSyntaxCheck": false,
-    "unknownTypes": "runtimeError",
+    "unknownTypes": "compileError",
     "addFilenames": true,
     "addCommonJS": true
   },
