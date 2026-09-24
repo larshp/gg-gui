@@ -19,8 +19,7 @@ FORM register_native_delayed_event.
   TRY.
       CREATE OBJECT go_delayed_events.
       SET HANDLER go_delayed_events->on_delayed FOR go_grid.
-      go_grid->register_delayed_event(
-        i_event_id = cl_gui_alv_grid=>mc_evt_delayed_change_select ).
+      go_grid->register_delayed_event( i_event_id = cl_gui_alv_grid=>mc_evt_delayed_change_select ).
       gv_native_events_registered = abap_true.
     CATCH cx_root INTO DATA(lx_event_error).
       CLEAR go_delayed_events.

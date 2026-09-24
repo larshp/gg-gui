@@ -42,6 +42,8 @@
     "line_only_punc": true,
     "aff_and_xml": true,
     "main_file_contents": true,
+    "keyword_case": true,
+    "keep_single_parameter_on_one_line": true,
     "names_no_dash": true,
     "msag_consistency": true,
     "nrob_consistency": true,

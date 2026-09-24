@@ -429,8 +429,7 @@ FORM change_header.
     COND tv_heading( WHEN gv_header_alt = abap_true
       THEN 'Runtime hierarchy' ELSE 'Tree subject' ) ).
   go_tree->hierarchy_header_set_tooltip( 'Header text and width changed at runtime' ).
-  go_tree->hierarchy_header_set_width(
-    COND #( WHEN gv_header_alt = abap_true THEN 40 ELSE 30 ) ).
+  go_tree->hierarchy_header_set_width( COND #( WHEN gv_header_alt = abap_true THEN 40 ELSE 30 ) ).
   go_tree->hierarchy_header_get_width( IMPORTING width = lv_width ).
   cl_gui_cfw=>flush( ).
   gv_status = |Hierarchy heading changed; reported width { lv_width }|.

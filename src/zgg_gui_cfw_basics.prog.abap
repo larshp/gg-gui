@@ -108,8 +108,7 @@ MODULE user_command_0100 INPUT.
       PERFORM register_events.
       lcl_log=>add( |Application event flag: { gv_application_event }| ).
     WHEN 'RESIZE'.
-      go_editor->set_alignment(
-        cl_gui_control=>align_at_left + cl_gui_control=>align_at_top ).
+      go_editor->set_alignment( cl_gui_control=>align_at_left + cl_gui_control=>align_at_top ).
       go_editor->set_position( left   = 8
                                top    = 8
                                width  = 420

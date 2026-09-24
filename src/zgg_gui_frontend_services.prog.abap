@@ -353,8 +353,7 @@ FORM inspect_directories.
       cl_gui_frontend_services=>get_upload_download_path(
         CHANGING upload_path = lv_upload download_path = lv_download ).
       cl_gui_frontend_services=>directory_get_current( CHANGING current_directory = lv_current ).
-      cl_gui_frontend_services=>get_sapgui_directory(
-        CHANGING sapgui_directory = lv_sapgui ).
+      cl_gui_frontend_services=>get_sapgui_directory( CHANGING sapgui_directory = lv_sapgui ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Temp { gv_temp_dir }; Desktop { lv_desktop }|
         CHANGING log    = gt_log ).
