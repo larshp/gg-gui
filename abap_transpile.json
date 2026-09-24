@@ -1,6 +1,13 @@
 {
-  "input_folder": ["src"],
+  "input_folder": ["src", "output_converter"],
+  "exclude_filter": [
+    "\\.prog\\."
+  ],
   "output_folder": "output",
+  "converter": {
+    "input_folder": ["src"],
+    "output_folder": "output_converter"
+  },
   "write_unit_tests": true,
   "write_source_map": true,
   "options": {
