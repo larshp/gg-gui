@@ -142,7 +142,7 @@ FORM create_controls.
       gv_status = 'Container SALV created with generated columns, functions, formatting, events, and five demo rows'.
       gv_detail = 'Use the buttons to inspect selection/layout/export plus popup, fullscreen, and offline modes'.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_salv, go_events.
+      CLEAR: go_salv, go_events.
       PERFORM show_fallback USING lx_error.
   ENDTRY.
 ENDFORM.
@@ -498,7 +498,13 @@ FORM show_fallback USING io_error TYPE REF TO cx_root.
 ENDFORM.
 
 FORM free_controls.
-  FREE: go_events, go_salv.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  CLEAR: go_events, go_salv.
+  IF go_fallback IS BOUND.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
+  IF go_host IS BOUND.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

@@ -75,8 +75,7 @@ MODULE user_command_0100 INPUT.
       gv_status = |Display mode changed to { gv_mode_text }|.
     WHEN 'BORDER'.
       gv_border = xsdbool( gv_border = abap_false ).
-      go_picture->set_3d_border(
-        COND i( WHEN gv_border = abap_true THEN 1 ELSE 0 ) ).
+      go_picture->set_3d_border( COND i( WHEN gv_border = abap_true THEN 1 ELSE 0 ) ).
       gv_status = |3D border enabled: { gv_border }|.
     WHEN 'CLEAR'.
       go_picture->clear_picture( ).
@@ -97,10 +96,6 @@ MODULE user_command_0100 INPUT.
       PERFORM describe_mode.
       gv_status = 'Picture source, synchronous loading, fit mode, and border reset'.
     WHEN 'PIC_EVENT'.
-      IMPORT event = gv_picture_event
-        mouse_pos_x = gv_mouse_x mouse_pos_y = gv_mouse_y
-        FROM MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.
-      FREE MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.
       gv_status = |{ gv_picture_event } at original-image coordinate { gv_mouse_x },{ gv_mouse_y }|.
   ENDCASE.
 ENDMODULE.
@@ -113,8 +108,7 @@ FORM create_controls.
   CREATE OBJECT go_host EXPORTING container_name = 'CC_MAIN'.
   CREATE OBJECT go_picture EXPORTING parent = go_host.
   go_picture->set_display_mode( gv_mode ).
-  go_picture->set_3d_border(
-    COND i( WHEN gv_border = abap_true THEN 1 ELSE 0 ) ).
+  go_picture->set_3d_border( COND i( WHEN gv_border = abap_true THEN 1 ELSE 0 ) ).
   PERFORM register_native_picture_events.
   IF gv_native_events_registered = abap_true.
     gv_status = 'Picture click and double-click events registered; choose an image source'.
@@ -262,10 +256,10 @@ FORM free_controls.
   PERFORM unregister_picture_events.
   IF go_picture IS BOUND.
     go_picture->free( ).
-    FREE go_picture.
+    CLEAR go_picture.
   ENDIF.
   IF go_host IS BOUND.
     go_host->free( ).
-    FREE go_host.
+    CLEAR go_host.
   ENDIF.
 ENDFORM.

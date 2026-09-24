@@ -228,16 +228,22 @@ ENDFORM.
 FORM release_active.
   IF go_control IS BOUND.
     go_control->free( ).
-    FREE go_control.
+    CLEAR go_control.
   ENDIF.
 * The chart engine exposes no control lifetime method, so only its reference is
 * dropped and the frontend output disappears with the next rendered variant.
-  FREE go_chart_engine.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
+  CLEAR go_chart_engine.
+  IF go_fallback IS BOUND.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
   CLEAR gv_active_class.
 ENDFORM.
 
 FORM free_controls.
   PERFORM release_active.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_host IS BOUND.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

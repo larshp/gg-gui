@@ -10,18 +10,16 @@ DATA go_picture_events TYPE REF TO lcl_picture_events.
 
 CLASS lcl_picture_events IMPLEMENTATION.
   METHOD on_click.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'PICTURE_CLICK'.
-
-    EXPORT event = lv_event mouse_pos_x = mouse_pos_x mouse_pos_y = mouse_pos_y
-      TO MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.
+    gv_picture_event = 'PICTURE_CLICK'.
+    gv_mouse_x = mouse_pos_x.
+    gv_mouse_y = mouse_pos_y.
     cl_gui_cfw=>set_new_ok_code( new_code = 'PIC_EVENT' ).
   ENDMETHOD.
 
   METHOD on_double_click.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'PICTURE_DBLCLICK'.
-
-    EXPORT event = lv_event mouse_pos_x = mouse_pos_x mouse_pos_y = mouse_pos_y
-      TO MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.
+    gv_picture_event = 'PICTURE_DBLCLICK'.
+    gv_mouse_x = mouse_pos_x.
+    gv_mouse_y = mouse_pos_y.
     cl_gui_cfw=>set_new_ok_code( new_code = 'PIC_EVENT' ).
   ENDMETHOD.
 ENDCLASS.
@@ -43,14 +41,14 @@ FORM register_native_picture_events.
         EXCEPTIONS cntl_error = 1 cntl_system_error = 2
           illegal_event_combination = 3 OTHERS = 4 ).
       IF sy-subrc <> 0.
-        FREE go_picture_events.
+        CLEAR go_picture_events.
         RETURN.
       ENDIF.
       SET HANDLER go_picture_events->on_click FOR go_picture.
       SET HANDLER go_picture_events->on_double_click FOR go_picture.
       gv_native_events_registered = abap_true.
     CATCH cx_root INTO DATA(lx_event_error).
-      FREE go_picture_events.
+      CLEAR go_picture_events.
       CLEAR gv_native_events_registered.
       gv_status = |Native picture event registration failed: { lx_event_error->get_text( ) }|.
   ENDTRY.
@@ -61,7 +59,6 @@ FORM unregister_picture_events.
     SET HANDLER go_picture_events->on_click FOR go_picture ACTIVATION space.
     SET HANDLER go_picture_events->on_double_click FOR go_picture ACTIVATION space.
   ENDIF.
-  FREE go_picture_events.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_PICTURE_EVENT'.
+  CLEAR go_picture_events.
+  CLEAR: gv_native_events_registered, gv_picture_event, gv_mouse_x, gv_mouse_y.
 ENDFORM.

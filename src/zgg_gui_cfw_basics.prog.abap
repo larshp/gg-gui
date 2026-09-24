@@ -108,8 +108,7 @@ MODULE user_command_0100 INPUT.
       PERFORM register_events.
       lcl_log=>add( |Application event flag: { gv_application_event }| ).
     WHEN 'RESIZE'.
-      go_editor->set_alignment(
-        cl_gui_control=>align_at_left + cl_gui_control=>align_at_top ).
+      go_editor->set_alignment( cl_gui_control=>align_at_left + cl_gui_control=>align_at_top ).
       go_editor->set_position( left   = 8
                                top    = 8
                                width  = 420
@@ -191,15 +190,15 @@ ENDFORM.
 FORM free_controls.
   IF go_timer IS BOUND.
     go_timer->cancel( ).
-    FREE go_timer.
+    CLEAR go_timer.
   ENDIF.
   IF go_editor IS BOUND.
     go_editor->free( ).
-    FREE go_editor.
+    CLEAR go_editor.
   ENDIF.
   IF go_container IS BOUND.
     go_container->free( ).
-    FREE go_container.
+    CLEAR go_container.
   ENDIF.
-  FREE go_events.
+  CLEAR go_events.
 ENDFORM.

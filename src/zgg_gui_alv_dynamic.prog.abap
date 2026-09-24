@@ -91,7 +91,7 @@ FORM create_controls.
       gv_status = |Dynamic table created with { lines( gt_fieldcat ) } catalog fields and displayed in CL_GUI_ALV_GRID|.
       gv_detail = |Generated style component: { gv_style_field }; rows: { lines( <gt_output> ) }|.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_grid, gr_table.
+      CLEAR: go_grid, gr_table.
       UNASSIGN <gt_output>.
       lv_error_text = lx_error->get_text( ).
       PERFORM show_fallback USING lv_error_text.
@@ -157,9 +157,13 @@ FORM set_style_for_row USING is_row TYPE any.
   ENDIF.
   APPEND INITIAL LINE TO <lt_styles> ASSIGNING <ls_style>.
   ASSIGN COMPONENT 'FIELDNAME' OF STRUCTURE <ls_style> TO <lv_component>.
-  IF sy-subrc = 0. <lv_component> = 'ACTIVE'. ENDIF.
+  IF sy-subrc = 0.
+    <lv_component> = 'ACTIVE'.
+  ENDIF.
   ASSIGN COMPONENT 'STYLE' OF STRUCTURE <ls_style> TO <lv_component>.
-  IF sy-subrc = 0. <lv_component> = cl_gui_alv_grid=>mc_style_enabled. ENDIF.
+  IF sy-subrc = 0.
+    <lv_component> = cl_gui_alv_grid=>mc_style_enabled.
+  ENDIF.
 ENDFORM.
 
 FORM append_runtime_row.
@@ -270,9 +274,18 @@ FORM show_fallback USING iv_error TYPE string.
 ENDFORM.
 
 FORM free_controls.
-  IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_grid IS BOUND.
+    go_grid->free( ).
+    CLEAR go_grid.
+  ENDIF.
+  IF go_fallback IS BOUND.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
+  IF go_host IS BOUND.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
   UNASSIGN <gt_output>.
-  FREE gr_table.
+  CLEAR gr_table.
 ENDFORM.

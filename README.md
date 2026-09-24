@@ -52,6 +52,22 @@ not support the `CONTROLS` statement. Both abaplint and the transpiler use
 existing checkouts in `deps/open-abap-core` and `deps/open-abap-gui` when
 present, and otherwise clone from GitHub.
 
+## Run in the Browser
+
+```text
+npm install
+npm start
+```
+
+`npm start` converts the reports into open-abap-gui transaction classes
+(`output_converter/`), transpiles everything, and serves the transactions at
+`http://127.0.0.1:8080` through the `express-icf-shim` and
+`ZCL_GG_HTTP_HANDLER`. The start page lists every transaction;
+`/transaction?tcode=ZGG_GUI_CATALOG` opens one directly. `scripts/setup.mjs` loads the
+transpiled repository into an in-memory SQLite database, which the framework
+scans to discover the transaction classes. Set `GG_GUI_PORT` or `GG_GUI_HOST`
+to change the listen address.
+
 ## Catalog Areas
 
 | Area | Reports |

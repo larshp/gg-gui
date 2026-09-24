@@ -6,13 +6,18 @@
   "scripts": {
     "lint": "abaplint",
     "verify:repo": "node scripts/verify-repo.mjs",
-    "transpile": "abap_transpile",
+    "convert": "open-abap-gui-convert",
+    "transpile": "npm run convert && abap_transpile",
     "unit": "npm run transpile && node output/index.mjs",
+    "start": "npm run transpile && node scripts/start-server.mjs",
     "test": "npm run verify:repo && npm run lint && npm run unit"
   },
   "devDependencies": {
-    "@abaplint/cli": "2.120.58",
-    "@abaplint/runtime": "2.13.91",
-    "@abaplint/transpiler-cli": "2.13.91"
+    "@abaplint/cli": "2.120.59",
+    "@abaplint/database-sqlite": "2.13.83",
+    "@abaplint/runtime": "2.13.92",
+    "@abaplint/open-abap-gui-converter": "^0.1.8",
+    "@abaplint/transpiler-cli": "2.13.92",
+    "express": "4.22.3"
   }
 }
