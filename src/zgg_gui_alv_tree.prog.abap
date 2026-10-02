@@ -149,8 +149,6 @@ MODULE user_command_0100 INPUT.
     WHEN 'RESET'.
       PERFORM reset_tree.
     WHEN 'TREE_CTX'.
-      IMPORT node_key = gv_context_node FROM MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.
-      FREE MEMORY ID 'ZGG_GUI_ALV_TREE_CTX'.
       gv_status = |NODE_CONTEXT_MENU_REQUEST extended for node { gv_context_node }|.
       gv_detail = 'The request menu contains Show node details and Reset sample entries'.
   ENDCASE.
@@ -204,7 +202,7 @@ FORM create_controls.
       ENDIF.
       gv_detail = 'Lazy children are loaded only by the Load lazy action; duplicate loads are prevented'.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_tree, go_events, go_dragdrop.
+      CLEAR: go_tree, go_events, go_dragdrop.
       PERFORM show_fallback USING lx_error.
   ENDTRY.
 ENDFORM.
@@ -471,8 +469,17 @@ ENDFORM.
 
 FORM free_controls.
   PERFORM unregister_context_event.
-  FREE: go_events, go_dragdrop.
-  IF go_tree IS BOUND. go_tree->free( ). FREE go_tree. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  CLEAR: go_events, go_dragdrop.
+  IF go_tree IS BOUND.
+    go_tree->free( ).
+    CLEAR go_tree.
+  ENDIF.
+  IF go_fallback IS BOUND.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
+  IF go_host IS BOUND.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

@@ -48,9 +48,12 @@ CLASS lcl_events IMPLEMENTATION.
   METHOD on_menu_click.
     gv_status = |CONTEXTMENU_CLICKED item { no }|.
     CASE no.
-      WHEN 1. PERFORM start_mode USING cl_gui_ilidragndrop_control=>co_drag.
-      WHEN 2. PERFORM start_mode USING cl_gui_ilidragndrop_control=>co_resize_xy.
-      WHEN 3. PERFORM toggle_visibility.
+      WHEN 1.
+        PERFORM start_mode USING cl_gui_ilidragndrop_control=>co_drag.
+      WHEN 2.
+        PERFORM start_mode USING cl_gui_ilidragndrop_control=>co_resize_xy.
+      WHEN 3.
+        PERFORM toggle_visibility.
     ENDCASE.
   ENDMETHOD.
 ENDCLASS.
@@ -232,8 +235,17 @@ FORM show_unavailable USING iv_error TYPE string.
 ENDFORM.
 
 FORM free_controls.
-  FREE go_events.
-  IF go_ili IS BOUND. go_ili->free( ). FREE go_ili. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  CLEAR go_events.
+  IF go_ili IS BOUND.
+    go_ili->free( ).
+    CLEAR go_ili.
+  ENDIF.
+  IF go_fallback IS BOUND.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
+  IF go_host IS BOUND.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

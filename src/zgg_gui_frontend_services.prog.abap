@@ -353,8 +353,7 @@ FORM inspect_directories.
       cl_gui_frontend_services=>get_upload_download_path(
         CHANGING upload_path = lv_upload download_path = lv_download ).
       cl_gui_frontend_services=>directory_get_current( CHANGING current_directory = lv_current ).
-      cl_gui_frontend_services=>get_sapgui_directory(
-        CHANGING sapgui_directory = lv_sapgui ).
+      cl_gui_frontend_services=>get_sapgui_directory( CHANGING sapgui_directory = lv_sapgui ).
       zcl_gg_gui_demo_helper=>add_log(
         EXPORTING event = |Temp { gv_temp_dir }; Desktop { lv_desktop }|
         CHANGING log    = gt_log ).
@@ -481,16 +480,22 @@ FORM refresh_log.
       APPEND lv_log_line TO lt_text.
     ENDLOOP.
     TRY.
-      go_log->set_text_as_r3table( lt_text ).
-      cl_gui_cfw=>flush( ).
-      go_log->go_to_line( lines( gt_log ) ).
-      cl_gui_cfw=>flush( ).
+        go_log->set_text_as_r3table( lt_text ).
+        cl_gui_cfw=>flush( ).
+        go_log->go_to_line( lines( gt_log ) ).
+        cl_gui_cfw=>flush( ).
       CATCH cx_root.
     ENDTRY.
   ENDIF.
 ENDFORM.
 
 FORM free_controls.
-  IF go_log IS BOUND. go_log->free( ). FREE go_log. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_log IS BOUND.
+    go_log->free( ).
+    CLEAR go_log.
+  ENDIF.
+  IF go_host IS BOUND.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

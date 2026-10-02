@@ -18,7 +18,7 @@ TOP-OF-PAGE.
   FORMAT RESET.
   ULINE.
 
-END-OF-PAGE.
+  END-OF-PAGE.
   ULINE.
   FORMAT COLOR COL_HEADING.
   WRITE: / 'Page', sy-pagno, 20 'Generated', sy-datum, sy-uzeit,

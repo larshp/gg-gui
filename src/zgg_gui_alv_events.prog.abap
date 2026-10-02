@@ -253,7 +253,6 @@ MODULE user_command_0100 INPUT.
     WHEN 'RESET'.
       PERFORM reset_sample.
     WHEN 'ALV_DELAYED'.
-      FREE MEMORY ID 'ZGG_GUI_ALV_DELAYED'.
       ADD 1 TO gv_event_count.
       gv_status = |DELAYED_CHANGED_SEL_CALLBACK received; event sequence { gv_event_count }|.
       gv_detail = 'Selection stabilized before the delayed native callback reached the application'.
@@ -347,7 +346,7 @@ FORM create_grid.
         PERFORM register_native_delayed_event.
       ENDIF.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_grid, go_events.
+      CLEAR: go_grid, go_events.
       PERFORM show_fallback USING lx_error.
   ENDTRY.
 ENDFORM.
@@ -407,8 +406,11 @@ ENDFORM.
 FORM toggle_event_mode.
   gv_application_events = xsdbool( gv_application_events = abap_false ).
   PERFORM unregister_delayed_event.
-  IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
-  FREE go_events.
+  IF go_grid IS BOUND.
+    go_grid->free( ).
+    CLEAR go_grid.
+  ENDIF.
+  CLEAR go_events.
   PERFORM create_grid.
   gv_status = |Grid recreated with application-event mode { gv_application_events }|.
   gv_detail = COND #( WHEN gv_application_events = abap_true
@@ -446,8 +448,17 @@ ENDFORM.
 
 FORM free_controls.
   PERFORM unregister_delayed_event.
-  FREE: go_events, go_dragdrop.
-  IF go_grid IS BOUND. go_grid->free( ). FREE go_grid. ENDIF.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  CLEAR: go_events, go_dragdrop.
+  IF go_grid IS BOUND.
+    go_grid->free( ).
+    CLEAR go_grid.
+  ENDIF.
+  IF go_fallback IS BOUND.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
+  IF go_host IS BOUND.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

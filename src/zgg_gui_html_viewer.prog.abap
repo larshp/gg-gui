@@ -303,8 +303,11 @@ FORM free_controls.
   IF go_viewer IS BOUND.
     go_viewer->close_document( ).
     go_viewer->free( ).
-    FREE go_viewer.
+    CLEAR go_viewer.
   ENDIF.
-  FREE go_events.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  CLEAR go_events.
+  IF go_host IS BOUND.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

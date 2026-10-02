@@ -2,9 +2,9 @@ PROCESS BEFORE OUTPUT.
   MODULE status_0100.
   LOOP AT gt_rows INTO gs_row WITH CONTROL tc_rows
     CURSOR tc_rows-current_line.
-    MODULE row_attributes.
-  ENDLOOP.
-  MODULE restore_cursor.
+  MODULE row_attributes.
+ENDLOOP.
+MODULE restore_cursor.
 
 PROCESS AFTER INPUT.
   MODULE exit_0100 AT EXIT-COMMAND.

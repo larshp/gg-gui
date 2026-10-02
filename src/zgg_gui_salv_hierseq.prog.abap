@@ -100,6 +100,7 @@ FORM create_controls.
       ENDIF.
       PERFORM configure_levels.
       PERFORM register_native_hierseq_events.
+      CLEAR: gv_hierseq_event, gv_event_level, gv_event_row, gv_event_column.
       go_hierseq->display( ).
       PERFORM consume_native_hierseq_event.
       IF gv_hierseq_event IS INITIAL.
@@ -111,7 +112,7 @@ FORM create_controls.
         gv_detail = 'GROUP_ID is the explicit master/slave binding; header and item structures remain separate'.
       ENDIF.
     CATCH cx_root INTO DATA(lx_error).
-      FREE: go_hierseq, go_header_columns, go_item_columns,
+      CLEAR: go_hierseq, go_header_columns, go_item_columns,
         go_item_sorts, go_item_filters, go_item_aggregations.
       lv_error = lx_error->get_text( ).
       PERFORM show_fallback USING lv_error.
@@ -184,10 +185,6 @@ ENDFORM.
 
 
 FORM consume_native_hierseq_event.
-  CLEAR: gv_hierseq_event, gv_event_level, gv_event_row, gv_event_column.
-  IMPORT event = gv_hierseq_event level = gv_event_level row = gv_event_row
-    column = gv_event_column FROM MEMORY ID 'ZGG_GUI_SALV_HIERSEQ_EVENT'.
-  FREE MEMORY ID 'ZGG_GUI_SALV_HIERSEQ_EVENT'.
   IF gv_hierseq_event IS NOT INITIAL.
     gv_status = |Hierseq { gv_hierseq_event } at level { gv_event_level }, row { gv_event_row }|.
     gv_detail = |Event column: { gv_event_column }|.
@@ -294,8 +291,14 @@ ENDFORM.
 
 FORM free_controls.
   PERFORM unregister_hierseq_events.
-  FREE: go_header_columns, go_item_columns, go_item_sorts,
+  CLEAR: go_header_columns, go_item_columns, go_item_sorts,
     go_item_filters, go_item_aggregations, go_hierseq.
-  IF go_fallback IS BOUND. go_fallback->free( ). FREE go_fallback. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_fallback IS BOUND.
+    go_fallback->free( ).
+    CLEAR go_fallback.
+  ENDIF.
+  IF go_host IS BOUND.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

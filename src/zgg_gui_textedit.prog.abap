@@ -231,6 +231,12 @@ FORM save_file.
 ENDFORM.
 
 FORM free_controls.
-  IF go_editor IS BOUND. go_editor->free( ). FREE go_editor. ENDIF.
-  IF go_host IS BOUND. go_host->free( ). FREE go_host. ENDIF.
+  IF go_editor IS BOUND.
+    go_editor->free( ).
+    CLEAR go_editor.
+  ENDIF.
+  IF go_host IS BOUND.
+    go_host->free( ).
+    CLEAR go_host.
+  ENDIF.
 ENDFORM.

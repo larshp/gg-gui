@@ -1,14 +1,23 @@
 {
-  "input_folder": ["src"],
-  "input_filter": [],
+  "input_folder": ["src", "output_converter"],
   "exclude_filter": [
+    "\\.prog\\.",
+    "\\.manifest\\.json"
   ],
   "output_folder": "output",
+  "converter": {
+    "input_folder": ["src"],
+    "output_folder": "output_converter"
+  },
   "write_unit_tests": true,
   "write_source_map": true,
   "options": {
+    "setup": {
+      "filename": "../scripts/setup.mjs",
+      "preFunction": "setupDatabase"
+    },
     "ignoreSyntaxCheck": false,
-    "unknownTypes": "runtimeError",
+    "unknownTypes": "compileError",
     "addFilenames": true,
     "addCommonJS": true
   },
@@ -20,7 +29,11 @@
     {
       "url": "https://github.com/open-abap/open-abap-gui",
       "folder": "/deps/open-abap-gui",
-      "files": ["/src/**", "/scaffold/**"]
+      "files": ["/src/**", "/framework/**"]
+    },
+    {
+      "url": "https://github.com/open-abap/express-icf-shim",
+      "folder": "/deps/express-icf-shim"
     }
   ]
 }

@@ -13,18 +13,16 @@ DATA gv_tree_factory_error TYPE string.
 
 CLASS lcl_salv_tree_events IMPLEMENTATION.
   METHOD on_link.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'LINK_CLICK'.
-
-    EXPORT event = lv_event node_key = node_key columnname = columnname
-      TO MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.
+    gv_salv_event = 'LINK_CLICK'.
+    gv_event_node = node_key.
+    gv_event_column = columnname.
     cl_gui_cfw=>set_new_ok_code( new_code = 'SALV_EVT' ).
   ENDMETHOD.
 
   METHOD on_double.
-    DATA lv_event TYPE c LENGTH 24 VALUE 'DOUBLE_CLICK'.
-
-    EXPORT event = lv_event node_key = node_key columnname = columnname
-      TO MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.
+    gv_salv_event = 'DOUBLE_CLICK'.
+    gv_event_node = node_key.
+    gv_event_column = columnname.
     cl_gui_cfw=>set_new_ok_code( new_code = 'SALV_EVT' ).
   ENDMETHOD.
 ENDCLASS.
@@ -38,7 +36,7 @@ FORM create_native_salv_tree.
         CHANGING  t_table     = gt_rows ).
       go_tree = go_native_salv_tree.
     CATCH cx_root INTO DATA(lx_factory_error).
-      FREE go_native_salv_tree.
+      CLEAR go_native_salv_tree.
       CLEAR go_tree.
       gv_tree_factory_error = lx_factory_error->get_text( ).
   ENDTRY.
@@ -57,7 +55,7 @@ FORM register_salv_tree_events.
       SET HANDLER go_salv_tree_events->on_double FOR go_native_salv_events.
       gv_native_events_registered = abap_true.
     CATCH cx_root INTO DATA(lx_event_error).
-      FREE: go_salv_tree_events, go_native_salv_events, go_native_salv_tree.
+      CLEAR: go_salv_tree_events, go_native_salv_events, go_native_salv_tree.
       CLEAR gv_native_events_registered.
       gv_detail = |Native SALV tree event registration failed: { lx_event_error->get_text( ) }|.
   ENDTRY.
@@ -70,7 +68,6 @@ FORM unregister_salv_tree_events.
     SET HANDLER go_salv_tree_events->on_double
       FOR go_native_salv_events ACTIVATION space.
   ENDIF.
-  FREE: go_salv_tree_events, go_native_salv_events, go_native_salv_tree.
-  CLEAR gv_native_events_registered.
-  FREE MEMORY ID 'ZGG_GUI_SALV_TREE_EVENT'.
+  CLEAR: go_salv_tree_events, go_native_salv_events, go_native_salv_tree.
+  CLEAR: gv_native_events_registered, gv_salv_event, gv_event_node, gv_event_column.
 ENDFORM.
