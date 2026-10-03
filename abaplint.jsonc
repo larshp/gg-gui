@@ -13,6 +13,11 @@
       "files": "/src/**/*.*"
     },
     {
+      "url": "https://github.com/open-abap/open-abap-bal",
+      "folder": "/deps/open-abap-bal",
+      "files": "/src/**/*.*"
+    },
+    {
       "url": "https://github.com/open-abap/open-abap-gui",
       "folder": "/deps/open-abap-gui",
       "files": "/src/**/*.*"

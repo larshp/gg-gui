@@ -1,8 +1,7 @@
 {
   "input_folder": ["src", "output_converter"],
   "exclude_filter": [
-    "\\.prog\\.",
-    "\\.manifest\\.json"
+    "\\.prog\\."
   ],
   "output_folder": "output",
   "converter": {
@@ -25,6 +24,10 @@
     {
       "url": "https://github.com/open-abap/open-abap-core",
       "folder": "/deps/open-abap-core"
+    },
+    {
+      "url": "https://github.com/open-abap/open-abap-bal",
+      "folder": "/deps/open-abap-bal"
     },
     {
       "url": "https://github.com/open-abap/open-abap-gui",
